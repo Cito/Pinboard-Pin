@@ -1,0 +1,51 @@
+{
+
+  "manifest_version": 2,
+
+  "name": "Pinboard Pin",
+  "version": "0.1.0",
+  "description": "A modern web extension for pinning pages on Pinboard (pinboard.in) with Firefox.",
+  "homepage_url": "https://github.com/Cito/Pinboard-Pin",
+
+  "options_ui": {
+    "page": "/index.html?page=options"
+  },
+
+  "icons": {
+    "16": "/img/pinboard_16.png",
+    "24": "/img/pinboard_24.png",
+    "32": "/img/pinboard_32.png",
+    "48": "/img/pinboard_48.png",
+    "64": "/img/pinboard_64.png",
+    "96": "/img/pinboard_96.png",
+    "128": "/img/pinboard_128.png",
+    "256": "/img/pinboard_256.png"
+  },
+
+  "background": {
+    "page": "/index.html?page=background"
+  },
+
+  "browser_action": {
+     "default_title": "Pinboard Pin",
+     "default_icon": {
+        "16": "/img/pinboard_idle_16.png",
+        "24": "/img/pinboard_idle_24.png",
+        "32": "/img/pinboard_idle_32.png",
+        "48": "/img/pinboard_idle_48.png",
+        "64": "/img/pinboard_idle_64.png",
+        "96": "/img/pinboard_idle_96.png",
+        "128": "/img/pinboard_idle_128.png",
+        "256": "/img/pinboard_idle_256.png"
+     },
+     "default_popup": "/index.html"
+  },
+
+  "permissions": [
+    "storage",
+    "tabs",
+    "http://*/*",
+    "https://*/*"
+  ]
+
+}

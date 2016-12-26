@@ -1,0 +1,123 @@
+<div class="popup">
+
+<h1 *ngIf="!ready">Loading page from Pinboard...</h1>
+<h1 *ngIf="ready && !update">Save page to Pinboard</h1>
+<h1 *ngIf="ready && update">Update page in Pinboard</h1>
+
+<div class="buttons">
+<button type="button" (click)="pinboardLink('')">
+  Pinboard home
+</button>
+<button type="button" (click)="pinboardLink('~/starred/')">
+  Favorites
+</button>
+<button type="button" (click)="pinboardLink('~/unread/')">
+  Unread
+</button>
+<button type="button" (click)="pinboardLink('random/?type=unread')">
+  Random unread
+</button>
+<button type="button" (click)="pinboardLink('popular/')">
+  Popular
+</button>
+<button type="button" (click)="pinboardLink('recent/')">
+  Recent
+</button>
+<button type="button" (click)="pinboardLink('settings/')">
+  Pinboard settings
+</button>
+<button type="button" (click)="settings()">
+  Pinboard&nbsp;Pin settings
+</button>
+<button type="button" (click)="logOut()">
+  Log out
+</button>
+</div>
+
+<form *ngIf="!error" (ngSubmit)="submit(f)" #f="ngForm">
+  <div class="info">
+    <label></label>
+    <span *ngIf="update && !date" class="info">
+      This page has already been added as a bookmark to Pinboard.
+    </span><span *ngIf="update && date" class="info">
+      This page has already been added as a bookmark to Pinboard {{date | ago}}.
+    </span><span *ngIf="!update" class="note">
+      This page has not yet been added as a bookmark to Pinboard.
+    </span>
+  </div><div>
+    <label for="url">URL:</label>
+    <input id="url" name="url" type="url" size="64" required
+           maxlength="2000" [disabled]="!ready" [ngModel]="url">
+  </div><div>
+    <label for="title">Title:</label>
+    <input id="title" name="title" type="text" size="64" required
+           maxlength="255" [disabled]="!ready" [ngModel]="title">
+  </div><div>
+    <label for="description">Description:</label>
+    <textarea id="description" name="description" cols="64" rows="4"
+              maxlength="64000" [disabled]="!ready" [ngModel]="description">
+    </textarea>
+  </div><div class="completions">
+    <ul *ngIf="ready && tagsFocus && completions">
+      <li *ngFor="let tag of completions, let i = index"
+          (mouseover)="tagSelected = i" (mousedown)="selectCompletion(tag)"
+          [class.selected]="i == tagSelected">{{tag}}</li>
+    </ul>
+  </div><div>
+    <label for="tags">Tags:</label>
+    <input id="tags" name="tags" type="text" size="64" autocomplete="off"
+           (focus)="tagsFocus = true" (blur)="tagsFocus = false"
+           (keydown)="tagsKeyDown($event)" (keyup)="tagsKeyUp($event)"
+           maxlength="6400" [disabled]="!ready" [ngModel]="tags">
+  </div><div *ngIf="suggested && suggested.length">
+    <label>Suggested:</label>
+    <span class="suggested">
+      <a *ngFor="let tag of suggested" href="#" (click)="addTags(tag)"
+         [class.added]="hasTags(tag)">{{tag}}</a>
+      <a href="#" (click)="addTags(suggested)"
+         [class.added]="suggested.length > 1 && hasTags(suggested)">Add all</a>
+    </span>
+  </div><div *ngIf="popular && popular.length">
+    <label>Popular:</label>
+    <span class="suggested">
+      <a *ngFor="let tag of popular" href="#" (click)="addTags(tag)"
+         [class.added]="hasTags(tag)">{{tag}}</a>
+      <a href="#" (click)="addTags(popular)"
+         [class.added]="popular.length > 1 && hasTags(popular)">Add all</a>
+    </span>
+  </div><div *ngIf="keywords && keywords.length">
+    <label>Keywords:</label>
+    <span class="suggested">
+      <a *ngFor="let tag of keywords" href="#" (click)="addTags(tag)"
+         [class.added]="hasTags(tag)">{{tag}}</a>
+      <a href="#" (click)="addTags(keywords)"
+         [class.added]="hasTags(keywords.length > 1 && keywords)">Add all</a>
+    </span>
+  </div>
+  <div class="submit">
+    <label></label>
+    <input type="checkbox" id="unshared" name="unshared" [ngModel]="unshared">
+    <label for="unshared">private</label>
+    <input type="checkbox" id="toread" name="toread" [ngModel]="toread">
+    <label for="toread">to read</label>
+    <button type="button" (click)="cancel()">Cancel</button>
+    <button *ngIf="update" type="button" [disabled]="!ready" (click)="remove()">
+      Remove bookmark</button>
+    <button type="submit"
+            [disabled]="!ready || !f.valid || !f.controls.url?.value">
+      {{ update ? 'Update bookmark' : 'Add bookmark' }}
+    </button>
+  </div>
+</form>
+
+<p *ngIf="error" class="error">{{error}}</p>
+
+<form *ngIf="error">
+  <div class="submit">
+    <label></label>
+    <button (click)="cancel()">Cancel</button>
+    <button *ngIf="retry" (click)="retry()">Try again</button>
+  </div>
+</form>
+
+</div>

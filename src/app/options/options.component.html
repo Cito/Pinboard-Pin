@@ -1,0 +1,35 @@
+<div [class]="page">
+
+<div *ngIf="page == 'popup'">
+  <button type="button" (click)="close()">Close</button>
+</div>
+
+<h1>{{ page == 'popup'? 'Pinboard Pin Options' : 'Options' }}</h1>
+
+<form (ngSubmit)="submit(f)" #f="ngForm">
+<div>
+  <input type="checkbox" id="ping" name="ping" [ngModel]="options?.ping"
+         (change)="submit(f)" [disabled]="!options">
+  <label for="ping">Always check and show whether pages have been bookmarked</label>
+</div>
+<hr>
+<div>
+  <input type="checkbox" id="unshared" name="unshared" [ngModel]="options?.unshared"
+         (change)="submit(f)" [disabled]="!options">
+  <label for="unshared">Add new bookmarks as private by default</label>
+</div>
+<hr>
+<div>
+  <input type="checkbox" id="toread" name="toread" [ngModel]="options?.toread"
+         (change)="submit(f)" [disabled]="!options">
+  <label for="toread">Add new bookmarks as unread by default</label>
+</div>
+<hr>
+<div>
+  <input type="checkbox" id="blockquote" name="blockquote" [ngModel]="options?.blockquote"
+         (change)="submit(f)" [disabled]="!options">
+  <label for="blockquote">Wrap selected description as a block quote</label>
+</div>
+</form>
+
+</div>

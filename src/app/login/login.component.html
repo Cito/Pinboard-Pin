@@ -1,0 +1,29 @@
+<div class="popup">
+
+<h1>Log in to Pinboard</h1>
+
+<p>You must log in to Pinboard first using the API token
+  that you can find on your
+  <a href="#" (click)="openPasswordPage()">Pinboard password page</a>.</p>
+
+<form (ngSubmit)="submit(f)" #f="ngForm">
+  <div>
+    <label *ngIf="!checking" for="token">
+      <span *ngIf="!error">Please enter your API token:</span>
+      <span *ngIf="error" class="error">Invalid API token, please re-enter:</span>
+    </label>
+    <label *ngIf="checking"><span class="info">Trying to log in
+      with this API token...</span></label>
+  </div>
+  <div>
+    <input id="token" name="token" type="text" size="40"
+           pattern=".+:.+" placeholder="API Token" autofocus="autofocus"
+           [disabled]="checking" ngModel>
+    <button type="submit"
+            [disabled]="checking || !f.valid || !f.controls.token?.value">
+      Log in
+    </button>
+  </div>
+</form>
+
+</div>

@@ -1,0 +1,31 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# compiled output
+/dist
+/tmp
+
+# built extensions
+*.xpi
+*.zip
+
+# dependencies
+/node_modules
+
+# IDEs and editors
+/.idea
+/.vscode
+.project
+.classpath
+*.launch
+.settings/
+
+# misc
+/connect.lock
+/coverage/*
+/libpeerconnection.log
+npm-debug.log
+/typings
+
+#System Files
+.DS_Store
+Thumbs.db

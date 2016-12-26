@@ -1,0 +1,150 @@
+.popup {
+  width: 40em;
+}
+
+h1 {
+  font-size: 24px;
+  line-height: 36px;
+  background: url("/img/pinboard_32.png") no-repeat;
+  padding: 2px 48px;
+  margin: 0 0 4pt;
+  border-bottom: 1px solid #136;
+}
+
+.error {
+  color: #a00;
+  text-align: center;
+  font-weight: bold;
+}
+
+div.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8pt;
+  margin-bottom: 16pt;
+}
+
+div.buttons button {
+  font-size: 8pt;
+}
+
+form div {
+  display: flex;
+  align-items: baseline;
+  margin: 3pt 0;
+  width: 40em;
+}
+
+form div label {
+  font-size: 10pt;
+  margin-right: 5pt;
+  text-align: right;
+  width: 5em;
+}
+
+form div.info {
+  font-size: 10pt;
+  margin-bottom: 6pt;
+}
+
+span.info {
+  color: #375;
+}
+
+span.note {
+  color: #666;
+}
+
+span.suggested {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  width: 36em;
+}
+
+span.suggested a {
+  font-size: 10pt;
+  color: #136;
+  margin-right: 6pt;
+  text-decoration: none;
+}
+
+span.suggested a.added {
+  color: #888;
+}
+
+span.suggested a:last-child {
+  font-weight: bold;
+}
+
+span.suggested a:nth-last-child(2) {
+  margin-right: 9pt;
+}
+
+form div input[type=checkbox] + label {
+  font-size: 11pt;
+  margin-left: 5pt;
+  margin-right: 2em;
+  text-align: left;
+  width: auto;
+}
+
+form div input[type=text], form div input[type=url], form div textarea {
+  width: 38em;
+  font-family: sans-serif;
+  font-size: 11pt;
+}
+
+form div.submit {
+  margin-top: 12pt;
+}
+
+form div.submit button {
+  margin-left: 8pt;
+}
+
+form div.submit label + button {
+  margin-left: auto;
+}
+
+button {
+  border-width: 1px;
+}
+
+button[type=submit] {
+  border-width: 2px;
+}
+
+form div.completions {
+  display: block;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  height: 0;
+  width: 40em;
+}
+
+.completions ul {
+  position: absolute;
+  font-size: 11pt;
+  list-style-type: none;
+  bottom: 4pt;
+  left: 55pt;
+  width: 16em;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+  border: 1px solid #333;
+  box-shadow: 3pt 3pt 3pt #333;
+  color: #136;
+  z-index: 9;
+}
+
+.completions li {
+  padding: 1pt 2pt;
+}
+
+.completions li.selected {
+  background-color: #136;
+  color: #ccc;
+}
