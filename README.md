@@ -31,7 +31,7 @@ Also note that if you are using the Privacy Badger extension and Pinboard Pin sh
 Development:
 ------------
 
-- Follow the instructions outlined in [DEVELOP.md](https://github.com/cito/Pinboard-Pin/blob/master/DEVELOP.md) if you want to run this extension in development mode.
+- Follow the instructions outlined in [DEVELOP.md](https://github.com/cito/Pinboard-Pin/blob/master/DEVELOP.md) if you want to build this extension on your own or run it in development mode.
 - Contact the author, open GitHub issues or send in pull requests to contribute.
 
 Author:

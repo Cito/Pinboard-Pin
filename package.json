@@ -1,15 +1,13 @@
 {
   "name": "pinboard-pin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
     "build": "ng build --aot",
-    "build:prod": "npm run clean && ng build --aot --prod --sourcemap=false",
+    "build:prod": "ng build --aot --prod --sourcemap=false && node finish",
     "build:ext": "web-ext build --source-dir=dist --artifacts-dir=.",
-    "build:zip": "npm run build:prod && npm run clean:gz && npm run build:ext",
-    "clean": "rm -rf dist",
-    "clean:gz": "rm dist/*.js.gz",
+    "build:zip": "npm run build:prod && npm run build:ext",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "web-ext run --source-dir=dist --firefox=\"C:/Program Files/Mozilla Firefox/firefox.exe\""
   },

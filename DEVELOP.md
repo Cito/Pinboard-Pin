@@ -1,7 +1,7 @@
 Development Notes for Pinboard Pin
 ==================================
 
-This is an add-on for pinning pages on [Pinboard](https://pinboard.in) in the web browser, based on the [WebExtensions](https://developer.mozilla.org/de/Add-ons/WebExtensions) system. This web extension has been developed for and tested with Firefox 50 for Windows and Linux. Since WebExtensions was created as a cross-browser standard, it should be portable to other platforms and web browsers like Chrome, Opera or Edge with only few adaptions.
+This is an add-on for pinning pages on [Pinboard](https://pinboard.in) in the web browser, based on the [WebExtensions](https://developer.mozilla.org/de/Add-ons/WebExtensions) system. This web extension has been developed for and tested with Firefox 50 for Windows and Linux. Since WebExtensions was created as a cross-browser standard, it should be portable to other platforms and web browsers like Chrome, Opera or Edge with only few adaptations.
 
 The web extension has been created using [Angular](https://angular.io/) and the [Angular CLI](https://github.com/angular/angular-cli).
 
@@ -10,7 +10,6 @@ Installation
 
 Install the application for development:
 
-    npm install -g angular-cli
     npm install
 
 Building and testing
@@ -24,7 +23,11 @@ Test extension with Firefox:
 
     npm run test
 
-Build signed extension to be released:
+Build unsigned extension for production:
+
+    npm run build:prod
+
+Package unsigned extension as zip file:
 
     npm run build:zip
 
