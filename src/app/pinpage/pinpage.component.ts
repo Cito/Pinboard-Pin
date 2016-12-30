@@ -8,6 +8,7 @@ import {Subscription, Subject} from "rxjs";
 import {IconService} from "../icon.service";
 import {PinboardService, pinboardPage} from "../pinboard.service";
 import {Options, StorageService} from "../storage.service";
+import {NgForm} from "@angular/forms";
 
 const debounceTime = 250; // timeout in ms for reacting to changes
 const maxCompletions = 9; // maximum number of suggested completions
@@ -111,13 +112,13 @@ export class PinPageComponent implements OnInit, OnDestroy {
   setData(data: any): void {
     if (data.posts && data.posts.length) {
       this.date = data ? data.date : null;
-      data = data.posts[0];
-      this.url = data.href;
-      this.title = data.description;
-      this.description = data.extended;
-      this.tags = data.tags;
-      this.unshared = data.shared != 'yes';
-      this.toread = data.toread == 'yes';
+      const post = data.posts[0];
+      this.url = post.href;
+      this.title = post.description;
+      this.description = post.extended;
+      this.tags = post.tags;
+      this.unshared = post.shared != 'yes';
+      this.toread = post.toread == 'yes';
       this.update = true;
       // set browser icon to saved state
       browser.tabs.query({url: this.url}).then(tabs => {
@@ -189,7 +190,9 @@ export class PinPageComponent implements OnInit, OnDestroy {
           words.pop();
         if (words.indexOf(tag) < 0) {
           words.push(tag);
-          event.target.value = words.join(' ') + ' ';
+          value = words.join(' ') + ' ';
+          this.tagsChanged(value);
+          this.tags = value;
         }
         break;
       default:
@@ -262,8 +265,9 @@ export class PinPageComponent implements OnInit, OnDestroy {
   }
 
   // submit form (save page to Pinboard)
-  submit({value, valid}: {value: Post, valid: boolean}) {
-    if (!valid) return false;
+  submit(form: NgForm) {
+    if (!form.valid) return false;
+    let value: Post = form.value;
     value.url = (value.url || '').trim();
     value.title = (value.title || '').trim();
     if (!value.url || !value.title) return false;

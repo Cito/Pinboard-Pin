@@ -68,7 +68,7 @@
     <input id="tags" name="tags" type="text" size="64" autocomplete="off"
            (focus)="tagsFocus = true" (blur)="tagsFocus = false"
            (keydown)="tagsKeyDown($event)" (keyup)="tagsKeyUp($event)"
-           maxlength="6400" [disabled]="!ready" [ngModel]="tags">
+           maxlength="6400" [disabled]="!ready" [(ngModel)]="tags">
   </div><div *ngIf="suggested && suggested.length">
     <label>Suggested:</label>
     <span class="suggested">
