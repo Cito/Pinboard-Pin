@@ -11,7 +11,7 @@ Features:
 ---------
 
 * Icon changing color to show whether the current page has been bookmarked in Pinboard.
-* Save a new bookmark for the current page in Pinboard, adding description and tags in a popup dialog. 
+* Save a new bookmark for the current page in Pinboard, adding description and tags in a popup dialog.
 * Update and delete the bookmark for the current page in Pinboard from the popup.
 * Automatic creation of a description from a selected text on the page or using an existing meta tag on the page.
 * Enter or update tags using automatic suggestions in the popup dialog.
@@ -24,7 +24,7 @@ You can install the extension using the [Mozilla Add-ons](https://addons.mozilla
 Notes:
 ------
 
-Note that you must explicitly enable the option for displaying whether the page has already been saved on Pinboard, because this will send the URL of the page to the Pinboard server for every page. Therefore this feature is also automatically disabled in "incognito mode". 
+Note that you must explicitly enable the option for displaying whether the page has already been saved on Pinboard, because this will send the URL of the page to the Pinboard server for every page. Therefore this feature is also automatically disabled in "incognito mode".
 
 Also note that if you are using the Privacy Badger extension and Pinboard Pin shows an error when accessing Pinboard, make sure that the domain pinboard.in is not blocked in the filter settings of Privacy Badger, or simply put in on the whitelist of Privacy Badger.
 
@@ -32,6 +32,7 @@ Development:
 ------------
 
 - Follow the instructions outlined in [DEVELOP.md](https://github.com/cito/Pinboard-Pin/blob/master/DEVELOP.md) if you want to build this extension on your own or run it in development mode.
+- Read my blog post [Web Extensions made with Angular](https://cito.github.io/blog/web-ext-with-angular/) to learn more about how and why this extension has been created.
 - Contact the author, open GitHub issues or send in pull requests to contribute.
 
 Author:
