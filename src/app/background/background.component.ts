@@ -14,8 +14,8 @@ import {IconService} from "../icon.service";
 })
 export class BackgroundComponent implements OnInit, OnDestroy {
 
-  private updatedListener: Function;
-  private messageListener: Function;
+  private updatedListener: (tabId: number, changeInfo: any, tab: any) => void;
+  private messageListener: (message: any) => void;
 
   constructor(private storage: StorageService,
               private pinboard: PinboardService,
@@ -50,7 +50,7 @@ export class BackgroundComponent implements OnInit, OnDestroy {
   }
 
   // fires when another process connects
-  onMessage(message) {
+  onMessage(message: any): void {
     if (message.options && message.options.ping != this.ping) {
       this.ping = message.options.ping;
       this.setOnUpdateListener(this.ping);
@@ -68,7 +68,7 @@ export class BackgroundComponent implements OnInit, OnDestroy {
   }
 
   // fires when the active tab in a window changes
-  onUpdated(tabId: number, changeInfo: any, tab: any) {
+  onUpdated(tabId: number, changeInfo: any, tab: any): void {
     // do not ping Pinboard in incognito mode
     if (tab.incognito) return;
     const url = changeInfo.url;

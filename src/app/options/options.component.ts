@@ -17,7 +17,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
 
   page: string; // type of page (popup or options)
 
-  private messageListener: Function;
+  private messageListener: (message: any) => void;
 
   constructor(private storage: StorageService,
               private appRef: ApplicationRef) {
@@ -61,7 +61,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
   // fires when another process connects
   // this synchronizes the settings if options popup and options page
   // are open at the same time
-  onMessage(message) {
+  onMessage(message: any): void {
     let options = message.options;
     if (options && !this.sameOptions(options)) {
       this.options = options;

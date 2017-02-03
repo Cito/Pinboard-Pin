@@ -33,18 +33,18 @@ export class StorageService {
 
   // get keys from local storage as an Observable
   // when only one key is requested, only its value is returned
-  get(keys: string): Observable<any> {
+  get(keys: string | string[] | null): Observable<any> {
     return Observable.fromPromise(this.storage.get(keys)).map(
       res => typeof keys == 'string' ? res[keys] : res);
   }
 
   // set keys in local storage as an Observable
-  set(keys: any): Observable<any> {
+  set(keys: Object): Observable<any> {
     return Observable.fromPromise(this.storage.set(keys));
   }
 
   // remove keys in local storage as an Observable
-  remove(keys: any): Observable<any> {
+  remove(keys: string | string[]): Observable<any> {
     return Observable.fromPromise(this.storage.remove(keys));
   }
 
