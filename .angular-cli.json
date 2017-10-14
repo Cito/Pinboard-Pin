@@ -1,6 +1,6 @@
 {
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "project": {
-    "version": "1.0.0-beta.26",
     "name": "pinboard-pin"
   },
   "apps": [
@@ -14,25 +14,28 @@
       ],
       "index": "index.html",
       "main": "main.ts",
-      "test": "test.ts",
-      "tsconfig": "tsconfig.json",
+      "polyfills": "polyfills.ts",
+      "tsconfig": "tsconfig.app.json",
       "prefix": "app",
-      "mobile": false,
       "styles": [
         "styles.css"
       ],
       "scripts": [],
+      "environmentSource": "environments/environment.ts",
       "environments": {
-        "source": "environments/environment.ts",
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts"
       }
     }
   ],
-  "addons": [],
-  "packages": [],
+  "lint": [
+    {
+      "project": "src/tsconfig.app.json"
+    }
+  ],
   "defaults": {
     "styleExt": "css",
+    "component": {},
     "prefixInterfaces": false,
     "inline": {
       "style": false,

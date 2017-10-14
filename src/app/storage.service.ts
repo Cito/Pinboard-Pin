@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import {Observable} from "rxjs";
+import {Observable} from 'rxjs/Observable';
 
 export interface Options {
   ping: boolean;
@@ -35,7 +35,7 @@ export class StorageService {
   // when only one key is requested, only its value is returned
   get(keys: string | string[] | null): Observable<any> {
     return Observable.fromPromise(this.storage.get(keys)).map(
-      res => typeof keys == 'string' ? res[keys] : res);
+      res => typeof keys === 'string' ? res[keys] : res);
   }
 
   // set keys in local storage as an Observable
@@ -61,7 +61,7 @@ export class StorageService {
 
   // set a volatile info for users of this service
   setInfo(name: string, value: any): void {
-    this.info[name] = value
+    this.info[name] = value;
   }
 
   // get a volatile info that was previously set

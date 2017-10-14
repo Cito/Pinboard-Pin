@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 
 const msPerSecond = 1000;
 const msPerMinute = msPerSecond * 60;
@@ -19,20 +19,28 @@ export class AgoPipe implements PipeTransform {
 
   // show date as passed time in simple human readable form
   transform(value: Date|string): string {
-    if (!value) return 'some time ago';
+    if (!value) {
+      return 'some time ago';
+    }
 
-    const time: number = typeof value == 'string' ?
+    const time: number = typeof value === 'string' ?
       Date.parse(value as string) : (value as Date).getTime();
     const elapsed = Date.now() - time;
 
-    if (elapsed < 0) return 'some time ago';
-    if (elapsed < msPerSecond) return 'just now';
+    if (elapsed < 0) {
+      return 'some time ago';
+    }
+    if (elapsed < msPerSecond) {
+      return 'just now';
+    }
 
     for (let i = 0; i < 6; ++i) {
       if (i > 4 || elapsed < intervalParts[i + 1]) {
-        let n = Math.round(elapsed / intervalParts[i]);
+        const n = Math.round(elapsed / intervalParts[i]);
         let unit = intervalUnits[i];
-        if (n != 1) unit += 's';
+        if (n !== 1) {
+          unit += 's';
+        }
         return n + ' ' + unit + ' ago';
       }
     }

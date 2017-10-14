@@ -1,7 +1,7 @@
 Development Notes for Pinboard Pin
 ==================================
 
-This is an add-on for pinning pages on [Pinboard](https://pinboard.in) in the web browser, based on the [WebExtensions](https://developer.mozilla.org/de/Add-ons/WebExtensions) system. This web extension has been developed for and tested with Firefox 50 for Windows and Linux. Since WebExtensions was created as a cross-browser standard, it should be portable to other platforms and web browsers like Chrome, Opera or Edge with only few adaptations.
+This is an add-on for pinning pages on [Pinboard](https://pinboard.in) in the web browser, based on the [WebExtensions](https://developer.mozilla.org/de/Add-ons/WebExtensions) system. This web extension has been developed for and tested with Firefox 56 for Windows and Linux. Since WebExtensions was created as a cross-browser standard, it should be portable to other platforms and web browsers like Chrome, Opera or Edge with only few adaptations.
 
 The web extension has been created using [Angular](https://angular.io/) and the [Angular CLI](https://github.com/angular/angular-cli).
 
@@ -11,6 +11,8 @@ Installation
 Install the application for development:
 
     npm install
+    
+On Windows, use Node 8.1.4 if installation fails.
 
 Building and testing
 --------------------
@@ -40,12 +42,12 @@ Known issues
 
 * The web-ext tool currently doesn't work with the 64bit version for Firefox on Windows. As a workaround, set a the path with "--firefox=" when calling "web-ext run" or replace "(64)" with "(64-64)" in the line starting with "arch = " in node_modules/web-ext/node_modules/fx-runner/lib/utils.js.
 
-* Since Firefox supports ES6, theoretically, it should be possible to set target="es6" in tsconfig.json. However, the current version of UglifyJS which is used by the Angular CLI to pack the JavaScript bundle doesn't support ES6 yet. It is possible to use the "harmony" branch of UglifyJS, which already supports ES 6. But this branch still has some problems with scoping which might result in glitches in the resulting code. Furthermore, the vendor.js bundle which is larger than main.js will still be ES 5.
+* Since Firefox supports ES2015, theoretically, it should be possible to set target="es2015" in tsconfig.json. However, the Angular CLI uses UglifyJS which doesn't support ES6 yet. This should be solved in Angular CLI 1.5.
 
 Future development
 ------------------
 
-* Wait for UglifyJS to fully support ES6, then switch to target="es6" in tsconfig.json. Also find a way to create vendor.js in ES6.
+* Wait for Angular CLI 1.5 and Angular 5, then switch to target="es2015" in tsconfig.json.
 
 * The Pinboard API seems to have the "popular" and "recommended" categories interchanged in the "suggest" method for tags. "Popular" are actually those taken from our own tags, contrary to what the Pinboard API docs say. This has already been reported to the Pinboard support. If they will changed this behavior, we need to adapt our code that currently swaps these categories.
 

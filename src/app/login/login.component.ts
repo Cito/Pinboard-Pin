@@ -1,9 +1,9 @@
 // this component is the login dialog displayed in the popup
 
 import {Component, OnInit} from '@angular/core';
-import {Router} from "@angular/router";
+import {Router} from '@angular/router';
 
-import {passwordPage, PinboardService} from "../pinboard.service";
+import {passwordPage, PinboardService} from '../pinboard.service';
 
 export interface Login {
   token: string;
@@ -34,16 +34,26 @@ export class LoginComponent implements OnInit {
 
   // submit form (store token)
   submit({value, valid}: {value: Login, valid: boolean}) {
-    if (!valid) return false;
+    if (!valid) {
+      return false;
+    }
     let token = value.token;
-    if (!token) return false;
+    if (!token) {
+      return false;
+    }
     token = token.trim();
-    if (!token) return false;
+    if (!token) {
+      return false;
+    }
     this.checking = true;
     this.pinboard.setToken(token).subscribe(
       ok => {
         this.error = !ok;
-        if (ok) this.continue(); else this.checking = false;
+        if (ok) {
+          this.continue();
+        } else {
+          this.checking = false;
+        }
       },
       error => {
         this.error = true;
