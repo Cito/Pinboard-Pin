@@ -34,7 +34,7 @@
 </button>
 </div>
 
-<form *ngIf="!error" (ngSubmit)="submit(f)" #f="ngForm">
+<form *ngIf="!error" (ngSubmit)="submit(form)" #form="ngForm">
   <div class="info">
     <label></label>
     <span *ngIf="update && !date" class="info">
@@ -104,7 +104,7 @@
     <button *ngIf="update" type="button" [disabled]="!ready" (click)="remove()">
       Remove bookmark</button>
     <button type="submit"
-            [disabled]="!ready || !f.valid || !f.controls.url?.value">
+            [disabled]="!ready || !form.valid || !form.controls.url?.value">
       {{ update ? 'Update bookmark' : 'Add bookmark' }}
     </button>
   </div>

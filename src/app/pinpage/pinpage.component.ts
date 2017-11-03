@@ -1,10 +1,13 @@
 // this component is the save bookmark dialog displayed in the popup
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {
+  Component, ElementRef, OnInit, OnDestroy
+} from '@angular/core';
 import {Router} from '@angular/router';
 
 import {Subscription} from 'rxjs/Subscription';
 import {Subject} from 'rxjs/Subject';
+import {timer} from 'rxjs/observable/timer';
 import {debounceTime, distinctUntilChanged, finalize} from 'rxjs/operators';
 
 import {IconService} from '../icon.service';
@@ -62,7 +65,8 @@ export class PinPageComponent implements OnInit, OnDestroy {
   constructor(private pinboard: PinboardService,
               private storage: StorageService,
               private icon: IconService,
-              private router: Router) { }
+              private router: Router,
+              private eref: ElementRef) { }
 
   ngOnInit() {
     this.ready = this.update = this.error = this.retry = false;
@@ -147,7 +151,19 @@ export class PinPageComponent implements OnInit, OnDestroy {
         this.tags = this.tags.trim() + ' ';
       }
       this.completions = null;
-      this.ready = true;
+      this.setReady();
+    });
+  }
+
+  // set form as ready for input
+  setReady() {
+    this.ready = true;
+    // wait until inputs have been enabled, then focus
+    timer(0).subscribe(() => {
+      const focus = this.url ? (this.title ? (
+        this.tags && ! this.description ?
+        'description' : 'tags') : 'title') : 'url';
+      this.eref.nativeElement.querySelector('#' + focus).focus();
     });
   }
 
