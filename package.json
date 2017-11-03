@@ -1,11 +1,11 @@
 {
   "name": "pinboard-pin",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
     "build": "ng build --aot",
-    "build:prod": "ng build --aot --prod --sourcemap=false && node finish",
+    "build:prod": "ng build --aot --prod --sourcemap=false --output-hashing=none",
     "build:ext": "web-ext build --source-dir=dist --artifacts-dir=.",
     "build:zip": "npm run build:prod && npm run build:ext",
     "lint": "tslint \"src/**/*.ts\"",
