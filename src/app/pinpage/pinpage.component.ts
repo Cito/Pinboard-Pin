@@ -255,11 +255,12 @@ export class PinPageComponent implements OnInit, OnDestroy {
   // it must then determine the list of tag completions
   tagsChanged(tags) {
     const words = tags.replace(',', ' ').split(' ');
-    const word = words.length ? words.pop() : null;
+    let word = words.length ? words.pop() : null;
     let completions: string[] = [];
     if (word) {
+      word = word.toLowerCase();
       for (const tag of this.allTags) {
-        if (tag.startsWith(word) && words.indexOf(tag) < 0) {
+        if (tag.toLowerCase().startsWith(word) && words.indexOf(tag) < 0) {
           completions.push(tag);
           if (completions.length >= maxCompletions) {
             break;
