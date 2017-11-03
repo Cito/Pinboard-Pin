@@ -12,6 +12,9 @@ const intervalUnits = [
 const intervalParts = [
   msPerSecond, msPerMinute, msPerHour, msPerDay, msPerMonth, msPerYear];
 
+
+// Pipe for showing time intervals
+
 @Pipe({
   name: 'ago'
 })

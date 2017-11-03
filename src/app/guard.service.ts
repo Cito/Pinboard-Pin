@@ -5,8 +5,10 @@ import {
 } from '@angular/router';
 
 import {Observable} from 'rxjs/Observable';
+import {map} from 'rxjs/operators';
 
 import {PinboardService} from './pinboard.service';
+
 
 // Guard for the index route of this extension
 
@@ -21,13 +23,13 @@ export class Guard implements CanActivate {
     const page = route.queryParams['page'];
 
     if (!page || page === 'popup') {
-      return this.pinboard.needToken.map(needed => {
+      return this.pinboard.needToken.pipe(map(needed => {
         if (!needed) {
           return true;
         }
         this.router.navigate(['/login']);
         return false;
-      });
+      }));
     }
 
     this.router.navigate(['/' + page]);
