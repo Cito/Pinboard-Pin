@@ -12,7 +12,7 @@ Install the application for development:
 
     npm install
     
-On Windows, use Node 8.1.4 if installation fails.
+On Windows, use Node 8.9.0 if installation fails.
 
 Building and testing
 --------------------
@@ -42,12 +42,9 @@ Known issues
 
 * The web-ext tool currently doesn't work with the 64bit version for Firefox on Windows. As a workaround, set a the path with "--firefox=" when calling "web-ext run" or replace "(64)" with "(64-64)" in the line starting with "arch = " in node_modules/web-ext/node_modules/fx-runner/lib/utils.js.
 
-* Since Firefox supports ES2015, theoretically, it should be possible to set target="es2015" in tsconfig.json. However, the Angular CLI uses UglifyJS which doesn't support ES6 yet. This should be solved in Angular CLI 1.5.
 
 Future development
 ------------------
-
-* Wait for Angular CLI 1.5 and Angular 5, then switch to target="es2015" in tsconfig.json.
 
 * The Pinboard API seems to have the "popular" and "recommended" categories interchanged in the "suggest" method for tags. "Popular" are actually those taken from our own tags, contrary to what the Pinboard API docs say. This has already been reported to the Pinboard support. If they will changed this behavior, we need to adapt our code that currently swaps these categories.
 
