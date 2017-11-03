@@ -29,4 +29,4 @@
   if (keywords) keywords = keywords.slice(0, 6400);
   return {url: url, title: title || null,
     description: description || null, keywords: keywords};
-})()
+})();

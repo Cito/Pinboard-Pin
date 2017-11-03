@@ -27,6 +27,13 @@ export interface Post {
   toread: boolean;
 }
 
+export interface Content {
+  url: string;
+  title: string;
+  description: string;
+  keywords: string[];
+}
+
 
 // Pin page form
 // TODO: This class is too big, should be refactored.
@@ -74,6 +81,8 @@ export class PinPageComponent implements OnInit, OnDestroy {
       this.options = options;
       browser.tabs.executeScript(
         null, {file: '/js/content.js'}).then(
+        (content: Content[]) => content[0]).catch(
+            () => this.getContent()).then(
         content => this.setContent(content),
         error => this.logError(
           'Can only pin normal web pages.', error.toString()));
@@ -88,11 +97,18 @@ export class PinPageComponent implements OnInit, OnDestroy {
     this.tagsSubscription.unsubscribe();
   }
 
+  // get url and title of content (used if content script cannot run)
+  getContent(): Promise<Content> {
+    return browser.tabs.query(
+      {active: true, currentWindow: true}).then(
+      tabs => tabs[0]).then(tab => ({
+        url: tab.url, title: tab.title,
+        description: null, keywords: null
+    }));
+  }
+
   // store info on current content in the form inputs
-  setContent(content) {
-    if (content) {
-      content = content[0];
-    }
+  setContent(content: Content) {
     if (content && content.url) {
       this.url = content.url;
       this.title = content.title;
@@ -114,7 +130,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
             'Cannot check this page on Pinboard.', error.toString()));
     } else {
       this.logError('Can only pin normal web pages.',
-        'Cannot access page content');
+        'Cannot get the URL of the page');
     }
   }
 
