@@ -89,7 +89,9 @@ form div input[type=checkbox] + label {
   width: auto;
 }
 
-form div input[type=text], form div input[type=url], form div textarea {
+form div input[type=text],
+form div input[type=url],
+form div textarea {
   width: 38em;
   font-family: sans-serif;
   font-size: 11pt;
