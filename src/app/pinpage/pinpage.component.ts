@@ -50,7 +50,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   title: string;
   description: string; // description
   tags: string; // current tags
-  allTags: string[]; // all of our tags
+  allTags: {[tag: string]: number}; // all of our tags with frequency
   suggested: string[]; // recommended tags from our own
   popular: string[]; // other popular tags
   keywords: string[]; // keywords taken from the page
@@ -272,28 +272,33 @@ export class PinPageComponent implements OnInit, OnDestroy {
   tagsChanged(tags) {
     const words = tags.replace(',', ' ').split(' ');
     let word = words.length ? words.pop() : null;
-    let completions: string[] = [];
+    const allTags = this.allTags;
+    const matches: [string, number][] = [];
     if (word) {
       word = word.toLowerCase();
-      for (const tag of this.allTags) {
-        if (tag.toLowerCase().startsWith(word) && words.indexOf(tag) < 0) {
-          completions.push(tag);
-          if (completions.length >= maxCompletions) {
-            break;
+      for (const tag in allTags) {
+        if (allTags.hasOwnProperty(tag)) {
+          if (tag.toLowerCase().startsWith(word) && words.indexOf(tag) < 0) {
+            matches.push([tag, allTags[tag]]);
           }
         }
       }
     }
+    // sort matching tags by decreasing frequency
+    matches.sort((a: [string, number], b: [string, number]) =>
+        b[1] - a[1] || a[0].localeCompare(b[0]));
+    matches.splice(maxCompletions);
+    const completions: string[] = matches.map(a => a[0]).reverse();
     if (completions.length) {
-      completions.reverse();
-    } else {
-      completions = null;
-    }
-    if (completions !== this.completions) {
-      this.completions = completions;
-      if (completions) {
+      const oldCompletions = this.completions;
+      if (!oldCompletions || completions.length !== oldCompletions.length ||
+        completions.some((tag, i) =>
+          completions[i] !== oldCompletions[i])) {
+        this.completions = completions;
         this.tagSelected = completions.length - 1;
       }
+    } else {
+      this.completions = null;
     }
   }
 

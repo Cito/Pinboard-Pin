@@ -125,17 +125,24 @@ export class PinboardService {
       data => Object.assign(data[0], data[1])));
   }
 
-  // get the list of all used tags (without the tag counters)
-  tags(): Observable<string[]> {
-    return this.httpGet('tags/get').pipe(
-      map(tags => Object.keys(tags)));
+  // get the list of all used tags (with numeric tag counters)
+  tags(): Observable<{[tag: string]: number}> {
+    return this.httpGet('tags/get').pipe(map(tags => {
+        for (const tag in tags) {
+          if (tags.hasOwnProperty(tag)) {
+            tags[tag] = +tags[tag];
+          }
+        }
+        return tags;
+      }));
   }
 
   // get a cached list of all used tags
-  cachedTags(): Observable<string[]> {
+  cachedTags(): Observable<{[tag: string]: number}> {
     return this.storage.get('tags').pipe(switchMap(tags => {
       const date = Date.now();
-      if (!tags || !tags.tags || !tags.date) {
+      if (!tags || !tags.tags || !tags.date ||
+          tags.tags instanceof Array) {  // old version used arrays
         // no tags cached, retrieve tags first from Pinboard
         return this.tags().pipe(tap(tags =>
           this.storage.set({tags: {tags: tags, date: date}}).subscribe()));
@@ -150,33 +157,28 @@ export class PinboardService {
     }));
   }
 
-  // update the cached list of all used tags
-  updateTagCache(tags: string[]): Observable<any> {
-    if (!tags || !tags.length) {
+  // update the cached object with all used tags and their frequency
+  updateTagCache(addTags: string[]): Observable<any> {
+    if (!addTags || !addTags.length) {
       return EmptyObservable();
     }
-    return this.storage.get('tags').pipe(mergeMap(oldtags => {
-      let oldList, oldDate;
-      if (oldtags && oldtags.tags && oldtags.date) {
-        oldList = oldtags.tags;
-        oldDate = oldtags.date;
+    return this.storage.get('tags').pipe(mergeMap(cache => {
+      let tags, date;
+      if (cache && cache.tags && cache.date) {
+        tags = cache.tags;
+        date = cache.date;
       } else {
-        oldList = [];
-        oldDate = Date.now();
+        tags = {};
+        date = Date.now();
       }
-      const oldLength = oldList.length;
-      const newTags = {};
-      for (const tag of tags) {
-        newTags[tag] = true;
+      for (const tag of addTags) {
+        if (addTags.hasOwnProperty(tag)) {
+          ++tags[tag];
+        } else {
+          tags[tag] = 1;
+        }
       }
-      for (const tag of oldList) {
-        newTags[tag] = true;
-      }
-      const newList = Object.keys(newTags);
-      if (newList.length > oldLength) {
-        return this.storage.set({tags: {tags: newList, date: oldDate}});
-      }
-      return EmptyObservable();
+      return this.storage.set({tags: {tags: tags, date: date}});
     }));
   }
 
