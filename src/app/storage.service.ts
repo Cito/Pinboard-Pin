@@ -9,13 +9,15 @@ export interface Options {
   unshared: boolean;
   toread: boolean;
   blockquote: boolean;
+  alpha: boolean;
 }
 
 const defaultOptions: Options = {
   ping: false,
   unshared: false,
   toread: false,
-  blockquote: false
+  blockquote: false,
+  alpha: false
 };
 
 

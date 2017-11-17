@@ -274,12 +274,13 @@ export class PinPageComponent implements OnInit, OnDestroy {
     let word = words.length ? words.pop() : null;
     const allTags = this.allTags;
     const matches: [string, number][] = [];
+    const alpha = this.options.alpha;
     if (word) {
       word = word.toLowerCase();
       for (const tag in allTags) {
         if (allTags.hasOwnProperty(tag)) {
           if (tag.toLowerCase().startsWith(word) && words.indexOf(tag) < 0) {
-            matches.push([tag, allTags[tag]]);
+            matches.push([tag, alpha ? 0 : allTags[tag]]);
           }
         }
       }
