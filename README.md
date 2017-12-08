@@ -3,7 +3,9 @@ Pinboard Pin Web Extension for Firefox
 
 Pinboard Pin is a modern web extension for pinning pages on [Pinboard](https://pinboard.in) with Firefox.
 
-It pretty much replicates the functionality of the [Pinboard Plus](https://github.com/clvrobj/Pinboard-Plus) extension that has been created for the Chrome browser, but it has been rewritten from scratch to support Firefox using the modern [Angular](https://angular.io/) framework instead of a mix of the older [AngularJS](https://angularjs.org/), [jQuery](https://jquery.com/) and [Underscore](http://underscorejs.org/) libraries used by Pinboard Plus. This rewrite was also intended as a proof-of-concept that modern Angular is a viable platform for building web extensions.
+Pinboard is a fast, no-nonsense bookmarking site for people who value privacy and speed. Note that while the Pinboard Pin extension is provided by its author as free and open source software, Pinboard is a separate, paid service and you need to sign up for an account in order to use it. The author of Pinboard Pin is not affiliated with the provider of the Pinboard service. For any questions regarding the Pinboard service itself, please contact the Pinboard support.
+
+This extension pretty much replicates the functionality of the [Pinboard Plus](https://github.com/clvrobj/Pinboard-Plus) extension that has been created for the Chrome browser, but it has been rewritten from scratch to support Firefox using the modern [Angular](https://angular.io/) framework instead of a mix of the older [AngularJS](https://angularjs.org/), [jQuery](https://jquery.com/) and [Underscore](http://underscorejs.org/) libraries used by Pinboard Plus. This rewrite was also intended as a proof-of-concept that modern Angular is a viable platform for building web extensions.
 
 The current version has been tested with Firefox 56 for Windows and Linux.
 
