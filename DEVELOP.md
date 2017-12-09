@@ -36,7 +36,7 @@ Package unsigned extension as zip file:
 Known issues
 ------------
 
-* Unfortunately, storing tabsets is not supported by the Pinboard API. Therefore this feature has not been implemented in this add-on.
+* Unfortunately, storing tabsets is not supported by the Pinboard API. Therefore you need to be logged in to use this feature. This works the same as in the official add-on.
 
 * If you get errors when requesting data from the Pinboard API via https, these could be caused by the Privacy Badger extension. Make sure that the domain pinboard.in is fully enabled in Privacy Badger or whitelist it.
 

@@ -9,10 +9,12 @@ import {forkJoin} from 'rxjs/observable/forkJoin';
 import {StorageService} from './storage.service';
 import {Post} from './pinpage/pinpage.component';
 import {HttpClient, HttpParams} from '@angular/common/http';
+import {fromPromise as ObservableFromPromise} from 'rxjs/observable/fromPromise';
 
 export const pinboardPage = 'https://pinboard.in/';
 
 export const passwordPage = pinboardPage + 'settings/password';
+const tabsPage = pinboardPage + 'tabs/';
 
 const apiUrl = 'https://api.pinboard.in/v1/';
 
@@ -180,6 +182,17 @@ export class PinboardService {
       }
       return this.storage.set({tags: {tags: tags, date: date}});
     }));
+  }
+
+  // save the current tabs as tabset using the web form
+  // (this operation is not provided by the Pinboard API)
+  saveTabs(data): Observable<browser.tabs.Tab> {
+    const params = new FormData();
+    params.append('data', JSON.stringify(data));
+    const post = this.http.post(tabsPage + 'save/', params);
+    const show = ObservableFromPromise(browser.tabs.create(
+      {url: tabsPage + 'show/'}));
+    return post.pipe(switchMap(() => show));
   }
 
 }

@@ -379,6 +379,36 @@ export class PinPageComponent implements OnInit, OnDestroy {
     return false;
   }
 
+  // save current tabs as tab set to Pinboard
+  saveTabs() {
+    browser.tabs.query({windowType: 'normal', url: '*://*/*'}).then(
+      tabs => {
+        const wTabs = {};
+        for (const tab of tabs) {
+          const wId = tab.windowId;
+          if (!wTabs[wId]) {
+            wTabs[wId] = {};
+          }
+          wTabs[wId][tab.index] = {title: tab.title, url: tab.url};
+        }
+        const windows = Object.keys(wTabs).map(
+          wId => Object.keys(wTabs[wId]).map(
+            index => wTabs[wId][index]));
+        if (windows.length) {
+          const data = {
+            browser: 'ffox', windows: windows,
+          };
+          this.pinboard.saveTabs(data).subscribe(() => {
+            this.cancel();
+          }, error => {
+            this.logError(
+              'Sorry, could not save this tab set to Pinboard.',
+              error.toString());
+          });
+        }
+      });
+  }
+
   // navigate to options
   settings() {
     // store a note that we are showing on a popup page
