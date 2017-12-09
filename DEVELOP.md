@@ -12,7 +12,7 @@ Install the application for development:
 
     npm install
     
-On Windows, use Node 8.9.0 if installation fails.
+On Windows, use latest Node or Yarn if installation fails.
 
 Building and testing
 --------------------
