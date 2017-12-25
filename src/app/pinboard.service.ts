@@ -160,10 +160,7 @@ export class PinboardService {
   }
 
   // update the cached object with all used tags and their frequency
-  updateTagCache(addTags: string[]): Observable<any> {
-    if (!addTags || !addTags.length) {
-      return EmptyObservable();
-    }
+  updateTagCache(addTags: string[], savedTags: string[]): Observable<any> {
     return this.storage.get('tags').pipe(mergeMap(cache => {
       let tags, date;
       if (cache && cache.tags && cache.date) {
@@ -173,11 +170,22 @@ export class PinboardService {
         tags = {};
         date = Date.now();
       }
+      for (const tag of savedTags) {
+        if (!addTags.includes[tag]) {
+          if (tags.hasOwnProperty(tag)) {
+            if (--tags[tag] <= 0) {
+              delete tags[tag];
+            }
+          }
+        }
+      }
       for (const tag of addTags) {
-        if (addTags.hasOwnProperty(tag)) {
-          ++tags[tag];
-        } else {
-          tags[tag] = 1;
+        if (!savedTags.includes[tag]) {
+          if (tags.hasOwnProperty(tag)) {
+            ++tags[tag];
+          } else {
+            tags[tag] = 1;
+          }
         }
       }
       return this.storage.set({tags: {tags: tags, date: date}});

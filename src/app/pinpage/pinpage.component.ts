@@ -50,6 +50,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   title: string;
   description: string; // description
   tags: string; // current tags
+  savedTags: string; // tags already saved for this URL
   allTags: {[tag: string]: number}; // all of our tags with frequency
   suggested: string[]; // recommended tags from our own
   popular: string[]; // other popular tags
@@ -163,8 +164,10 @@ export class PinPageComponent implements OnInit, OnDestroy {
     }
     this.pinboard.cachedTags().subscribe(tags => {
       this.allTags = tags;
+      this.tags = this.tags.trim();
+      this.savedTags = this.tags;
       if (this.tags) {
-        this.tags = this.tags.trim() + ' ';
+        this.tags += ' ';
       }
       this.completions = null;
       this.setReady();
@@ -183,7 +186,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  // check whether the give tags have already been added
+  // check whether the given tags have already been added
   hasTags(tags: string|string[]): boolean {
     if (!this.tags) {
       return false;
@@ -192,7 +195,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
       tags = [tags as string];
     }
     const allTags = this.tags.split(' ').filter(tag => !!tag);
-    return (tags as string[]).every(tag => allTags.indexOf(tag) >= 0);
+    return (tags as string[]).every(tag => allTags.includes(tag));
   }
 
   // add the given tags if they have not already been added, otherwise remove
@@ -201,11 +204,11 @@ export class PinPageComponent implements OnInit, OnDestroy {
       tags = [tags as string];
     }
     let allTags = (this.tags || '').split(' ').filter(tag => !!tag);
-    const newTags = (tags as string[]).filter(tag => allTags.indexOf(tag) < 0);
+    const newTags = (tags as string[]).filter(tag => !allTags.includes(tag));
     if (newTags.length) { // some tags are new
       allTags.push(...newTags);  // add these tags
     } else { // all tags have already been added, remove these tags again
-      allTags = allTags.filter(tag => (tags as string[]).indexOf(tag) < 0);
+      allTags = allTags.filter(tag => !(tags as string[]).includes(tag));
     }
     this.tags = allTags.join(' ');
   }
@@ -244,7 +247,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
         if (words.length) {
           words.pop();
         }
-        if (words.indexOf(tag) < 0) {
+        if (!words.includes(tag)) {
           words.push(tag);
           value = words.join(' ') + ' ';
           this.tagsChanged(value);
@@ -279,7 +282,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
       word = word.toLowerCase();
       for (const tag in allTags) {
         if (allTags.hasOwnProperty(tag)) {
-          if (tag.toLowerCase().startsWith(word) && words.indexOf(tag) < 0) {
+          if (tag.toLowerCase().startsWith(word) && !words.includes(tag)) {
             matches.push([tag, alpha ? 0 : allTags[tag]]);
           }
         }
@@ -310,7 +313,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
     if (words.length) {
       words.pop();
     }
-    if (words.indexOf(tag) < 0) {
+    if (!words.includes(tag)) {
       words.push(tag);
       value = words.join(' ') + ' ';
       this.tagsChanged(value);
@@ -349,9 +352,10 @@ export class PinPageComponent implements OnInit, OnDestroy {
     }
     value.description = (value.description || '').trim() || null;
     // clean up tags, maximum of 100 tags with 255 chars each
-    const tags = value.tags ? value.tags.split(' ').filter(tag => !!tag).slice(
-      0, 100).map(tag => tag.slice(0, 255)) : [];
+    const tags = value.tags ? value.tags.split(' ').filter(
+      tag => !!tag).slice(0, 100).map(tag => tag.slice(0, 255)) : [];
     value.tags = tags.join(' ');
+    const savedTags = this.savedTags ? this.savedTags.split(' ') : [];
     this.pinboard.save(value).subscribe(
       error => {
         if (error) {
@@ -359,7 +363,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
             error);
         } else {
           // update the tags in the cache
-          this.pinboard.updateTagCache(tags).pipe(finalize(
+          this.pinboard.updateTagCache(tags, savedTags).pipe(finalize(
             // set the browser icon to saved state
             () => browser.tabs.query({url: this.url}).then(tabs => {
               for (const tab of tabs) {

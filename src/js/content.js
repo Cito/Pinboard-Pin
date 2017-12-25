@@ -17,7 +17,7 @@
       let words = [];
       for (let word of content.split(',')) {
         word = word.replace(/\s+/, '').slice(0, 255).toLowerCase();
-        if (word && words.indexOf(word) < 0) {
+        if (word && !words.includes(word)) {
           words.push(word);
           if (words.length >= 100) break;
         }
