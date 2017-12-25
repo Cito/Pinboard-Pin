@@ -164,10 +164,12 @@ export class PinPageComponent implements OnInit, OnDestroy {
     }
     this.pinboard.cachedTags().subscribe(tags => {
       this.allTags = tags;
-      this.tags = this.tags.trim();
-      this.savedTags = this.tags;
       if (this.tags) {
+        this.tags.trim();
+        this.savedTags = this.tags;
         this.tags += ' ';
+      } else {
+        this.savedTags = null;
       }
       this.completions = null;
       this.setReady();
@@ -325,18 +327,28 @@ export class PinPageComponent implements OnInit, OnDestroy {
   // delete the current bookmark
   remove() {
     if (this.ready && this.update && this.url) {
-      this.pinboard.delete(this.url).pipe(finalize(
-        // set the browser icon to unsaved state
-        () => browser.tabs.query({url: this.url}).then(tabs => {
-          for (const tab of tabs) {
-            this.icon.setIcon(tab.id, false);
-          }
-          this.cancel();
-        }, error => {
-          console.error(error.toString());
-          this.cancel();
-        }))).subscribe();
+      this.pinboard.delete(this.url).subscribe(
+        () => {
+          // update the tags in the cache
+          const savedTags = this.savedTags ? this.savedTags.split(' ') : [];
+          this.pinboard.updateTagCache([], savedTags).pipe(finalize(
+            // set the browser icon to unsaved state
+            () => browser.tabs.query({url: this.url}).then(tabs => {
+              for (const tab of tabs) {
+                this.icon.setIcon(tab.id, false);
+              }
+              this.cancel();
+            }, error => {
+              console.error(error.toString());
+              this.cancel();
+            }))).subscribe();
+        },
+        error => {
+          this.logError('Sorry, could not remove this page from Pinboard',
+            error.toString());
+        });
     }
+    return false;
   }
 
   // submit form (save page to Pinboard)
