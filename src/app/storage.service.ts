@@ -8,7 +8,8 @@ export interface Options {
   ping: boolean;
   unshared: boolean;
   toread: boolean;
-  ignoremeta: boolean;
+  meta: boolean;
+  selection: boolean;
   blockquote: boolean;
   alpha: boolean;
 }
@@ -17,7 +18,8 @@ const defaultOptions: Options = {
   ping: false,
   unshared: false,
   toread: false,
-  ignoremeta: false,
+  meta: true,
+  selection: true,
   blockquote: false,
   alpha: false
 };

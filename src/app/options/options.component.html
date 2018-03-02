@@ -26,9 +26,15 @@
 </div>
 <hr>
 <div>
-  <input type="checkbox" id="ignoremeta" name="ignoremeta" [ngModel]="options?.ignoremeta"
+  <input type="checkbox" id="meta" name="meta" [ngModel]="options?.meta"
          (change)="submit(form)" [disabled]="!options">
-  <label for="ignoremeta">Ignore meta elements for description and tags</label>
+  <label for="meta">Use meta elements for description and tags</label>
+</div>
+<hr>
+<div>
+  <input type="checkbox" id="selection" name="selection" [ngModel]="options?.selection"
+         (change)="submit(form)" [disabled]="!options">
+  <label for="selection">Use selected text as description</label>
 </div>
 <hr>
 <div>

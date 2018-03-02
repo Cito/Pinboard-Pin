@@ -27,11 +27,19 @@ export interface Post {
   toread: boolean;
 }
 
-export interface Content {
+interface Content {
   url: string;
   title: string;
   description: string;
   keywords: string[];
+}
+
+interface RawContent {
+  url: string;
+  title: string;
+  selection: string;
+  description: string;
+  keywords: string;
 }
 
 
@@ -80,11 +88,11 @@ export class PinPageComponent implements OnInit, OnDestroy {
     this.ready = this.update = this.error = this.retry = false;
     this.storage.getOptions().subscribe(options => {
       this.options = options;
-      const getContent = options.ignoremeta ? this.getContent() :
-          browser.tabs.executeScript(
-            null, {file: '/js/content.js'}).then(
-            (content: Content[]) => content[0]).catch(
-                () => this.getContent());
+      const getContent = options.meta || options.selection ?
+        browser.tabs.executeScript(null, {file: '/js/content.js'}
+          ).then((content: Array<RawContent>) =>
+          this.processContent(content[0])).catch(() =>
+          this.getContent()) : this.getContent();
       getContent.then(
         content => this.setContent(content),
         error => this.logError(
@@ -98,6 +106,32 @@ export class PinPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.tagsSubscription.unsubscribe();
+  }
+
+  // process the data gathered by the content script
+  processContent(content: RawContent): Content {
+    const options = this.options;
+    let description = options.selection ? content.selection : null;
+    if (!description && options.meta) {
+      description = content.description;
+    }
+    description = description ? description.slice(0, 64000) : null;
+    let keywords: string[] = [];
+    if (options.meta && content.keywords) {
+      for (let word of content.keywords.split(',')) {
+        word = word.replace(/\s+/, '').slice(
+          0, 255).toLowerCase();
+        if (word && !keywords.includes(word)) {
+          keywords.push(word);
+          if (keywords.length >= 100) {
+            break;
+          }
+        }
+      }
+    }
+    keywords = keywords.length ? keywords.slice(0, 6400) : null;
+    return {url: content.url || null, title: content.title || null,
+      description, keywords};
   }
 
   // get url and title of content (used if content script cannot run)
