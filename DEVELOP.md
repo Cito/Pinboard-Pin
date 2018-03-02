@@ -36,6 +36,8 @@ Package unsigned extension as zip file:
 Known issues
 ------------
 
+* When building the extension, you currently need to patch Angular-CLI as mentioned in https://github.com/angular/angular/issues/21948
+
 * Due to limitations in the Web-Ext API, the keyboard shortcut (Alt+P) cannot be changed or deactivated (at least I don't see a simple way how to do this - let me know if I'm overlooking something).
 
 * When using the Keyboard shortcut, the popup dialog does not get focus in Firefox < 60 (if anybody knows a workaround, please let me know).
@@ -43,9 +45,6 @@ Known issues
 * Unfortunately, storing tabsets is not supported by the Pinboard API. Therefore you need to be logged in to Pinboard in order use this feature. This works the same as in the official add-on.
 
 * If you get errors when requesting data from the Pinboard API via https, these could be caused by the Privacy Badger extension. Make sure that the domain pinboard.in is fully enabled in Privacy Badger or whitelist it.
-
-* The web-ext tool currently doesn't work with the 64bit version for Firefox on Windows. As a workaround, set a the path with "--firefox=" when calling "web-ext run" or replace "(64)" with "(64-64)" in the line starting with "arch = " in node_modules/web-ext/node_modules/fx-runner/lib/utils.js.
-
 
 Future development
 ------------------

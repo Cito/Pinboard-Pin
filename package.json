@@ -10,8 +10,8 @@
     "build:zip": "npm run build:prod && npm run build:ext",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "web-ext run --source-dir=dist --firefox=\"C:/Program Files/Mozilla Firefox/firefox.exe\"",
-    "test-dev": "web-ext run --source-dir=dist --firefox=\"C:/Program Files/Firefox Developer Edition/firefox.exe\"",
-    "test-nightly": "web-ext run --source-dir=dist --firefox=\"C:/Program Files/Nightly/firefox.exe\""
+    "test:dev": "web-ext run --source-dir=dist --firefox=\"C:/Program Files/Firefox Developer Edition/firefox.exe\"",
+    "test:nightly": "web-ext run --source-dir=dist --firefox=\"C:/Program Files/Nightly/firefox.exe\""
   },
   "private": true,
   "dependencies": {
