@@ -80,10 +80,12 @@ export class PinPageComponent implements OnInit, OnDestroy {
     this.ready = this.update = this.error = this.retry = false;
     this.storage.getOptions().subscribe(options => {
       this.options = options;
-      browser.tabs.executeScript(
-        null, {file: '/js/content.js'}).then(
-        (content: Content[]) => content[0]).catch(
-            () => this.getContent()).then(
+      const getContent = options.ignoremeta ? this.getContent() :
+          browser.tabs.executeScript(
+            null, {file: '/js/content.js'}).then(
+            (content: Content[]) => content[0]).catch(
+                () => this.getContent());
+      getContent.then(
         content => this.setContent(content),
         error => this.logError(
           'Can only pin normal web pages.', error.toString()));

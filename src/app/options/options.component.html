@@ -26,6 +26,12 @@
 </div>
 <hr>
 <div>
+  <input type="checkbox" id="ignoremeta" name="ignoremeta" [ngModel]="options?.ignoremeta"
+         (change)="submit(form)" [disabled]="!options">
+  <label for="ignoremeta">Ignore meta elements for description and tags</label>
+</div>
+<hr>
+<div>
   <input type="checkbox" id="blockquote" name="blockquote" [ngModel]="options?.blockquote"
          (change)="submit(form)" [disabled]="!options">
   <label for="blockquote">Wrap selected description as a block quote</label>
