@@ -15,6 +15,8 @@ export class OptionsComponent implements OnInit, OnDestroy {
 
   options: Options;
 
+  shortcut: string;  // default keyboard shortcut
+
   page: string; // type of page (popup or options)
 
   private messageListener: (message: any) => void;
@@ -29,6 +31,13 @@ export class OptionsComponent implements OnInit, OnDestroy {
     this.storage.getOptions().subscribe(options => {
       this.options = options;
       this.setOnMessageListener(true);
+    });
+    browser.commands.getAll().then(commands => {
+      for (const command of commands) {
+        if (command.name === '_execute_browser_action') {
+          this.shortcut = command.shortcut;
+        }
+      }
     });
   }
 

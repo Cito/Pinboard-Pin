@@ -7,7 +7,7 @@ Pinboard is a fast, no-nonsense bookmarking site for people who value privacy an
 
 This extension pretty much replicates the functionality of the [Pinboard Plus](https://github.com/clvrobj/Pinboard-Plus) extension that has been created for the Chrome browser, but it has been rewritten from scratch to support Firefox using the modern [Angular](https://angular.io/) framework instead of a mix of the older [AngularJS](https://angularjs.org/), [jQuery](https://jquery.com/) and [Underscore](http://underscorejs.org/) libraries used by Pinboard Plus. This rewrite was also intended as a proof-of-concept that modern Angular is a viable platform for building web extensions.
 
-The current version has been tested with Firefox 56 for Windows and Linux.
+The current version has been tested with Firefox 58 for Windows and Linux.
 
 Features:
 ---------
@@ -17,6 +17,7 @@ Features:
 * Update and delete the bookmark for the current page in Pinboard from the popup.
 * Automatic creation of a description from a selected text on the page or using an existing meta tag on the page.
 * Enter or update tags using automatic suggestions in the popup dialog.
+* Use a keyboard shortcut (Alt + P) to open the popup dialog.
 
 Installation:
 -------------
