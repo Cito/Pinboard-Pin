@@ -110,7 +110,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
 
   // store info on current content in the form inputs
   setContent(content: Content) {
-    if (content && content.url) {
+    if (content && content.url && this.pinboard.isValidUrl(content.url)) {
       this.url = content.url;
       this.title = content.title;
       this.description = content.description;

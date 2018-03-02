@@ -203,4 +203,9 @@ export class PinboardService {
     return post.pipe(switchMap(() => show));
   }
 
+  // check if the given URL is valid (can be saved in Pinboard)
+  isValidUrl(url: string): boolean {
+    return url && /:\/\//.test(url);
+  }
+
 }
