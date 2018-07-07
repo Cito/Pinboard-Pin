@@ -5,7 +5,7 @@
   "angular-cli": {},
   "scripts": {
     "build": "ng build --aot",
-    "build:prod": "ng build --aot --prod --sourcemap=false --output-hashing=none",
+    "build:prod": "ng build --aot --prod --source-map=false --output-hashing=none",
     "build:ext": "web-ext build --source-dir=dist --artifacts-dir=.",
     "build:zip": "npm run build:prod && npm run build:ext",
     "lint": "tslint \"src/**/*.ts\"",
