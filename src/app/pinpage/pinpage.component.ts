@@ -1,19 +1,15 @@
 // this component is the save bookmark dialog displayed in the popup
 
-import {
-  Component, ElementRef, OnInit, OnDestroy
-} from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import {NgForm} from '@angular/forms';
 import {Router} from '@angular/router';
 
-import {Subscription} from 'rxjs/Subscription';
-import {Subject} from 'rxjs/Subject';
-import {timer} from 'rxjs/observable/timer';
+import {Subscription, Subject, timer} from 'rxjs';
 import {debounceTime, distinctUntilChanged, finalize} from 'rxjs/operators';
 
 import {IconService} from '../icon.service';
 import {PinboardService, pinboardPage} from '../pinboard.service';
 import {Options, StorageService} from '../storage.service';
-import {NgForm} from '@angular/forms';
 
 const debounceDueTime = 250; // timeout in ms for reacting to changes
 const maxCompletions = 9; // maximum number of suggested completions

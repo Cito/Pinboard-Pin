@@ -14,8 +14,10 @@ import {IconService} from '../icon.service';
 })
 export class BackgroundComponent implements OnInit, OnDestroy {
 
-  private updatedListener: (tabId: number, changeInfo: any, tab: any) => void;
-  private messageListener: (message: any) => void;
+  private readonly updatedListener:
+    (tabId: number, changeInfo: any, tab: any) => void;
+  private readonly messageListener:
+    (message: any) => void;
 
   constructor(private storage: StorageService,
               private pinboard: PinboardService,

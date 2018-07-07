@@ -17,6 +17,14 @@ h1 {
   font-weight: bold;
 }
 
+button {
+  border-width: 1px;
+}
+
+button[type=submit] {
+  border-width: 2px;
+}
+
 div.buttons {
   display: flex;
   justify-content: space-between;
@@ -107,14 +115,6 @@ form div.submit button {
 
 form div.submit label + button {
   margin-left: auto;
-}
-
-button {
-  border-width: 1px;
-}
-
-button[type=submit] {
-  border-width: 2px;
 }
 
 form div.completions {

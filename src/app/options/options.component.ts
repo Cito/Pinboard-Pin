@@ -1,7 +1,9 @@
 // this component is the user setting dialog displayed under options
 
 import {Component, OnInit, OnDestroy, ApplicationRef} from '@angular/core';
+import {NgForm} from '@angular/forms';
 import {Options, StorageService} from '../storage.service';
+import {Post} from "../pinpage/pinpage.component";
 
 
 // Options form
@@ -19,7 +21,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
 
   page: string; // type of page (popup or options)
 
-  private messageListener: (message: any) => void;
+  private readonly messageListener: (message: any) => void;
 
   constructor(private storage: StorageService,
               private appRef: ApplicationRef) {
@@ -86,8 +88,12 @@ export class OptionsComponent implements OnInit, OnDestroy {
   }
 
   // submit form (store options in local storage)
-  submit({value, valid}: {value: Options, valid: boolean}) {
-    if (!value || !valid || this.sameOptions(value)) {
+  submit(form: NgForm) {
+    if (!form.valid) {
+      return false;
+    }
+    const value: Options = form.value;
+    if (!value || this.sameOptions(value)) {
       return false;
     }
     this.options = value;

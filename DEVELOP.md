@@ -40,8 +40,6 @@ Known issues
 
 * Due to limitations in the Web-Ext API, the keyboard shortcut (Alt+P) cannot be changed or deactivated (at least I don't see a simple way how to do this - let me know if I'm overlooking something).
 
-* When using the Keyboard shortcut, the popup dialog does not get focus in Firefox < 60 (if anybody knows a workaround, please let me know).
-
 * Unfortunately, storing tabsets is not supported by the Pinboard API. Therefore you need to be logged in to Pinboard in order use this feature. This works the same as in the official add-on.
 
 * If you get errors when requesting data from the Pinboard API via https, these could be caused by the Privacy Badger extension. Make sure that the domain pinboard.in is fully enabled in Privacy Badger or whitelist it.

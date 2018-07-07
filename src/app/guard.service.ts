@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
-import {
-  Router, ActivatedRouteSnapshot,
-  RouterStateSnapshot, CanActivate
-} from '@angular/router';
+import { Router, ActivatedRouteSnapshot,  RouterStateSnapshot, CanActivate
+  } from '@angular/router';
 
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 import {PinboardService} from './pinboard.service';

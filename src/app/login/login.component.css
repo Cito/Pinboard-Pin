@@ -31,6 +31,7 @@ span.info {
 
 button {
   border-width: 1px;
+  margin-left: 1em;
 }
 
 button[type=submit] {

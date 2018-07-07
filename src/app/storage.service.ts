@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 
-import {Observable} from 'rxjs/Observable';
-import {fromPromise as ObservableFromPromise} from 'rxjs/observable/fromPromise';
+import {Observable, from as ObservableFrom} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 export interface Options {
@@ -33,7 +32,7 @@ export class StorageService {
 
   private storage = browser.storage.local;  // needs "storage" permission
 
-  private info: Object;
+  private readonly info: Object;
 
   constructor() {
     this.info = {}; // for various info shared via this service
@@ -42,18 +41,18 @@ export class StorageService {
   // get keys from local storage as an Observable
   // when only one key is requested, only its value is returned
   get(keys: string | string[] | null): Observable<any> {
-    return ObservableFromPromise(this.storage.get(keys)).pipe(
+    return ObservableFrom(this.storage.get(keys)).pipe(
       map(res => typeof keys === 'string' ? res[keys] : res));
   }
 
   // set keys in local storage as an Observable
   set(keys: any): Observable<any> {
-    return ObservableFromPromise(this.storage.set(keys));
+    return ObservableFrom(this.storage.set(keys));
   }
 
   // remove keys in local storage as an Observable
   remove(keys: string | string[]): Observable<any> {
-    return ObservableFromPromise(this.storage.remove(keys));
+    return ObservableFrom(this.storage.remove(keys));
   }
 
   // retrieve options from local storage

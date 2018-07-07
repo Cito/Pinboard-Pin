@@ -1,15 +1,12 @@
 import {Injectable} from '@angular/core';
 
-import {Observable} from 'rxjs/Observable';
+import {throwError as observableThrow, Observable,
+  of as ObservableOf, forkJoin, from as ObservableFrom} from 'rxjs';
 import {filter, map, mergeMap, switchMap, tap} from 'rxjs/operators';
-import {empty as EmptyObservable} from 'rxjs/observable/empty';
-import {of as ObservableOf} from 'rxjs/observable/of';
-import {forkJoin} from 'rxjs/observable/forkJoin';
 
 import {StorageService} from './storage.service';
 import {Post} from './pinpage/pinpage.component';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {fromPromise as ObservableFromPromise} from 'rxjs/observable/fromPromise';
 
 export const pinboardPage = 'https://pinboard.in/';
 
@@ -34,7 +31,7 @@ export class PinboardService {
     if (!params.auth_token) {
       return this.storage.get('token').pipe(switchMap(token => {
         if (!token) {
-          Observable.throw(new Error('No API token!'));
+          observableThrow(new Error('No API token!'));
         }
         params.auth_token = token;
         return this.httpGet(method, params);
@@ -42,7 +39,8 @@ export class PinboardService {
     }
     params.format = 'json';
     const httpParams = Object.entries(params).reduce(
-      (params, [key, value]) => params.set(key, value), new HttpParams());
+      (params: HttpParams, [key, value]: [string, string]) =>
+        params.set(key, value), new HttpParams());
     return this.http.get(
       apiUrl + method, {params: httpParams});
   }
@@ -198,7 +196,7 @@ export class PinboardService {
     const params = new FormData();
     params.append('data', JSON.stringify(data));
     const post = this.http.post(tabsPage + 'save/', params);
-    const show = ObservableFromPromise(browser.tabs.create(
+    const show = ObservableFrom(browser.tabs.create(
       {url: tabsPage + 'show/'}));
     return post.pipe(switchMap(() => show));
   }
