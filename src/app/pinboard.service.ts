@@ -65,7 +65,6 @@ export class PinboardService {
     const httpParams = Object.entries(params).reduce(
       (params: HttpParams, [key, value]: [string, string]) =>
         params.set(key, value), new HttpParams({encoder: paramsEncoder}));
-    console.error('PARAMS=', httpParams.toString());
     return this.http.get(
       apiUrl + method, {params: httpParams});
   }
