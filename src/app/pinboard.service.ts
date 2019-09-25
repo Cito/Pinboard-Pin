@@ -6,7 +6,7 @@ import {filter, map, mergeMap, switchMap, tap} from 'rxjs/operators';
 
 import {StorageService} from './storage.service';
 import {Post} from './pinpage/pinpage.component';
-import {HttpClient, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpParameterCodec, HttpParams} from '@angular/common/http';
 
 export const pinboardPage = 'https://pinboard.in/';
 
@@ -16,6 +16,30 @@ const tabsPage = pinboardPage + 'tabs/';
 const apiUrl = 'https://api.pinboard.in/v1/';
 
 const cacheTimeout = 1000 * 60 * 60; // one hour cache time
+
+// Create a custom encoder for query parameters that can be used
+// as a workaround for https://github.com/angular/angular/issues/18261
+// in order to fix https://github.com/Cito/Pinboard-Pin/issues/17
+
+class ParamsEncoder implements HttpParameterCodec {
+  encodeKey(key: string): string {
+    return encodeURIComponent(key);
+  }
+
+  encodeValue(value: string): string {
+    return encodeURIComponent(value);
+  }
+
+  decodeKey(key: string): string {
+    return decodeURIComponent(key);
+  }
+
+  decodeValue(value: string): string {
+    return decodeURIComponent(value);
+  }
+}
+
+const paramsEncoder = new ParamsEncoder();
 
 
 // Service for dealing with the Pinboard API
@@ -40,7 +64,8 @@ export class PinboardService {
     params.format = 'json';
     const httpParams = Object.entries(params).reduce(
       (params: HttpParams, [key, value]: [string, string]) =>
-        params.set(key, value), new HttpParams());
+        params.set(key, value), new HttpParams({encoder: paramsEncoder}));
+    console.error('PARAMS=', httpParams.toString());
     return this.http.get(
       apiUrl + method, {params: httpParams});
   }
