@@ -36,8 +36,6 @@ Package unsigned extension as zip file:
 Known issues
 ------------
 
-* When building the extension, you currently need to patch Angular-CLI as mentioned in https://github.com/angular/angular/issues/21948
-
 * Due to limitations in the Web-Ext API, the keyboard shortcut (Alt+P) cannot be changed or deactivated (at least I don't see a simple way how to do this - let me know if I'm overlooking something).
 
 * Unfortunately, storing tabsets is not supported by the Pinboard API. Therefore you need to be logged in to Pinboard in order use this feature. This works the same as in the official add-on.
