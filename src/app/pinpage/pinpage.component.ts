@@ -106,6 +106,10 @@ export class PinPageComponent implements OnInit, OnDestroy {
 
   // process the data gathered by the content script
   processContent(content: RawContent): Content {
+    let { url, title } = content;
+    url = url || null;
+    title = title ? (title.length > 255 ?  // trim title
+      title.slice(0, 254) + '\u2026' : title) : null;
     const options = this.options;
     let description = options.selection ? content.selection : null;
     if (!description && options.meta) {
@@ -126,8 +130,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
       }
     }
     keywords = keywords.length ? keywords.slice(0, 6400) : null;
-    return {url: content.url || null, title: content.title || null,
-      description, keywords};
+    return {url, title, description, keywords};
   }
 
   // get url and title of content (used if content script cannot run)
