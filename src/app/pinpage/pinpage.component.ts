@@ -144,7 +144,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   }
 
   // store info on current content in the form inputs
-  setContent(content: Content) {
+  setContent(content: Content): void {
     if (content && content.url && this.pinboard.isValidUrl(content.url)) {
       this.url = content.url;
       this.title = content.title;
@@ -212,7 +212,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   }
 
   // set form as ready for input
-  setReady() {
+  setReady(): void {
     this.ready = true;
     // wait until inputs have been enabled, then focus
     timer(0).subscribe(() => {
@@ -309,7 +309,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
 
   // this method is called with debounce when tags have changed
   // it must then determine the list of tag completions
-  tagsChanged(tags) {
+  tagsChanged(tags): void {
     const words = tags.replace(',', ' ').split(' ');
     let word = words.length ? words.pop() : null;
     const allTags = this.allTags;
@@ -344,7 +344,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   }
 
   // this method is called when a tag completion was clicked
-  selectCompletion(tag: string) {
+  selectCompletion(tag: string): boolean {
     let value = this.tags || '';
     const words = value.split(' ');
     if (words.length) {
@@ -360,7 +360,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   }
 
   // delete the current bookmark
-  remove() {
+  remove(): boolean {
     if (this.ready && this.update && this.url) {
       this.pinboard.delete(this.url).subscribe(
         () => {
@@ -386,16 +386,26 @@ export class PinPageComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  // submit form (save page to Pinboard)
-  submit(form: NgForm) {
-    if (!form.valid) {
-      return false;
+  // reset error message
+  reset(): boolean {
+    this.error = null;
+    return false;
+  }
+
+  // submit form
+  submit(form: NgForm): boolean {
+    if (form.valid) {
+      this.save(form.value);
     }
-    const value: Post = form.value;
+    return false;
+  }
+
+  // save page to Pinboard
+  save(value: Post): void {
     value.url = (value.url || '').trim();
     value.title = (value.title || '').trim();
     if (!value.url || !value.title) {
-      return false;
+      return;
     }
     value.description = (value.description || '').trim() || null;
     // clean up tags, maximum of 100 tags with 255 chars each
@@ -427,11 +437,10 @@ export class PinPageComponent implements OnInit, OnDestroy {
         this.logError('Sorry, could not save this page to Pinboard',
           error.toString());
       });
-    return false;
   }
 
   // save current tabs as tab set to Pinboard
-  saveTabs() {
+  saveTabs(): void {
     browser.tabs.query({windowType: 'normal', url: '*://*/*'}).then(
       tabs => {
         const wTabs = {};
@@ -461,27 +470,27 @@ export class PinPageComponent implements OnInit, OnDestroy {
   }
 
   // navigate to options
-  settings() {
+  settings(): void {
     // store a note that we are showing on a popup page
     this.storage.setInfo('options.page', 'popup');
     this.router.navigate(['/options']);
   }
 
   // log out from Pinboard
-  logOut() {
+  logOut(): void {
     this.pinboard.forgetToken().subscribe(
       () => this.router.navigate(['/login']));
   }
 
   // show error message and log it on the console
-  logError(errmsg, logmsg) {
+  logError(errmsg, logmsg): void {
     if (errmsg) {
       console.error(logmsg || errmsg);
     }
     this.error = errmsg;
   }
 
-  pinboardLink(page) {
+  pinboardLink(page): boolean {
     if (page && page.indexOf('~') >= 0) {
       this.pinboard.userName.subscribe(
         name => this.pinboardLink(page.replace('~', 'u:' + name)));
@@ -497,7 +506,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   }
 
   // close the whole popup
-  cancel() {
+  cancel(): void {
     window.close();
   }
 
