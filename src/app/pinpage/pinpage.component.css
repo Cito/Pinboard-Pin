@@ -83,6 +83,7 @@ form div.submit button {
   width: 120px;
   padding-top: 16px;
   padding-bottom: 12px;
+  align-self: stretch;
 }
 
 form div.submit label + button {
