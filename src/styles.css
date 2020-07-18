@@ -2,13 +2,57 @@
 
 body {
   font-family: sans-serif;
+  font-size: 14px;
+  background-color: #fafafb;
+  padding: 0;
+  margin: 0;
 }
 
-input[type=text],
-input[type=url] {
+.popup {
+  padding: 8px;
+}
+
+.popup h1 {
+  font-size: 24px;
+  line-height: 36px;
+  background: url("/img/pinboard_32.png") no-repeat;
+  padding: 2px 48px;
+  margin: 0 0 4px;
+  border-bottom: 1px solid #136;
+}
+
+input[type=text], input[type=url], textarea {
   font-family: sans-serif;
+  font-size: 14px;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #8d8585;
+  background-color: #f8f5f5;
 }
 
-div.popup {
-  background-color: white;
+button {
+  border: 1px solid #052C53;
+  border-radius: 4px;
+  background-color: #3A529A;
+  color: #BEDDFB;
+  padding: 8px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+button:hover {
+  background-color: #0D6CCA;
+}
+
+button[type=submit] {
+  border-width: 2px;
+}
+
+button:disabled, button:disabled:hover {
+  opacity: 0.4;
+}
+
+input[type=text]:focus, input[type=url]:focus, textarea:focus, button:focus, input[type=checkbox]:focus {
+  outline: solid 2px #5cbbe7;
+  -moz-outline-radius: 6px
 }

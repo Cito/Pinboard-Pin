@@ -12,43 +12,36 @@
          (change)="submit(form)" [disabled]="!options">
   <label for="ping">Always check and show whether pages have been bookmarked</label>
 </div>
-<hr>
 <div>
   <input type="checkbox" id="unshared" name="unshared" [ngModel]="options?.unshared"
          (change)="submit(form)" [disabled]="!options">
   <label for="unshared">Add new bookmarks as private by default</label>
 </div>
-<hr>
 <div>
   <input type="checkbox" id="toread" name="toread" [ngModel]="options?.toread"
          (change)="submit(form)" [disabled]="!options">
   <label for="toread">Add new bookmarks as unread by default</label>
 </div>
-<hr>
 <div>
   <input type="checkbox" id="meta" name="meta" [ngModel]="options?.meta"
          (change)="submit(form)" [disabled]="!options">
   <label for="meta">Use meta elements for description and tags</label>
 </div>
-<hr>
 <div>
   <input type="checkbox" id="selection" name="selection" [ngModel]="options?.selection"
          (change)="submit(form)" [disabled]="!options">
   <label for="selection">Use selected text as description</label>
 </div>
-<hr>
 <div>
   <input type="checkbox" id="blockquote" name="blockquote" [ngModel]="options?.blockquote"
          (change)="submit(form)" [disabled]="!options">
   <label for="blockquote">Wrap selected description as a block quote</label>
 </div>
-<hr>
 <div>
   <input type="checkbox" id="alpha" name="alpha" [ngModel]="options?.alpha"
          (change)="submit(form)" [disabled]="!options">
   <label for="alpha">Sort tag suggestions by name instead of frequency</label>
 </div>
-<hr>
 <div>
   Keyboard shortcut for saving pages to Pinboard Pin: <kbd>{{shortcut}}</kbd>
 </div>

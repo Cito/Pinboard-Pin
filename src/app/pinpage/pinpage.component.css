@@ -1,14 +1,5 @@
 .popup {
-  width: 40em;
-}
-
-h1 {
-  font-size: 24px;
-  line-height: 36px;
-  background: url("/img/pinboard_32.png") no-repeat;
-  padding: 2px 48px;
-  margin: 0 0 4pt;
-  border-bottom: 1px solid #136;
+  width: 720px;
 }
 
 .error {
@@ -17,42 +8,33 @@ h1 {
   font-weight: bold;
 }
 
-button {
-  border-width: 1px;
-}
-
-button[type=submit] {
-  border-width: 2px;
-}
-
 div.buttons {
   display: flex;
   justify-content: space-between;
-  margin-top: 8pt;
-  margin-bottom: 16pt;
+  margin-top: 8px;
+  margin-bottom: 16px;
 }
 
 div.buttons button {
-  font-size: 8pt;
+  font-size: 10px;
+  max-width: 70px;
 }
 
 form div {
   display: flex;
   align-items: baseline;
-  margin: 3pt 0;
-  width: 40em;
+  margin-top: 8px;
 }
 
 form div label {
-  font-size: 10pt;
-  margin-right: 5pt;
+  margin-right: 8px;
   text-align: right;
-  width: 5em;
+  font-weight: bold;
+  width: 100px;
 }
 
 form div.info {
-  font-size: 10pt;
-  margin-bottom: 6pt;
+  margin-bottom: 8px;
 }
 
 span.info {
@@ -67,13 +49,11 @@ span.suggested {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  width: 36em;
 }
 
 span.suggested a {
-  font-size: 10pt;
   color: #136;
-  margin-right: 6pt;
+  margin-right: 8px;
   text-decoration: none;
 }
 
@@ -86,36 +66,48 @@ span.suggested a:last-child {
 }
 
 span.suggested a:nth-last-child(2) {
-  margin-right: 9pt;
-}
-
-form div input[type=checkbox] + label {
-  font-size: 11pt;
-  margin-left: 5pt;
-  margin-right: 2em;
-  text-align: left;
-  width: auto;
+  margin-right: 12px;
 }
 
 form div input[type=text],
 form div input[type=url],
 form div textarea {
-  width: 38em;
-  font-family: sans-serif;
-  font-size: 11pt;
+  flex: 1 0 70px;
 }
 
 form div.submit {
-  margin-top: 12pt;
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+}
+
+form div.submit label {
+  text-align: left;
+  width: auto;
 }
 
 form div.submit button {
-  margin-left: 8pt;
+  margin-left: 8px;
+  width: 120px;
+  padding-top: 16px;
+  padding-bottom: 12px;
 }
 
 form div.submit label + button {
   margin-left: auto;
 }
+
+input[type=checkbox] {
+  transform: scale(2);
+  margin-right: 12px;
+  margin-bottom: 4px;
+}
+
+input[type=checkbox]:focus {
+  outline: solid 1px #5cbbe7;
+  -moz-outline-radius: 6px
+}
+
 
 form div.completions {
   display: block;
@@ -123,30 +115,30 @@ form div.completions {
   margin: 0;
   padding: 0;
   height: 0;
-  width: 40em;
 }
 
 .completions ul {
   position: absolute;
-  font-size: 11pt;
   list-style-type: none;
-  bottom: 4pt;
-  left: 55pt;
-  width: 16em;
+  bottom: -2px;
+  left: 110px;
+  width: 300px;
+  max-height: 250px;
+  overflow-y: scroll;
   margin: 0;
   padding: 0;
-  background-color: #fff;
+  background-color: #FCFCF9;
   border: 1px solid #333;
-  box-shadow: 3pt 3pt 3pt #333;
-  color: #136;
+  box-shadow: 4px 4px 10px #C3C38C;
+  color: #3A529A;
   z-index: 9;
 }
 
 .completions li {
-  padding: 1pt 2pt;
+  padding: 4px;
 }
 
 .completions li.selected {
-  background-color: #136;
-  color: #ccc;
+  background-color: #3A529A;
+  color: #BEDDFB;
 }
