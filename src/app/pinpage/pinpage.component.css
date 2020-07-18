@@ -91,16 +91,11 @@ form div.submit label + button {
 }
 
 input[type=checkbox] {
-  transform: scale(2);
+  width: 30px;
+  height: 30px;
   margin-right: 12px;
   margin-bottom: 4px;
 }
-
-input[type=checkbox]:focus {
-  outline: solid 1px #5cbbe7;
-  -moz-outline-radius: 6px
-}
-
 
 form div.completions {
   display: block;

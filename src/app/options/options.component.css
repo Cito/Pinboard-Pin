@@ -18,12 +18,15 @@
 
 input[type=checkbox] {
   margin-right: 8px;
-  transform: scale(1.25);
-  padding: 3px;
 }
 
 .popup div button {
   float: right;
+}
+
+form div {
+  display: flex;
+  align-items: baseline;
 }
 
 form div:last-of-type {
