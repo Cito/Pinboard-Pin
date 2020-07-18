@@ -56,3 +56,49 @@ input[type=text]:focus, input[type=url]:focus, textarea:focus, button:focus, inp
   outline: solid 2px #5cbbe7;
   -moz-outline-radius: 6px
 }
+
+span.error {
+  color: #a00;
+}
+
+span.info {
+  color: #375;
+}
+
+span.note {
+  color: #666;
+}
+
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #280034;
+    color: #CCCCCC;
+  }
+
+  .popup h1 {
+    border-bottom: 1px solid #B882D8;
+  }
+
+  input[type=text], input[type=url], textarea {
+    border: 1px solid #B882D8;
+    background-color: #28005C;
+    color: #CCCCCC;
+  }
+
+  span.info {
+    color: #4CB07E;
+  }
+
+  span.note {
+    color: #aaaaaa;
+  }
+
+  span.error {
+    color: #FF0F0F;
+  }
+
+  a, a:visited {
+    color: #5cbbe7;
+  }
+}

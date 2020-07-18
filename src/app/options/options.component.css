@@ -29,3 +29,13 @@ input[type=checkbox] {
 form div:last-of-type {
   margin-top: 16px;
 }
+
+@media (prefers-color-scheme: dark) {
+  .options {
+    color: #CCCCCC;
+    background-color: #232327;
+  }
+  .options h1 {
+    color: #CCCCCC;
+  }
+}

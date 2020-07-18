@@ -37,14 +37,6 @@ form div.info {
   margin-bottom: 8px;
 }
 
-span.info {
-  color: #375;
-}
-
-span.note {
-  color: #666;
-}
-
 span.suggested {
   display: flex;
   align-items: baseline;
@@ -141,4 +133,26 @@ form div.completions {
 .completions li.selected {
   background-color: #3A529A;
   color: #BEDDFB;
+}
+
+@media (prefers-color-scheme: dark) {
+  span.suggested a {
+    color: #B882D8;
+  }
+
+  span.suggested a.added {
+    color: #aaaaaa;
+  }
+
+  .completions ul {
+    background-color: #28005C;
+    border: 1px solid #B882D8;
+    box-shadow: 4px 4px 10px #B882D8;
+    color: #CCCCCC;
+  }
+
+  .completions li.selected {
+    background-color: #3A529A;
+    color: #BEDDFB;
+  }
 }

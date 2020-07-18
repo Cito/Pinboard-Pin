@@ -20,11 +20,3 @@ form div input[type=text] {
 form div button {
   flex: 0 0 80px;
 }
-
-span.error {
-  color: #a00;
-}
-
-span.info {
-  color: #375;
-}
