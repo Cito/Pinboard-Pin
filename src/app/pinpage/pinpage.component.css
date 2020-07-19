@@ -27,10 +27,10 @@ form div {
 }
 
 form div label {
+  flex: 0 0 100px;
   margin-right: 8px;
   text-align: right;
   font-weight: bold;
-  width: 100px;
 }
 
 form div.info {
