@@ -91,6 +91,7 @@ form div.submit label + button {
 }
 
 input[type=checkbox] {
+  flex: 0 0 30px;
   width: 30px;
   height: 30px;
   margin-right: 12px;
