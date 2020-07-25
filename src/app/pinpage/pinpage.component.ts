@@ -115,7 +115,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
     if (!description && options.meta) {
       description = content.description;
     }
-    description = description ? description.slice(0, 64000) : null;
+    description = description?.slice(0, 64000);
     let keywords: string[] = [];
     if (options.meta && content.keywords) {
       for (let word of content.keywords.split(',')) {
@@ -173,7 +173,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   // receive page data and suggested tags from parallel queries
   setData(data: any): void {
     if (data.posts && data.posts.length) {
-      this.date = data ? data.date : null;
+      this.date = data?.date;
       const post = data.posts[0];
       this.url = post.href;
       this.title = post.description;
