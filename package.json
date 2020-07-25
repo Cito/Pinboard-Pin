@@ -30,13 +30,13 @@
     "@angular/cli": "~10.0.4",
     "@angular/compiler-cli": "~10.0.5",
     "@angular/language-service": "~10.0.5",
-    "@types/node": "^12.11.1",
+    "@types/node": "^14.0.26",
     "codelyzer": "^6.0.0",
     "stylelint": "^13.6.1",
     "stylelint-config-standard": "^20.0.0",
-    "ts-node": "~7.0.0",
-    "tslint": "~6.1.0",
-    "typescript": "~3.9.7",
+    "ts-node": "^7.0.1",
+    "tslint": "^6.1.0",
+    "typescript": "^3.9.7",
     "web-ext": "^4.3.0",
     "web-ext-types": "^3.2.1"
   }
