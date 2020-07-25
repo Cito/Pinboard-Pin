@@ -1,6 +1,6 @@
 {
   "name": "pinboard-pin",
-  "version": "0.2.9",
+  "version": "0.3.0",
   "license": "MIT",
   "scripts": {
     "build": "ng build --aot",
