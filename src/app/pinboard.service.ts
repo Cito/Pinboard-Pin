@@ -122,12 +122,12 @@ export class PinboardService {
   }
 
   // delete bookmark with the given url
-  delete(url): Observable<any> {
+  delete(url: string): Observable<any> {
     return this.httpGet('posts/delete', {url: url});
   }
 
   // get suggested tags for the given url
-  suggest(url): Observable<any> {
+  suggest(url: string): Observable<any> {
     return this.httpGet(
       'posts/suggest', {url: url}).pipe(map(data => {
       const tags = {popular: [], recommended: []};
@@ -144,7 +144,7 @@ export class PinboardService {
   }
 
   // get post for the given url together with the suggested tags
-  getAndSuggest(url): Observable<any> {
+  getAndSuggest(url: string): Observable<any> {
     return forkJoin([this.get(url), this.suggest(url)]).pipe(map(
       data => Object.assign(data[0], data[1])));
   }
@@ -184,7 +184,7 @@ export class PinboardService {
   // update the cached object with all used tags and their frequency
   updateTagCache(addTags: string[], savedTags: string[]): Observable<any> {
     return this.storage.get('tags').pipe(mergeMap(cache => {
-      let tags, date;
+      let tags: {[tag: string]: number}, date: number;
       if (cache && cache.tags && cache.date) {
         tags = cache.tags;
         date = cache.date;
@@ -216,7 +216,7 @@ export class PinboardService {
 
   // save the current tabs as tabset using the web form
   // (this operation is not provided by the Pinboard API)
-  saveTabs(data): Observable<browser.tabs.Tab> {
+  saveTabs(data: any): Observable<browser.tabs.Tab> {
     const params = new FormData();
     params.append('data', JSON.stringify(data));
     const post = this.http.post(tabsPage + 'save/', params);
