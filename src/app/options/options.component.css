@@ -1,45 +1,44 @@
 .options {
   color: #555;
+  padding: 8px;
+  background-color: white;
 }
 
 .popup {
-  width: 32em;
+  width: 500px;
 }
 
 .options h1 {
-  font-size: 24pt;
+  font-size: 24px;
   font-weight: normal;
-  margin: 18pt 0 12pt;
+  margin: 18px 0 12px;
   padding: 0;
   color: #777;
 }
 
-.popup h1 {
-  font-size: 24px;
-  line-height: 36px;
-  background: url("/img/pinboard_32.png") no-repeat;
-  padding: 2px 48px;
-  margin: 0 0 18pt;
-  border-bottom: 1px solid #136;
-}
-
 input[type=checkbox] {
-  margin-right: 1em;
-  transform: scale(1.25);
-  padding: 3pt;
-}
-
-hr {
-  height: 1px;
-  margin: 9pt 0;
-  padding: 0;
-  color: #999;
-  background: #999;
-  border: none;
+  margin-right: 8px;
 }
 
 .popup div button {
   float: right;
-  font-size: 8pt;
-  margin: 6pt 0;
+}
+
+form div {
+  display: flex;
+  align-items: baseline;
+}
+
+form div:last-of-type {
+  margin-top: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .options {
+    color: #CCCCCC;
+    background-color: #232327;
+  }
+  .options h1 {
+    color: #CCCCCC;
+  }
 }
