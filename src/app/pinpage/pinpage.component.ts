@@ -115,7 +115,9 @@ export class PinPageComponent implements OnInit, OnDestroy {
     if (!description && options.meta) {
       description = content.description;
     }
-    description = description?.slice(0, 64000);
+    description = description ? (description.length > 3200 ?
+      // trim description (actual max. size seems to be 3798 chars)
+      description.slice(0, 3199) + '\u2026' : description) : null;
     let keywords: string[] = [];
     if (options.meta && content.keywords) {
       for (let word of content.keywords.split(',')) {
@@ -151,7 +153,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
       this.description = content.description;
       if (this.description && this.options.blockquote) {
         this.description = '<blockquote>' +
-          this.description.slice(0, 64000 - 25) + '</blockquote>';
+          this.description.slice(0, 3200 - 25) + '</blockquote>';
       }
       this.keywords = content.keywords;
       this.tags = null;

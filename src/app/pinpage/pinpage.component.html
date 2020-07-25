@@ -61,7 +61,7 @@
   </div><div>
     <label for="description">Description:</label>
     <textarea id="description" name="description" cols="64" rows="4"
-              maxlength="64000" [disabled]="!ready" [ngModel]="description">
+              maxlength="3200" [disabled]="!ready" [ngModel]="description">
     </textarea>
   </div><div class="completions">
     <ul *ngIf="ready && tagsFocus && completions">
