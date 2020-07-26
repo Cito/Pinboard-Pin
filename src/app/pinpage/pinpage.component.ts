@@ -21,6 +21,7 @@ export interface Post {
   tags: string;
   unshared: boolean;
   toread: boolean;
+  noreplace: boolean;
 }
 
 interface Content {
@@ -71,7 +72,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   retry: boolean;
   options: Options;
 
-  private tagsSubject = new Subject();
+  private tagsSubject = new Subject<string>();
   private tagsSubscription: Subscription;
 
   constructor(private pinboard: PinboardService,
@@ -311,7 +312,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
 
   // this method is called with debounce when tags have changed
   // it must then determine the list of tag completions
-  tagsChanged(tags): void {
+  tagsChanged(tags: string): void {
     const words = tags.replace(',', ' ').split(' ');
     let word = words.length ? words.pop() : null;
     const allTags = this.allTags;

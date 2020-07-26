@@ -53,6 +53,7 @@
   "permissions": [
     "storage",
     "tabs",
+    "contextMenus",
     "*://*/*"
   ]
 

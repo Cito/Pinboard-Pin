@@ -64,14 +64,15 @@ export class OptionsComponent implements OnInit, OnDestroy {
 
   // set the listener for internal messages
   setOnMessageListener(on: boolean) {
+    const event = browser.runtime.onMessage;
     const listener = this.messageListener;
-    if (browser.runtime.onMessage.hasListener(listener)) {
+    if (event.hasListener(listener)) {
       if (!on) {
-        browser.runtime.onMessage.removeListener(listener);
+        event.removeListener(listener);
       }
     } else {
       if (on) {
-        browser.runtime.onMessage.addListener(listener);
+        event.addListener(listener);
       }
     }
   }

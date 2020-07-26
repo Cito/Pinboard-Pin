@@ -12,12 +12,13 @@ The current version has been tested with Firefox 78 for Windows and Linux.
 Features
 --------
 
-* Icon changing color to show whether the current page has been bookmarked in Pinboard.
+* Icon that changes its color to show whether the current page has been bookmarked in Pinboard.
 * Save a new bookmark for the current page in Pinboard, adding description and tags in a popup dialog.
 * Update and delete the bookmark for the current page in Pinboard from the popup.
 * Automatic creation of a description from a selected text on the page or using an existing meta tag on the page.
 * Enter or update tags using automatic suggestions in the popup dialog.
 * Use a keyboard shortcut (Alt + P) to open the popup dialog.
+* Use the context menu to open the popup dialog for the current page or to quickly save any link on the page.
 
 Installation
 ------------

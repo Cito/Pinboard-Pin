@@ -101,7 +101,7 @@ export class PinboardService {
   }
 
   // get bookmark with the given url
-  get(url): Observable<any> {
+  get(url: string): Observable<any> {
     return this.httpGet('posts/get', {url: url, meta: 'no'});
   }
 
@@ -115,6 +115,7 @@ export class PinboardService {
     if (post.tags) {
       params.tags = post.tags;
     }
+    params.replace = post.noreplace ? 'no' : 'yes';
     params.shared = post.unshared ? 'no' : 'yes';
     params.toread = post.toread ? 'yes' : 'no';
     return this.httpGet('posts/add', params).pipe(

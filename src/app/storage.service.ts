@@ -11,6 +11,7 @@ export interface Options {
   selection: boolean;
   blockquote: boolean;
   alpha: boolean;
+  menu: boolean;
 }
 
 const defaultOptions: Options = {
@@ -20,7 +21,8 @@ const defaultOptions: Options = {
   meta: true,
   selection: true,
   blockquote: false,
-  alpha: false
+  alpha: false,
+  menu: false,
 };
 
 

@@ -3,8 +3,9 @@
 import {Component, OnInit, OnDestroy} from '@angular/core';
 import {StorageService} from '../storage.service';
 import {PinboardService} from '../pinboard.service';
+import {Post} from '../pinpage/pinpage.component';
 import {IconService} from '../icon.service';
-
+import {Options} from '../storage.service';
 
 // Background page used for checking whether pages are saved in Pinboard
 
@@ -15,70 +16,86 @@ import {IconService} from '../icon.service';
 export class BackgroundComponent implements OnInit, OnDestroy {
 
   private readonly updatedListener:
-    (tabId: number, changeInfo: any, tab: any) => void;
+    (tabId: number, changeInfo: any, tab: browser.tabs.Tab) => void;
   private readonly messageListener:
     (message: any) => void;
+  private readonly menuListener:
+    (info: browser.menus.OnClickData, tab: browser.tabs.Tab) => void;
 
   constructor(private storage: StorageService,
               private pinboard: PinboardService,
               private icon: IconService) {
     this.updatedListener = this.onUpdated.bind(this);
     this.messageListener = this.onMessage.bind(this);
+    this.menuListener = this.onMenuClicked.bind(this);
   }
 
-  private ping: boolean;
+  private ping = false;
+  private menu = false;
+  private toread = false;
+  private unshared = false;
 
   ngOnInit() {
     this.storage.getOptions().subscribe(options => {
-      this.ping = options.ping;
       this.setOnMessageListener(true);
-      this.setOnUpdateListener(this.ping);
+      this.onMessage({options});
     });
   }
 
   ngOnDestroy() {
     this.setOnUpdateListener(false);
     this.setOnMessageListener(false);
+    this.setOnMenuClickedListener(false);
   }
 
   // set the listener for internal messages
   setOnMessageListener(on: boolean) {
+    const event = browser.runtime.onMessage;
     const listener = this.messageListener;
-    if (browser.runtime.onMessage.hasListener(listener)) {
+    if (event.hasListener(listener)) {
       if (!on) {
-        browser.runtime.onMessage.removeListener(listener);
+        event.removeListener(listener);
       }
     } else {
       if (on) {
-        browser.runtime.onMessage.addListener(listener);
+        event.addListener(listener);
       }
     }
   }
 
   // fires when another process connects
   onMessage(message: any): void {
-    if (message.options && message.options.ping !== this.ping) {
-      this.ping = message.options.ping;
-      this.setOnUpdateListener(this.ping);
+    const options: Options = message.options;
+    if (options) {
+      if (options.ping !== this.ping) {
+        this.setOnUpdateListener(options.ping);
+      }
+      if (options.menu !== this.menu) {
+        this.setOnMenuClickedListener(options.menu);
+      }
+      this.toread = options.toread;
+      this.unshared = options.unshared;
     }
   }
 
   // set the listener for url update in browser tabs
   setOnUpdateListener(on: boolean) {
+    const event = browser.tabs.onUpdated;
     const listener = this.updatedListener;
-    if (browser.tabs.onUpdated.hasListener(listener)) {
+    if (event.hasListener(listener)) {
       if (!on) {
-        browser.tabs.onUpdated.removeListener(listener);
+        event.removeListener(listener);
       }
     } else {
       if (on) {
-        browser.tabs.onUpdated.addListener(listener);
+        event.addListener(listener);
       }
     }
+    this.ping = on;
   }
 
   // fires when the active tab in a window changes
-  onUpdated(tabId: number, changeInfo: any, tab: any): void {
+  onUpdated(tabId: number, changeInfo: any, tab: browser.tabs.Tab): void {
     // do not ping Pinboard in incognito mode
     if (tab.incognito) {
       return;
@@ -94,6 +111,70 @@ export class BackgroundComponent implements OnInit, OnDestroy {
         this.icon.setIcon(tabId, false);
       }
     }
+  }
+
+  // set the listener for context menu clicks
+  setOnMenuClickedListener(on: boolean) {
+    const menus = browser.contextMenus;
+    const event = menus.onClicked;
+    const listener = this.menuListener;
+    if (event.hasListener(listener)) {
+      if (!on) {
+        event.removeListener(listener);
+        menus.remove('save-link-to-pinboard');
+        menus.remove('save-page-to-pinboard');
+      }
+    } else {
+      if (on) {
+        browser.contextMenus.create({
+          id: 'save-page-to-pinboard',
+          title: 'Save page to Pinboard',
+          contexts: ['page'],
+          documentUrlPatterns: ['http://*/*', 'https://*/*'],
+          command: '_execute_browser_action'
+        });
+        browser.contextMenus.create({
+          id: 'save-link-to-pinboard',
+          title: 'Save link to Pinboard',
+          contexts: ['link'],
+          targetUrlPatterns: ['http://*/*', 'https://*/*']
+        });
+        event.addListener(listener);
+      }
+    }
+    this.menu = on;
+  }
+
+  // handle menu clicks for saving links in the background
+  onMenuClicked(info: browser.menus.OnClickData, tab: browser.tabs.Tab): void {
+    if (info.menuItemId === 'save-link-to-pinboard' && info.linkUrl) {
+      const url = info.linkUrl;
+      // since we cannot get the actual title, we use the link text instead
+      const title = info.linkText || 'Link saved with Pinboard Pin';
+      const post: Post = {
+        url, title, description: '', tags: '',
+        unshared: this.unshared, toread: this.toread,
+        // links will be only added,
+        // we do not want to overwrite existing titles and descriptions
+        noreplace: true
+      };
+      this.pinboard.save(post).subscribe(
+        error => {
+          if (error && !/already exists/.test(error)) {
+            this.saveLinkError(error);
+          }
+        },
+        error => {
+          this.saveLinkError(error.toString());
+        });
+    }
+  }
+
+  saveLinkError(error: string): void {
+    console.error(error);
+    // we cannot display an alert directly, so we use a workaround
+    const showAlert = 'alert("Could not save the link to Pinboard.")';
+    browser.tabs.executeScript(null, {code : showAlert});
   }
 
 }
