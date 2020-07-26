@@ -16,7 +16,7 @@ body {
 .popup h1 {
   font-size: 24px;
   line-height: 36px;
-  background: url("/img/pinboard_32.png") no-repeat;
+  background: url('/img/pinboard_32.png') no-repeat;
   padding: 2px 48px;
   margin: 0 0 4px;
   border-bottom: 1px solid #136;
@@ -63,6 +63,16 @@ input[type=checkbox] {
   height: 16px;
 }
 
+input[type=checkbox]::before {
+  content: '\2713';
+  text-align: center;
+  color: #f8f5f5;
+  font-size: 14px;
+  line-height: 1;
+  float: left;
+  margin-left: 1px;
+}
+
 input[type=checkbox]:checked {
   background-color: #3A529A;
 }
@@ -84,7 +94,6 @@ span.note {
   color: #666;
 }
 
-
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #280034;
@@ -104,6 +113,10 @@ span.note {
   input[type=checkbox] {
     border: 1px solid #B882D8;
     background-color: #28005C;
+  }
+
+  input[type=checkbox]::before {
+    color: #28005C;
   }
 
   input[type=checkbox]:checked {

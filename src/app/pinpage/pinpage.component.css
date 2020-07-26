@@ -98,6 +98,11 @@ input[type=checkbox] {
   margin-bottom: 4px;
 }
 
+input[type=checkbox]::before {
+  font-size: 28px;
+  margin-left: 3px;
+}
+
 form div.completions {
   display: block;
   position: relative;
