@@ -44,3 +44,18 @@ Author
 
 * [Christoph Zwerschke](https://github.com/cito)
 
+Some Screenshots
+----------------
+
+Saving a page with Pinboard Pin:
+
+![Saving a page - light mode](screenshots/pinboard-pin-light.png?raw=true)
+
+Changing the Pinboard Pin settings:
+
+![Settings - light mode](screenshots/pinboard-pin-settings.png?raw=true)
+
+Pinboard Pin also supports dark mode:
+
+![Saving a page - dark mode](screenshots/pinboard-pin-dark.png?raw=true)
+
