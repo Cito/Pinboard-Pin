@@ -1,9 +1,9 @@
 // this component is the user setting dialog displayed under options
 
-import {Component, OnInit, OnDestroy, ApplicationRef} from '@angular/core';
-import {NgForm} from '@angular/forms';
-import {Options, StorageService} from '../storage.service';
-import {Post} from "../pinpage/pinpage.component";
+import { Component, OnInit, OnDestroy, ApplicationRef } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { Options, StorageService } from '../storage.service';
+import { Post } from "../pinpage/pinpage.component";
 
 
 // Options form
@@ -11,7 +11,7 @@ import {Post} from "../pinpage/pinpage.component";
 @Component({
   selector: 'app-options',
   templateUrl: './options.component.html',
-  styleUrls: ['./options.component.css']
+  styleUrls: ['./options.component.scss']
 })
 export class OptionsComponent implements OnInit, OnDestroy {
 
@@ -21,10 +21,13 @@ export class OptionsComponent implements OnInit, OnDestroy {
 
   page: string; // type of page (popup or options)
 
+  theme = 'light'; // color scheme of the page
+
   private readonly messageListener: (message: any) => void;
 
-  constructor(private storage: StorageService,
-              private appRef: ApplicationRef) {
+  constructor(
+    private storage: StorageService,
+    private appRef: ApplicationRef) {
     this.messageListener = this.onMessage.bind(this);
   }
 
@@ -32,6 +35,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
     this.page = this.storage.getInfo('options.page') || 'options';
     this.storage.getOptions().subscribe(options => {
       this.options = options;
+      this.setTheme();
       this.setOnMessageListener(true);
     });
     browser.commands.getAll().then(commands => {
@@ -47,10 +51,19 @@ export class OptionsComponent implements OnInit, OnDestroy {
     this.setOnMessageListener(false);
   }
 
+  setTheme() {
+    this.theme = (
+      this.options.dark === true ||
+      this.options.dark !== false &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches) ?
+      'dark' : 'light';
+  }
+
   // check whether given options are the same
   sameOptions(options: Options): boolean {
     for (const key in this.options) {
-      if (typeof this.options[key] === 'boolean') {
+      if (typeof this.options[key] === 'boolean'
+        && key !== 'dark') {
         options[key] = !!options[key];
       }
     }
@@ -84,6 +97,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
     const options = message.options;
     if (options && !this.sameOptions(options)) {
       this.options = options;
+      this.setTheme();
       this.appRef.tick(); // run change detection
     }
   }
@@ -98,8 +112,9 @@ export class OptionsComponent implements OnInit, OnDestroy {
       return false;
     }
     this.options = value;
+    this.setTheme();
     this.storage.setOptions(value).subscribe();
-    browser.runtime.sendMessage({'options': value});
+    browser.runtime.sendMessage({ 'options': value });
     return false;
   }
 

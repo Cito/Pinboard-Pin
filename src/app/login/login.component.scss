@@ -10,13 +10,12 @@ form div {
   display: flex;
   flex-direction: row;
   align-items: stretch;
-}
+  input[type="text"] {
+    flex: 1 0 70px;
+    margin-right: 8px;
+  }
 
-form div input[type=text] {
-  flex: 1 0 70px;
-  margin-right: 8px;
-}
-
-form div button {
-  flex: 0 0 80px;
+  button {
+    flex: 0 0 80px;
+  }
 }

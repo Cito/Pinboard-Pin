@@ -1,11 +1,11 @@
 // this component pings the saved state of pages in the background
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
-import {StorageService} from '../storage.service';
-import {PinboardService} from '../pinboard.service';
-import {Post} from '../pinpage/pinpage.component';
-import {IconService} from '../icon.service';
-import {Options} from '../storage.service';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { StorageService } from '../storage.service';
+import { PinboardService } from '../pinboard.service';
+import { Post } from '../pinpage/pinpage.component';
+import { IconService } from '../icon.service';
+import { Options } from '../storage.service';
 
 // Background page used for checking whether pages are saved in Pinboard
 
@@ -22,9 +22,10 @@ export class BackgroundComponent implements OnInit, OnDestroy {
   private readonly menuListener:
     (info: browser.menus.OnClickData, tab: browser.tabs.Tab) => void;
 
-  constructor(private storage: StorageService,
-              private pinboard: PinboardService,
-              private icon: IconService) {
+  constructor(
+    private storage: StorageService,
+    private pinboard: PinboardService,
+    private icon: IconService) {
     this.updatedListener = this.onUpdated.bind(this);
     this.messageListener = this.onMessage.bind(this);
     this.menuListener = this.onMenuClicked.bind(this);
@@ -38,7 +39,7 @@ export class BackgroundComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.storage.getOptions().subscribe(options => {
       this.setOnMessageListener(true);
-      this.onMessage({options});
+      this.onMessage({ options });
     });
   }
 
@@ -174,7 +175,7 @@ export class BackgroundComponent implements OnInit, OnDestroy {
     console.error(error);
     // we cannot display an alert directly, so we use a workaround
     const showAlert = 'alert("Could not save the link to Pinboard.")';
-    browser.tabs.executeScript(null, {code : showAlert});
+    browser.tabs.executeScript(null, { code: showAlert });
   }
 
 }

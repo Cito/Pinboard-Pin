@@ -1,0 +1,163 @@
+/* You can add global styles to this file, and also import other style files */
+
+body {
+  font-family: sans-serif;
+  font-size: 14px;
+  background-color: #fafafb;
+  padding: 0;
+  margin: 0;
+  color: #101010;
+}
+
+.popup {
+  padding: 8px;
+}
+
+.popup h1 {
+  font-size: 24px;
+  line-height: 36px;
+  background: url("/img/pinboard_32.png") no-repeat;
+  padding: 2px 48px;
+  margin: 0 0 4px;
+  border-bottom: 1px solid #136;
+}
+
+input[type="text"],
+input[type="url"],
+textarea {
+  font-family: sans-serif;
+  font-size: 14px;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #3a529a;
+  background-color: #f8f5f5;
+  width: 42em;
+  color: #101010;
+}
+
+button {
+  border: 1px solid #052c53;
+  border-radius: 4px;
+  background-color: #3a529a;
+  color: #beddfb;
+  padding: 6px;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+button:hover {
+  background-color: #0d6cca;
+}
+
+button[type="submit"] {
+  border-width: 2px;
+}
+
+button:disabled,
+button:disabled:hover {
+  opacity: 0.4;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  -moz-appearance: none;
+  border-radius: 4px;
+  border: 1px solid #3a529a;
+  background-color: #f8f5f5;
+  width: 16px;
+  height: 16px;
+
+  &::before {
+    content: "\2713";
+    text-align: center;
+    color: #f8f5f5;
+    font-size: 14px;
+    line-height: 1;
+    float: left;
+    margin-left: 1.5px;
+  }
+
+  &:checked {
+    background-color: #3a529a;
+  }
+}
+
+input[type="radio"] {
+  border-radius: 8px;
+
+  &::before {
+    content: "\2b24";
+    font-size: 12px;
+  }
+}
+
+input[type="text"],
+input[type="url"],
+textarea,
+button,
+input[type="checkbox"] {
+  &:focus {
+    outline: solid 2px #5cbbe7;
+    -moz-outline-radius: 6px;
+  }
+}
+
+span.error {
+  color: #a00;
+}
+
+span.info {
+  color: #375;
+}
+
+span.note {
+  color: #666;
+}
+
+div.dark {
+  background-color: #280034;
+  color: #cccccc;
+
+  .popup h1 {
+    border-bottom: 1px solid #b882d8;
+  }
+
+  input[type="text"],
+  input[type="url"],
+  textarea {
+    border: 1px solid #b882d8;
+    background-color: #28005c;
+    color: #cccccc;
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    border: 1px solid #b882d8;
+    background-color: #28005c;
+
+    &::before {
+      color: #28005c;
+    }
+
+    &:checked {
+      background-color: #b882d8;
+    }
+  }
+
+  span.info {
+    color: #4cb07e;
+  }
+
+  span.note {
+    color: #aaaaaa;
+  }
+
+  span.error {
+    color: #ff0f0f;
+  }
+
+  a,
+  a:visited {
+    color: #5cbbe7;
+  }
+}

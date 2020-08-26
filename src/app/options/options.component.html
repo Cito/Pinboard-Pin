@@ -1,56 +1,68 @@
-<div [class]="page">
+<div [ngClass]="[page, theme]">
 
-<div *ngIf="page == 'popup'">
-  <button type="button" (click)="close()">Close</button>
-</div>
+  <div *ngIf="page == 'popup'">
+    <button type="button" (click)="close()">Close</button>
+  </div>
 
-<h1>{{ page == 'popup'? 'Pinboard Pin Options' : 'Options' }}</h1>
+  <h1>{{ page == 'popup'? 'Pinboard Pin Options' : 'Options' }}</h1>
 
-<form (ngSubmit)="submit(form)" #form="ngForm">
-<div>
-  <input type="checkbox" id="ping" name="ping" [ngModel]="options?.ping"
-         (change)="submit(form)" [disabled]="!options">
-  <label for="ping">Always check and show whether pages have been bookmarked</label>
-</div>
-<div>
-  <input type="checkbox" id="unshared" name="unshared" [ngModel]="options?.unshared"
-         (change)="submit(form)" [disabled]="!options">
-  <label for="unshared">Add new bookmarks as private by default</label>
-</div>
-<div>
-  <input type="checkbox" id="toread" name="toread" [ngModel]="options?.toread"
-         (change)="submit(form)" [disabled]="!options">
-  <label for="toread">Add new bookmarks as unread by default</label>
-</div>
-<div>
-  <input type="checkbox" id="meta" name="meta" [ngModel]="options?.meta"
-         (change)="submit(form)" [disabled]="!options">
-  <label for="meta">Use meta elements for description and tags</label>
-</div>
-<div>
-  <input type="checkbox" id="selection" name="selection" [ngModel]="options?.selection"
-         (change)="submit(form)" [disabled]="!options">
-  <label for="selection">Use selected text as description</label>
-</div>
-<div>
-  <input type="checkbox" id="blockquote" name="blockquote" [ngModel]="options?.blockquote"
-         (change)="submit(form)" [disabled]="!options">
-  <label for="blockquote">Wrap selected description as a block quote</label>
-</div>
-<div>
-  <input type="checkbox" id="alpha" name="alpha" [ngModel]="options?.alpha"
-         (change)="submit(form)" [disabled]="!options">
-  <label for="alpha">Sort tag suggestions by name instead of frequency</label>
-</div>
-<div>
-  <input type="checkbox" id="menu" name="menu" [ngModel]="options?.menu"
-         (change)="submit(form)" [disabled]="!options">
-  <label for="menu">Add an entry to the context menu</label>
-</div>
-<div>
-  Keyboard shortcut for saving pages to Pinboard Pin:
-  <kbd style="margin-left:.67em">{{shortcut}}</kbd>
-</div>
-</form>
+  <form (ngSubmit)="submit(form)" #form="ngForm">
+    <div>
+      <input type="checkbox" id="ping" name="ping" [ngModel]="options?.ping" (change)="submit(form)"
+        [disabled]="!options">
+      <label for="ping">Always check and show whether pages have been bookmarked</label>
+    </div>
+    <div>
+      <input type="checkbox" id="unshared" name="unshared" [ngModel]="options?.unshared" (change)="submit(form)"
+        [disabled]="!options">
+      <label for="unshared">Add new bookmarks as private by default</label>
+    </div>
+    <div>
+      <input type="checkbox" id="toread" name="toread" [ngModel]="options?.toread" (change)="submit(form)"
+        [disabled]="!options">
+      <label for="toread">Add new bookmarks as unread by default</label>
+    </div>
+    <div>
+      <input type="checkbox" id="meta" name="meta" [ngModel]="options?.meta" (change)="submit(form)"
+        [disabled]="!options">
+      <label for="meta">Use meta elements for description and tags</label>
+    </div>
+    <div>
+      <input type="checkbox" id="selection" name="selection" [ngModel]="options?.selection" (change)="submit(form)"
+        [disabled]="!options">
+      <label for="selection">Use selected text as description</label>
+    </div>
+    <div>
+      <input type="checkbox" id="blockquote" name="blockquote" [ngModel]="options?.blockquote" (change)="submit(form)"
+        [disabled]="!options">
+      <label for="blockquote">Wrap selected description as a block quote</label>
+    </div>
+    <div>
+      <input type="checkbox" id="alpha" name="alpha" [ngModel]="options?.alpha" (change)="submit(form)"
+        [disabled]="!options">
+      <label for="alpha">Sort tag suggestions by name instead of frequency</label>
+    </div>
+    <div>
+      <input type="checkbox" id="menu" name="menu" [ngModel]="options?.menu" (change)="submit(form)"
+        [disabled]="!options">
+      <label for="menu">Add an entry to the context menu</label>
+    </div>
+    <div style="margin-top:1ex">
+      <label for="dark-on">Dark mode:</label>
+      <input type="radio" id="dark-auto" name="dark" [ngModel]="options?.dark" (change)="submit(form)" [value]="null"
+        [disabled]="!options">
+      <label for="dark-auto">auto</label>
+      <input type="radio" id="dark-on" name="dark" [ngModel]="options?.dark" (change)="submit(form)" [value]="true"
+        [disabled]="!options">
+      <label for="dark-on">on</label>
+      <input type="radio" id="dark-off" name="dark" [ngModel]="options?.dark" (change)="submit(form)" [value]="false"
+        [disabled]="!options">
+      <label for="dark-off">off</label>
+    </div>
+    <div style="margin-top:1ex">
+      Keyboard shortcut for saving pages to Pinboard Pin:
+      <kbd style="margin-left:.67em">{{shortcut}}</kbd>
+    </div>
+  </form>
 
 </div>

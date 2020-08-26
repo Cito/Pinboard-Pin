@@ -9,7 +9,7 @@ const defaultIcon = {
   '96': '/img/pinboard_idle_96.png',
   '128': '/img/pinboard_idle_128.png',
   '256': '/img/pinboard_idle_256.png'
- };
+};
 
 const savedIcon = {
   '16': '/img/pinboard_16.png',
@@ -20,7 +20,7 @@ const savedIcon = {
   '96': '/img/pinboard_96.png',
   '128': '/img/pinboard_128.png',
   '256': '/img/pinboard_256.png'
- };
+};
 
 
 // Service for setting the browser action icon

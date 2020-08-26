@@ -1,15 +1,15 @@
 // this component is the save bookmark dialog displayed in the popup
 
 import { Component, ElementRef, OnInit, OnDestroy } from '@angular/core';
-import {NgForm} from '@angular/forms';
-import {Router} from '@angular/router';
+import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 
-import {Subscription, Subject, timer} from 'rxjs';
-import {debounceTime, distinctUntilChanged, finalize} from 'rxjs/operators';
+import { Subscription, Subject, timer } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 
-import {IconService} from '../icon.service';
-import {PinboardService, pinboardPage} from '../pinboard.service';
-import {Options, StorageService} from '../storage.service';
+import { IconService } from '../icon.service';
+import { PinboardService, pinboardPage } from '../pinboard.service';
+import { Options, StorageService } from '../storage.service';
 
 const debounceDueTime = 250; // timeout in ms for reacting to changes
 const maxCompletions = 9; // maximum number of suggested completions
@@ -47,7 +47,7 @@ interface RawContent {
 @Component({
   selector: 'app-popup',
   templateUrl: './pinpage.component.html',
-  styleUrls: ['./pinpage.component.css']
+  styleUrls: ['./pinpage.component.scss']
 })
 export class PinPageComponent implements OnInit, OnDestroy {
 
@@ -56,7 +56,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   description: string; // description
   tags: string; // current tags
   savedTags: string; // tags already saved for this URL
-  allTags: {[tag: string]: number}; // all of our tags with frequency
+  allTags: { [tag: string]: number }; // all of our tags with frequency
   suggested: string[]; // recommended tags from our own
   popular: string[]; // other popular tags
   keywords: string[]; // keywords taken from the page
@@ -72,24 +72,28 @@ export class PinPageComponent implements OnInit, OnDestroy {
   retry: boolean;
   options: Options;
 
+  theme = 'light'; // color scheme of the page
+
   private tagsSubject = new Subject<string>();
   private tagsSubscription: Subscription;
 
-  constructor(private pinboard: PinboardService,
-              private storage: StorageService,
-              private icon: IconService,
-              private router: Router,
-              private eref: ElementRef) { }
+  constructor(
+    private pinboard: PinboardService,
+    private storage: StorageService,
+    private icon: IconService,
+    private router: Router,
+    private eref: ElementRef) { }
 
   ngOnInit() {
     this.ready = this.update = this.error = this.retry = false;
     this.storage.getOptions().subscribe(options => {
       this.options = options;
+      this.setTheme();
       const getContent = options.meta || options.selection ?
-        browser.tabs.executeScript(null, {file: '/js/content.js'}
-          ).then((content: Array<RawContent>) =>
+        browser.tabs.executeScript(null, { file: '/js/content.js' }
+        ).then((content: Array<RawContent>) =>
           this.processContent(content[0])).catch(() =>
-          this.getContent()) : this.getContent();
+            this.getContent()) : this.getContent();
       getContent.then(
         content => this.setContent(content),
         error => this.logError(
@@ -103,6 +107,14 @@ export class PinPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.tagsSubscription.unsubscribe();
+  }
+
+  setTheme() {
+    this.theme = (
+      this.options.dark === true ||
+      this.options.dark !== false &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches) ?
+      'dark' : 'light';
   }
 
   // process the data gathered by the content script
@@ -133,17 +145,17 @@ export class PinPageComponent implements OnInit, OnDestroy {
       }
     }
     keywords = keywords.length ? keywords.slice(0, 6400) : null;
-    return {url, title, description, keywords};
+    return { url, title, description, keywords };
   }
 
   // get url and title of content (used if content script cannot run)
   getContent(): Promise<Content> {
     return browser.tabs.query(
-      {active: true, currentWindow: true}).then(
-      tabs => tabs[0]).then(tab => ({
-        url: tab.url, title: tab.title,
-        description: null, keywords: null
-    }));
+      { active: true, currentWindow: true }).then(
+        tabs => tabs[0]).then(tab => ({
+          url: tab.url, title: tab.title,
+          description: null, keywords: null
+        }));
   }
 
   // store info on current content in the form inputs
@@ -164,9 +176,9 @@ export class PinPageComponent implements OnInit, OnDestroy {
       this.suggested = this.popular = null;
       // query both page data and suggested tags
       this.pinboard.getAndSuggest(this.url).subscribe(
-          data => this.setData(data),
-          error => this.logError(
-            'Cannot check this page on Pinboard.', error.toString()));
+        data => this.setData(data),
+        error => this.logError(
+          'Cannot check this page on Pinboard.', error.toString()));
     } else {
       this.logError('Can only pin normal web pages.',
         'Cannot get the URL of the page');
@@ -186,11 +198,11 @@ export class PinPageComponent implements OnInit, OnDestroy {
       this.toread = post.toread === 'yes';
       this.update = true;
       // set browser icon to saved state
-      browser.tabs.query({url: this.url}).then(tabs => {
-          for (const tab of tabs) {
-            this.icon.setIcon(tab.id, true);
-          }
-        },
+      browser.tabs.query({ url: this.url }).then(tabs => {
+        for (const tab of tabs) {
+          this.icon.setIcon(tab.id, true);
+        }
+      },
         error => console.error(error.toString()));
     }
     // Note: "popular" and "recommended" are interchanged in Pinboard
@@ -220,14 +232,14 @@ export class PinPageComponent implements OnInit, OnDestroy {
     // wait until inputs have been enabled, then focus
     timer(0).subscribe(() => {
       const focus = this.url ? (this.title ? (
-        this.tags && ! this.description ?
-        'description' : 'tags') : 'title') : 'url';
+        this.tags && !this.description ?
+          'description' : 'tags') : 'title') : 'url';
       this.eref.nativeElement.querySelector('#' + focus).focus();
     });
   }
 
   // check whether the given tags have already been added
-  hasTags(tags: string|string[]): boolean {
+  hasTags(tags: string | string[]): boolean {
     if (!this.tags) {
       return false;
     }
@@ -239,7 +251,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   }
 
   // add the given tags if they have not already been added, otherwise remove
-  addTags(tags: string|string[]): void {
+  addTags(tags: string | string[]): void {
     if (!Array.isArray(tags)) {
       tags = [tags as string];
     }
@@ -330,7 +342,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
     }
     // sort matching tags by decreasing frequency
     matches.sort((a: [string, number], b: [string, number]) =>
-        b[1] - a[1] || a[0].localeCompare(b[0]));
+      b[1] - a[1] || a[0].localeCompare(b[0]));
     matches.splice(maxCompletions);
     const completions: string[] = matches.map(a => a[0]).reverse();
     if (completions.length) {
@@ -371,7 +383,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
           const savedTags = this.savedTags ? this.savedTags.split(' ') : [];
           this.pinboard.updateTagCache([], savedTags).pipe(finalize(
             // set the browser icon to unsaved state
-            () => browser.tabs.query({url: this.url}).then(tabs => {
+            () => browser.tabs.query({ url: this.url }).then(tabs => {
               for (const tab of tabs) {
                 this.icon.setIcon(tab.id, false);
               }
@@ -425,7 +437,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
           // update the tags in the cache
           this.pinboard.updateTagCache(tags, savedTags).pipe(finalize(
             // set the browser icon to saved state
-            () => browser.tabs.query({url: this.url}).then(tabs => {
+            () => browser.tabs.query({ url: this.url }).then(tabs => {
               for (const tab of tabs) {
                 this.icon.setIcon(tab.id, true);
               }
@@ -444,7 +456,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
 
   // save current tabs as tab set to Pinboard
   saveTabs(): void {
-    browser.tabs.query({windowType: 'normal', url: '*://*/*'}).then(
+    browser.tabs.query({ windowType: 'normal', url: '*://*/*' }).then(
       tabs => {
         const wTabs = {};
         for (const tab of tabs) {
@@ -452,7 +464,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
           if (!wTabs[wId]) {
             wTabs[wId] = {};
           }
-          wTabs[wId][tab.index] = {title: tab.title, url: tab.url};
+          wTabs[wId][tab.index] = { title: tab.title, url: tab.url };
         }
         const windows = Object.keys(wTabs).map(
           wId => Object.keys(wTabs[wId]).map(
@@ -502,7 +514,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
       if (page) {
         url += page;
       }
-      browser.tabs.create({url: url});
+      browser.tabs.create({ url: url });
       this.cancel();
     }
     return false;

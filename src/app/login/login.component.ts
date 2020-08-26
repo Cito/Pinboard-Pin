@@ -1,10 +1,11 @@
 // this component is the login dialog displayed in the popup
 
-import {Component, OnInit} from '@angular/core';
-import {NgForm} from '@angular/forms';
-import {Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 
-import {passwordPage, PinboardService} from '../pinboard.service';
+import { passwordPage, PinboardService } from '../pinboard.service';
+import { Options, StorageService } from '../storage.service';
 
 export interface Login {
   token: string;
@@ -16,20 +17,35 @@ export interface Login {
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
 
   checking = false;
   error = false;
 
-  constructor(private pinboard: PinboardService, private router: Router) { }
+  theme = 'light'; // color scheme of the page
+
+  constructor(
+    private pinboard: PinboardService,
+    private storage: StorageService,
+    private router: Router) { }
 
   ngOnInit() {
+    this.storage.getOptions().subscribe(options =>
+      this.setTheme(options));
+  }
+
+  setTheme(options: Options) {
+    this.theme = (
+      options.dark === true ||
+      options.dark !== false &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches) ?
+      'dark' : 'light';
   }
 
   openPasswordPage() {
-    browser.windows.create({url: passwordPage});
+    browser.windows.create({ url: passwordPage });
     return false;
   }
 

@@ -1,29 +1,27 @@
-<div class="popup">
+<div class="popup" [ngClass]="theme">
 
-<h1>Log in to Pinboard</h1>
+  <h1>Log in to Pinboard</h1>
 
-<p>You must log in to Pinboard first using the API token
-  that you can find on your
-  <a href="#" (click)="openPasswordPage()">Pinboard password page</a>.</p>
+  <p>You must log in to Pinboard first using the API token
+    that you can find on your
+    <a href="#" (click)="openPasswordPage()">Pinboard password page</a>.</p>
 
-<form (ngSubmit)="submit(form)" #form="ngForm">
-  <div>
-    <label *ngIf="!checking" for="token">
-      <span *ngIf="!error">Please enter your API token:</span>
-      <span *ngIf="error" class="error">Invalid API token, please re-enter:</span>
-    </label>
-    <label *ngIf="checking"><span class="info">Trying to log in
-      with this API token...</span></label>
-  </div>
-  <div>
-    <input id="token" name="token" type="text"
-           pattern=".+:.+" placeholder="API Token" autofocus
-           [disabled]="checking" ngModel>
-    <button type="submit"
-            [disabled]="checking || !form.valid || !form.controls.token?.value">
-      Log in
-    </button>
-  </div>
-</form>
+  <form (ngSubmit)="submit(form)" #form="ngForm">
+    <div>
+      <label *ngIf="!checking" for="token">
+        <span *ngIf="!error">Please enter your API token:</span>
+        <span *ngIf="error" class="error">Invalid API token, please re-enter:</span>
+      </label>
+      <label *ngIf="checking"><span class="info">Trying to log in
+          with this API token...</span></label>
+    </div>
+    <div>
+      <input id="token" name="token" type="text" pattern=".+:.+" placeholder="API Token" autofocus [disabled]="checking"
+        ngModel>
+      <button type="submit" [disabled]="checking || !form.valid || !form.controls.token?.value">
+        Log in
+      </button>
+    </div>
+  </form>
 
 </div>

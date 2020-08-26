@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Router, ActivatedRouteSnapshot,  RouterStateSnapshot, CanActivate
-  } from '@angular/router';
+import {
+  Router, ActivatedRouteSnapshot, RouterStateSnapshot, CanActivate
+} from '@angular/router';
 
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import {PinboardService} from './pinboard.service';
+import { PinboardService } from './pinboard.service';
 
 
 // Guard for the index route of this extension
@@ -13,10 +14,10 @@ import {PinboardService} from './pinboard.service';
 @Injectable()
 export class Guard implements CanActivate {
 
-  constructor(private pinboard: PinboardService, private router: Router) {}
+  constructor(private pinboard: PinboardService, private router: Router) { }
 
   canActivate(route: ActivatedRouteSnapshot,
-              state: RouterStateSnapshot): Observable<boolean>|boolean {
+    state: RouterStateSnapshot): Observable<boolean> | boolean {
 
     const page = route.queryParams['page'];
 

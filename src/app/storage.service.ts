@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 
-import {Observable, from as ObservableFrom} from 'rxjs';
-import {map} from 'rxjs/operators';
+import { Observable, from as ObservableFrom } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface Options {
   ping: boolean;
@@ -12,6 +12,7 @@ export interface Options {
   blockquote: boolean;
   alpha: boolean;
   menu: boolean;
+  dark: boolean;
 }
 
 const defaultOptions: Options = {
@@ -23,6 +24,7 @@ const defaultOptions: Options = {
   blockquote: false,
   alpha: false,
   menu: false,
+  dark: null,
 };
 
 
@@ -65,7 +67,7 @@ export class StorageService {
 
   // store options in local storage
   setOptions(options: Options): Observable<any> {
-    return this.set({options: options});
+    return this.set({ options: options });
   }
 
   // set a volatile info for users of this service

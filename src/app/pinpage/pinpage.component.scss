@@ -1,0 +1,167 @@
+.popup {
+  width: 720px;
+}
+
+.error {
+  color: #a00;
+  text-align: center;
+  font-weight: bold;
+}
+
+div.buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  margin-bottom: 16px;
+
+  button {
+    font-size: 11px;
+    max-width: 70px;
+  }
+}
+
+form {
+  div {
+    display: flex;
+    align-items: baseline;
+    margin-top: 8px;
+
+    label {
+      flex: 0 0 100px;
+      margin-right: 8px;
+      text-align: right;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    textarea {
+      flex: 1 0 70px;
+    }
+  }
+
+  div.info {
+    margin-bottom: 8px;
+  }
+
+  div.submit {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+
+    label {
+      text-align: left;
+      width: auto;
+
+      + button {
+        margin-left: auto;
+      }
+    }
+
+    button {
+      margin-left: 8px;
+      width: 120px;
+      font-size: 14px;
+      padding: 8px;
+      align-self: stretch;
+    }
+  }
+
+  div.completions {
+    display: block;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    height: 0;
+  }
+}
+
+span.suggested {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  a {
+    color: #136;
+    margin-right: 8px;
+    text-decoration: none;
+  }
+
+  a.added {
+    color: #888;
+  }
+
+  a:last-child {
+    font-weight: bold;
+  }
+
+  a:nth-last-child(2) {
+    margin-right: 12px;
+  }
+}
+
+input[type="checkbox"] {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  margin-right: 12px;
+  margin-bottom: 4px;
+}
+
+input[type="checkbox"]::before {
+  font-size: 28px;
+  margin-left: 3px;
+}
+
+.completions {
+  ul {
+    position: absolute;
+    list-style-type: none;
+    bottom: -2px;
+    left: 110px;
+    width: 300px;
+    max-height: 250px;
+    overflow-y: scroll;
+    margin: 0;
+    padding: 0;
+    background-color: #fcfcf9;
+    border: 1px solid #333;
+    box-shadow: 4px 4px 10px #c3c38c;
+    color: #3a529a;
+    z-index: 9;
+  }
+
+  li {
+    padding: 4px;
+  }
+
+  li.selected {
+    background-color: #3a529a;
+    color: #beddfb;
+  }
+}
+
+.popup.dark {
+  span.suggested {
+    a {
+      color: #b882d8;
+    }
+
+    a.added {
+      color: #aaaaaa;
+    }
+  }
+
+  .completions {
+    ul {
+      background-color: #28005c;
+      border: 1px solid #b882d8;
+      box-shadow: 4px 4px 10px #b882d8;
+      color: #cccccc;
+    }
+
+    li.selected {
+      background-color: #3a529a;
+      color: #beddfb;
+    }
+  }
+}
