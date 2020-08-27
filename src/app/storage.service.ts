@@ -4,15 +4,16 @@ import { Observable, from as ObservableFrom } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export interface Options {
-  ping: boolean;
-  unshared: boolean;
-  toread: boolean;
-  meta: boolean;
-  selection: boolean;
-  blockquote: boolean;
-  alpha: boolean;
-  menu: boolean;
-  dark: boolean;
+  ping: boolean;  // check whether pages are bookmarked
+  unshared: boolean;  // add as private by default
+  toread: boolean;  // add as to read by default
+  meta: boolean;  // parse meta elements
+  selection: boolean;  // use selected text
+  blockquote: boolean;  // wrap as block quote
+  alpha: boolean;  // sort alphabetically
+  popular: boolean;  // show popular tags
+  menu: boolean;  // add entry to context menu
+  dark: boolean;  // use dark mode
 }
 
 const defaultOptions: Options = {
@@ -23,6 +24,7 @@ const defaultOptions: Options = {
   selection: true,
   blockquote: false,
   alpha: false,
+  popular: true,
   menu: false,
   dark: null,
 };
@@ -62,7 +64,15 @@ export class StorageService {
   // retrieve options from local storage
   getOptions(): Observable<Options> {
     return this.get('options').pipe(
-      map(options => options || defaultOptions));
+      map(options => {
+        const opts = {};
+        Object.keys(defaultOptions).forEach(
+          key => {
+            const val = options[key];
+            opts[key] = val === undefined ? defaultOptions[key] : val;
+          });
+        return opts as Options;
+      }));
   }
 
   // store options in local storage

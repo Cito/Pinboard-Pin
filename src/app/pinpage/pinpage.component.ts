@@ -209,7 +209,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
     if (data.popular) {
       this.suggested = data.popular;
     }
-    if (data.recommended) {
+    if (this.options.popular && data.recommended) {
       this.popular = data.recommended;
     }
     this.pinboard.cachedTags().subscribe(tags => {
