@@ -3,7 +3,6 @@
 import { Component, OnInit, OnDestroy, ApplicationRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Options, StorageService } from '../storage.service';
-import { Post } from "../pinpage/pinpage.component";
 
 
 // Options form
