@@ -68,7 +68,7 @@ export class StorageService {
         const opts = {};
         Object.keys(defaultOptions).forEach(
           key => {
-            const val = options[key];
+            const val = options ? options[key] : undefined;
             opts[key] = val === undefined ? defaultOptions[key] : val;
           });
         return opts as Options;
