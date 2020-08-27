@@ -3,10 +3,25 @@
 body {
   font-family: sans-serif;
   font-size: 14px;
-  background-color: #fafafb;
   padding: 0;
   margin: 0;
-  color: #101010;
+}
+
+main {
+  --hue: 220;
+  --hue-2: 100;
+  --color-lines: hsl(var(--hue-2), 33%, 40%);
+  --color-focus: hsl(var(--hue-2), 40%, 67%);
+  --color-bg: hsl(var(--hue), 5%, 95%);
+  --color-fg: hsl(var(--hue), 5%, 5%);
+  --color-bg-input: hsl(var(--hue), 10%, 90%);
+  --color-fg-input: hsl(var(--hue), 10%, 10%);
+  --color-error: hsl(0, 67%, 50%);
+  --color-info: hsl(120, 33%, 37%);
+  --color-note: hsl(240, 10%, 33%);
+
+  color: var(--color-fg);
+  background-color: var(--color-bg);
 }
 
 .popup {
@@ -19,7 +34,7 @@ body {
   background: url("/img/pinboard_32.png") no-repeat;
   padding: 2px 48px;
   margin: 0 0 4px;
-  border-bottom: 1px solid #136;
+  border-bottom: 1px solid var(--color-lines);
 }
 
 input[type="text"],
@@ -29,24 +44,26 @@ textarea {
   font-size: 14px;
   padding: 8px;
   border-radius: 4px;
-  border: 1px solid #3a529a;
-  background-color: #f8f5f5;
+  border: 1px solid var(--color-lines);
+  background-color: var(--color-bg-input);
+  color: var(--color-fg-input);
   width: 42em;
-  color: #101010;
 }
 
 button {
-  border: 1px solid #052c53;
+  border: none;
+  border-bottom: 2px solid hsl(var(--hue), 20%, 15%);
   border-radius: 4px;
-  background-color: #3a529a;
-  color: #beddfb;
+  background: linear-gradient(to bottom, hsl(var(--hue), 40%, 33%) 0%, hsl(var(--hue), 30%, 25%) 100%);
+  color: hsl(var(--hue), 25%, 95%);
   padding: 6px;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 12px;
+  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-  background-color: #0d6cca;
+  --hue: var(--hue-2);
 }
 
 button[type="submit"] {
@@ -62,15 +79,15 @@ input[type="checkbox"],
 input[type="radio"] {
   -moz-appearance: none;
   border-radius: 4px;
-  border: 1px solid #3a529a;
-  background-color: #f8f5f5;
+  border: 1px solid var(--color-lines);
+  background-color: var(--color-bg-input);
   width: 16px;
   height: 16px;
 
   &::before {
     content: "\2713";
     text-align: center;
-    color: #f8f5f5;
+    color: var(--color-bg-input);
     font-size: 14px;
     line-height: 1;
     float: left;
@@ -78,7 +95,7 @@ input[type="radio"] {
   }
 
   &:checked {
-    background-color: #3a529a;
+    background-color: hsl(var(--hue), 40%, 33%);
   }
 }
 
@@ -93,71 +110,46 @@ input[type="radio"] {
 
 input[type="text"],
 input[type="url"],
+input[type="checkbox"],
+input[type="radio"],
 textarea,
-button,
-input[type="checkbox"] {
+button {
   &:focus {
-    outline: solid 2px #5cbbe7;
+    outline: solid 2px var(--color-focus);
     -moz-outline-radius: 6px;
   }
 }
 
+input[type="radio"]:focus {
+  -moz-outline-radius: 9px;
+}
+
 span.error {
-  color: #a00;
+  color: var(--color-error);
 }
 
 span.info {
-  color: #375;
+  color: var(--color-info);
 }
 
 span.note {
-  color: #666;
+  color: var(--color-note);
 }
 
-div.dark {
-  background-color: #280034;
-  color: #cccccc;
-
-  .popup h1 {
-    border-bottom: 1px solid #b882d8;
-  }
-
-  input[type="text"],
-  input[type="url"],
-  textarea {
-    border: 1px solid #b882d8;
-    background-color: #28005c;
-    color: #cccccc;
-  }
+main.dark {
+  --color-bg: hsl(var(--hue), 25%, 7%);
+  --color-fg: hsl(var(--hue), 12%, 93%);
+  --color-bg-input: hsl(var(--hue), 25%, 15%);
+  --color-fg-input: hsl(var(--hue), 12%, 85%);
+  --color-focus: hsl(var(--hue-2), 40%, 50%);
+  --color-error: hsl(0, 75%, 57%);
+  --color-info: hsl(120, 67%, 40%);
+  --color-note: hsl(240, 10%, 60%);
 
   input[type="checkbox"],
   input[type="radio"] {
-    border: 1px solid #b882d8;
-    background-color: #28005c;
-
-    &::before {
-      color: #28005c;
-    }
-
     &:checked {
-      background-color: #b882d8;
+      background-color: hsl(var(--hue), 50%, 85%);
     }
-  }
-
-  span.info {
-    color: #4cb07e;
-  }
-
-  span.note {
-    color: #aaaaaa;
-  }
-
-  span.error {
-    color: #ff0f0f;
-  }
-
-  a,
-  a:visited {
-    color: #5cbbe7;
   }
 }

@@ -3,7 +3,7 @@
 }
 
 .error {
-  color: #a00;
+  color: var(--color-error);
   text-align: center;
   font-weight: bold;
 }
@@ -81,21 +81,21 @@ span.suggested {
   align-items: baseline;
   flex-wrap: wrap;
   a {
-    color: #136;
+    color: hsl(var(--hue), 40%, 33%);
     margin-right: 8px;
     text-decoration: none;
-  }
 
-  a.added {
-    color: #888;
-  }
+    &.added {
+      color: hsl(var(--hue), 5%, 60%);
+    }
 
-  a:last-child {
-    font-weight: bold;
-  }
+    &:last-child {
+      font-weight: bold;
+    }
 
-  a:nth-last-child(2) {
-    margin-right: 12px;
+    &:nth-last-child(2) {
+      margin-right: 12px;
+    }
   }
 }
 
@@ -105,11 +105,11 @@ input[type="checkbox"] {
   height: 30px;
   margin-right: 12px;
   margin-bottom: 4px;
-}
 
-input[type="checkbox"]::before {
-  font-size: 28px;
-  margin-left: 3px;
+  &::before {
+    font-size: 28px;
+    margin-left: 3px;
+  }
 }
 
 .completions {
@@ -123,10 +123,10 @@ input[type="checkbox"]::before {
     overflow-y: scroll;
     margin: 0;
     padding: 0;
-    background-color: #fcfcf9;
-    border: 1px solid #333;
-    box-shadow: 4px 4px 10px #c3c38c;
-    color: #3a529a;
+    background-color: var(--color-bg-input);
+    border: 1px solid hsl(var(--hue-2), 15%, 67%);
+    box-shadow: 4px 4px 10px hsl(var(--hue), 15%, 67%);
+    color: hsl(var(--hue), 40%, 33%);
     z-index: 9;
   }
 
@@ -135,33 +135,31 @@ input[type="checkbox"]::before {
   }
 
   li.selected {
-    background-color: #3a529a;
-    color: #beddfb;
+    background-color: hsl(var(--hue), 33%, 40%);
+    color: var(--color-bg-input);
   }
 }
 
-.popup.dark {
+main.dark {
   span.suggested {
     a {
-      color: #b882d8;
-    }
-
-    a.added {
-      color: #aaaaaa;
+      color: hsl(var(--hue), 60%, 67%);
+  
+      &.added {
+        color: hsl(var(--hue), 5%, 40%);
+      }
     }
   }
 
   .completions {
     ul {
-      background-color: #28005c;
-      border: 1px solid #b882d8;
-      box-shadow: 4px 4px 10px #b882d8;
-      color: #cccccc;
+      border: 1px solid hsl(var(--hue-2), 15%, 25%);
+      box-shadow: 4px 4px 10px hsl(var(--hue), 15%, 3%);
+      color: hsl(var(--hue), 33%, 86%);
     }
 
     li.selected {
-      background-color: #3a529a;
-      color: #beddfb;
+      background-color: hsl(var(--hue), 40%, 80%);
     }
   }
 }

@@ -1,14 +1,11 @@
 .options {
-  color: #555;
   padding: 8px;
-  background-color: white;
 
   h1 {
     font-size: 24px;
     font-weight: normal;
     margin: 18px 0 12px;
     padding: 0;
-    color: #777;
   }
 }
 
@@ -31,13 +28,4 @@ input[type="radio"] {
 form div {
   display: flex;
   align-items: center;
-}
-
-.options.dark {
-  color: #cccccc;
-  background-color: #232327;
-
-  h1 {
-    color: #cccccc;
-  }
 }

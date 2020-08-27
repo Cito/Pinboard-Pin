@@ -1,5 +1,5 @@
 Pinboard Pin Web Extension for Firefox
---------------------------------------
+----------------------------s----------
 
 Pinboard Pin is a modern web extension for pinning pages on [Pinboard](https://pinboard.in) with Firefox.
 
@@ -19,6 +19,7 @@ Features
 * Enter or update tags using automatic suggestions in the popup dialog.
 * Use a keyboard shortcut (Alt + P) to open the popup dialog.
 * Use the context menu to open the popup dialog for the current page or to quickly save any link on the page.
+* Configurable dark mode for the popup dialog.
 
 Installation
 ------------
