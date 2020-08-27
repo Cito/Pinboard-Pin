@@ -1,5 +1,5 @@
 Pinboard Pin Web Extension for Firefox
-----------------------------s----------
+--------------------------------------
 
 Pinboard Pin is a modern web extension for pinning pages on [Pinboard](https://pinboard.in) with Firefox.
 
