@@ -2,4 +2,4 @@
 // the app. You can add your own extra polyfills to this file.
 
 // Zone JS is required by Angular itself.
-import 'zone.js/dist/zone';
+import 'zone.js';
