@@ -1,23 +1,26 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "module": "es2020",
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
     "experimentalDecorators": true,
-    "target": "es2017",
     "typeRoots": [
       "node_modules/@types",
       "node_modules/web-ext-types"
     ],
+    "target": "es2017",
+    "module": "es2020",
     "lib": [
-      "es2018",
+      "es2020",
       "dom"
     ]
   },
   "angularCompilerOptions": {
-    "preserveWhitespaces": false
+    "preserveWhitespaces": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
   }
 }

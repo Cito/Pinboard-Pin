@@ -12,8 +12,6 @@ Install the application for development:
 
     npm install
 
-On Windows, use latest Node or Yarn if installation fails.
-
 Building and testing
 --------------------
 
