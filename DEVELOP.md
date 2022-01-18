@@ -43,6 +43,8 @@ Known issues
 Future development
 ------------------
 
+* Use v2 of the Pinboard API when this is available with all the neccesary functionality.
+
 * Require only those permissions that are needed for the selected options (issue #8).
 
 * The Pinboard API seems to have the "popular" and "recommended" categories interchanged in the "suggest" method for tags. "Popular" are actually those taken from our own tags, contrary to what the Pinboard API docs say. This has already been reported to the Pinboard support. If they will changed this behavior, we need to adapt our code that currently swaps these categories.
