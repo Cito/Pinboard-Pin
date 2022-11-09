@@ -59,4 +59,3 @@ Changing the Pinboard Pin settings:
 Pinboard Pin also supports dark mode:
 
 ![Saving a page - dark mode](screenshots/pinboard-pin-dark.png?raw=true)
-

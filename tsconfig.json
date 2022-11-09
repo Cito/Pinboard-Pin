@@ -10,7 +10,7 @@
       "node_modules/@types",
       "node_modules/web-ext-types"
     ],
-    "target": "es2017",
+    "target": "es2020",
     "module": "es2020",
     "lib": [
       "es2020",

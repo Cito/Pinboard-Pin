@@ -43,7 +43,7 @@ Known issues
 Future development
 ------------------
 
-* Use v2 of the Pinboard API when this is available with all the neccesary functionality.
+* Use v2 of the Pinboard API when this is available with all the necessary functionality.
 
 * Require only those permissions that are needed for the selected options (issue #8).
 
@@ -53,4 +53,4 @@ Future development
 
 * The PinPageComponent is much too big, and should be refactored to use child components, and objects instead of individual properties for the form fields, similar to the OptionsComponent.
 
-* Make this extension also work with Chrome (use the chrome.* API instead of the browser.* API provided by Firefox).
+* Make this extension also work with Chrome (use the `chrome.*` API instead of the `browser.*` API provided by Firefox).
