@@ -110,7 +110,7 @@ export class PinboardService {
   // add or replace bookmark with given attributes
   save(post: Post):
     Observable<string> {
-    const params: any = { url: post.url, description: post.title };
+    const params: any = { url: post.url, description: post.title, dt: new Date().toISOString() };
     if (post.description) {
       params.extended = post.description;
     }
