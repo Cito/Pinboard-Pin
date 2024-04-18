@@ -10,7 +10,7 @@ import { PinPageComponent } from './pinpage/pinpage.component';
 import { OptionsComponent } from './options/options.component';
 import { BackgroundComponent } from './background/background.component';
 
-import { Guard } from './guard.service';
+import { guard } from './guard';
 import { PinboardService } from './pinboard.service';
 import { StorageService } from './storage.service';
 import { IconService } from './icon.service';
@@ -22,7 +22,7 @@ const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'options', component: OptionsComponent },
   { path: 'background', component: BackgroundComponent },
-  { path: '**', component: PinPageComponent, canActivate: [Guard] }
+  { path: '**', component: PinPageComponent, canActivate: [guard] }
 ];
 
 
@@ -41,7 +41,7 @@ const appRoutes: Routes = [
     HttpClientModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [Guard, PinboardService, StorageService, IconService],
+  providers: [PinboardService, StorageService, IconService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
