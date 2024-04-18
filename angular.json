@@ -82,18 +82,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "pinboard-pin:build"
+            "buildTarget": "pinboard-pin:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "pinboard-pin:build:production"
+              "buildTarget": "pinboard-pin:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "pinboard-pin:build"
+            "buildTarget": "pinboard-pin:build"
           }
         },
         "lint": {

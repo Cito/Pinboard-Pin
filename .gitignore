@@ -2,6 +2,7 @@
 
 # cache
 .angular/cache
+.nx/cache
 
 # compiled output
 /dist
