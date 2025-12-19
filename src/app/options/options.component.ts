@@ -38,6 +38,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
       this.options = options;
       this.setTheme();
       this.setOnMessageListener(true);
+      this.appRef.tick();
     });
     browser.commands.getAll().then(commands => {
       for (const command of commands) {
@@ -45,6 +46,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
           this.shortcut = command.shortcut;
         }
       }
+      this.appRef.tick();
     });
   }
 

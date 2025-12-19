@@ -1,6 +1,6 @@
 // this component is the save bookmark dialog displayed in the popup
 
-import { Component, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -85,7 +85,8 @@ export class PinPageComponent implements OnInit, OnDestroy {
     private storage: StorageService,
     private icon: IconService,
     private router: Router,
-    private eref: ElementRef) { }
+    private eref: ElementRef,
+    private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
     this.ready = this.update = this.error = this.retry = false;
@@ -98,9 +99,9 @@ export class PinPageComponent implements OnInit, OnDestroy {
           this.processContent(content[0])).catch(() =>
             this.getContent()) : this.getContent();
       getContent.then(
-        content => this.setContent(content),
-        error => this.logError(
-          'Can only pin normal web pages.', error.toString()));
+        content => { this.setContent(content); this.cdr.detectChanges(); },
+        error => { this.logError(
+          'Can only pin normal web pages.', error.toString()); this.cdr.detectChanges(); });
     });
     this.tagsFocus = false;
     this.tagsSubscription = this.tagsSubject.pipe(
@@ -226,12 +227,14 @@ export class PinPageComponent implements OnInit, OnDestroy {
       }
       this.completions = null;
       this.setReady();
+      this.cdr.detectChanges();
     });
   }
 
   // set form as ready for input
   setReady(): void {
     this.ready = true;
+    this.cdr.detectChanges();
     // wait until inputs have been enabled, then focus
     timer(0).subscribe(() => {
       const focus = this.url ? (this.title ? (
@@ -506,6 +509,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
       console.error(logmsg || errmsg);
     }
     this.error = errmsg;
+    this.cdr.detectChanges();
   }
 
   pinboardLink(page): boolean {
