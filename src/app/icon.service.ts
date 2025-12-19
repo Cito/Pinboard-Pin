@@ -25,7 +25,7 @@ const savedIcon = {
 
 // Service for setting the browser action icon
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class IconService {
 
   constructor() { }

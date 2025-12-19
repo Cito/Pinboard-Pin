@@ -342,11 +342,9 @@ export class PinPageComponent implements OnInit, OnDestroy {
     const alpha = this.options.alpha;
     if (word) {
       word = word.toLowerCase();
-      for (const tag in allTags) {
-        if (allTags.hasOwnProperty(tag)) {
-          if (tag.toLowerCase().startsWith(word) && !words.includes(tag)) {
-            matches.push([tag, alpha ? 0 : allTags[tag]]);
-          }
+      for (const tag of Object.keys(allTags)) {
+        if (tag.toLowerCase().startsWith(word) && !words.includes(tag)) {
+          matches.push([tag, alpha ? 0 : allTags[tag]]);
         }
       }
     }
@@ -523,7 +521,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   }
 
   pinboardLink(page): boolean {
-    if (page && page.indexOf('~') >= 0) {
+    if (page && page.includes('~')) {
       this.pinboard.userName.subscribe({
         next: name => this.pinboardLink(page.replace('~', 'u:' + name))
       });

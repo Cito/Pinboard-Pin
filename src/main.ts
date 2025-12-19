@@ -9,9 +9,6 @@ import { PinPageComponent } from './app/pinpage/pinpage.component';
 import { OptionsComponent } from './app/options/options.component';
 import { BackgroundComponent } from './app/background/background.component';
 import { guard } from './app/guard';
-import { PinboardService } from './app/pinboard.service';
-import { StorageService } from './app/storage.service';
-import { IconService } from './app/icon.service';
 import { environment } from './environments/environment';
 
 if (environment.production) {
@@ -29,9 +26,6 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideZonelessChangeDetection(),
     provideRouter(appRoutes),
-    provideHttpClient(withInterceptorsFromDi()),
-    PinboardService,
-    StorageService,
-    IconService
+    provideHttpClient(withInterceptorsFromDi())
   ]
 }).catch(error => console.error(error));

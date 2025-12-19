@@ -13,7 +13,11 @@
     ],
     "target": "ES2022",
     "module": "es2020",
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "lib": [
+      "ES2022",
+      "DOM"
+    ]
   },
   "angularCompilerOptions": {
     "preserveWhitespaces": false,

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
 import {
-  throwError as observableThrow, Observable,
-  of as ObservableOf, forkJoin, from as ObservableFrom
+  throwError, Observable,
+  of, forkJoin, from
 } from 'rxjs';
 import { filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 
@@ -46,7 +46,7 @@ const paramsEncoder = new ParamsEncoder();
 
 // Service for dealing with the Pinboard API
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class PinboardService {
 
   constructor(private http: HttpClient, private storage: StorageService) { }
@@ -57,7 +57,7 @@ export class PinboardService {
     if (!params.auth_token) {
       return this.storage.get('token').pipe(switchMap(token => {
         if (!token) {
-          return observableThrow(() => new Error('No API token!'));
+          return throwError(() => new Error('No API token!'));
         }
         params.auth_token = token;
         return this.httpGet(method, params);
@@ -75,14 +75,14 @@ export class PinboardService {
   setToken(value: string): Observable<boolean> {
     const values = value.split(':', 2);
     if (values.length !== 2) {
-      return ObservableOf(false);
+      return of(false);
     }
     return this.httpGet(
       'user/api_token', { auth_token: value }).pipe(
         map(data => data.result === values[1]),
         switchMap(ok => ok ?
           this.storage.set({ token: value }).pipe(map(() => true)) :
-          ObservableOf(false)));
+          of(false)));
   }
 
   // check whether we still need an API token
@@ -155,10 +155,8 @@ export class PinboardService {
   // get the list of all used tags (with numeric tag counters)
   tags(): Observable<{ [tag: string]: number }> {
     return this.httpGet('tags/get').pipe(map(tags => {
-      for (const tag in tags) {
-        if (tags.hasOwnProperty(tag)) {
-          tags[tag] = +tags[tag];
-        }
+      for (const tag of Object.keys(tags)) {
+        tags[tag] = +tags[tag];
       }
       return tags;
     }));
@@ -180,7 +178,7 @@ export class PinboardService {
           this.storage.set({ tags: { tags: tags, date: date } }).subscribe());
       }
       // but still return the cached tags for faster access
-      return ObservableOf(tags.tags);
+      return of(tags.tags);
     }));
   }
 
@@ -196,7 +194,7 @@ export class PinboardService {
         date = Date.now();
       }
       for (const tag of savedTags) {
-        if (!addTags.includes[tag]) {
+        if (!addTags.includes(tag)) {
           if (tags.hasOwnProperty(tag)) {
             if (--tags[tag] <= 0) {
               delete tags[tag];
@@ -205,7 +203,7 @@ export class PinboardService {
         }
       }
       for (const tag of addTags) {
-        if (!savedTags.includes[tag]) {
+        if (!savedTags.includes(tag)) {
           if (tags.hasOwnProperty(tag)) {
             ++tags[tag];
           } else {
@@ -223,7 +221,7 @@ export class PinboardService {
     const params = new FormData();
     params.append('data', JSON.stringify(data));
     const post = this.http.post(tabsPage + 'save/', params);
-    const show = ObservableFrom(browser.tabs.create(
+    const show = from(browser.tabs.create(
       { url: tabsPage + 'show/' }));
     return post.pipe(switchMap(() => show));
   }
