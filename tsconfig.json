@@ -5,7 +5,7 @@
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": false,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "experimentalDecorators": true,
     "typeRoots": [
       "node_modules/@types",

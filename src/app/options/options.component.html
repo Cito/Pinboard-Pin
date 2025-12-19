@@ -1,8 +1,10 @@
 <main [ngClass]="[page, theme]">
 
-  <div *ngIf="page == 'popup'">
-    <button type="button" (click)="close()">Close</button>
-  </div>
+  @if (page == 'popup') {
+    <div>
+      <button type="button" (click)="close()">Close</button>
+    </div>
+  }
 
   <h1>{{ page == 'popup'? 'Pinboard Pin Options' : 'Options' }}</h1>
 

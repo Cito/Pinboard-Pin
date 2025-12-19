@@ -6,22 +6,30 @@
     that you can find on your
     <a href="#" (click)="openPasswordPage()">Pinboard password page</a>.</p>
 
-  <form (ngSubmit)="submit(form)" #form="ngForm">
-    <div>
-      <label *ngIf="!checking" for="token">
-        <span *ngIf="!error">Please enter your API token:</span>
-        <span *ngIf="error" class="error">Invalid API token, please re-enter:</span>
-      </label>
-      <label *ngIf="checking"><span class="info">Trying to log in
+    <form (ngSubmit)="submit(form)" #form="ngForm">
+      <div>
+        @if (!checking) {
+          <label for="token">
+            @if (!error) {
+              <span>Please enter your API token:</span>
+            }
+            @if (error) {
+              <span class="error">Invalid API token, please re-enter:</span>
+            }
+          </label>
+        }
+        @if (checking) {
+          <label><span class="info">Trying to log in
           with this API token...</span></label>
-    </div>
-    <div>
-      <input id="token" name="token" type="text" pattern=".+:.+" placeholder="API Token" autofocus [disabled]="checking"
-        ngModel>
-      <button type="submit" [disabled]="checking || !form.valid || !form.controls.token?.value">
-        Log in
-      </button>
-    </div>
-  </form>
+        }
+      </div>
+      <div>
+        <input id="token" name="token" type="text" pattern=".+:.+" placeholder="API Token" autofocus [disabled]="checking"
+          ngModel>
+        <button type="submit" [disabled]="checking || !form.valid || !form.controls.token?.value">
+          Log in
+        </button>
+      </div>
+    </form>
 
-</main>
+  </main>
