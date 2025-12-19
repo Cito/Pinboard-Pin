@@ -16,8 +16,7 @@ const intervalParts = [
 // Pipe for showing time intervals
 
 @Pipe({
-    name: 'ago',
-    standalone: false
+    name: 'ago'
 })
 export class AgoPipe implements PipeTransform {
 

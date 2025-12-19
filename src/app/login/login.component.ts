@@ -1,7 +1,8 @@
 // this component is the login dialog displayed in the popup
 
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { passwordPage, PinboardService } from '../pinboard.service';
@@ -15,10 +16,10 @@ export interface Login {
 // Log in form
 
 @Component({
-    selector: 'app-login',
-    templateUrl: './login.component.html',
-    styleUrls: ['./login.component.scss'],
-    standalone: false
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss'],
+  imports: [CommonModule, FormsModule]
 })
 export class LoginComponent implements OnInit {
 

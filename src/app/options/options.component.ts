@@ -1,17 +1,18 @@
 // this component is the user setting dialog displayed under options
 
 import { Component, OnInit, OnDestroy, ApplicationRef } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Options, StorageService } from '../storage.service';
 
 
 // Options form
 
 @Component({
-    selector: 'app-options',
-    templateUrl: './options.component.html',
-    styleUrls: ['./options.component.scss'],
-    standalone: false
+  selector: 'app-options',
+  templateUrl: './options.component.html',
+  styleUrls: ['./options.component.scss'],
+  imports: [CommonModule, FormsModule]
 })
 export class OptionsComponent implements OnInit, OnDestroy {
 

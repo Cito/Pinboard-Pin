@@ -11,8 +11,7 @@ import { Options } from '../storage.service';
 
 @Component({
     selector: 'app-background',
-    template: '<h1>Background page for Pinboard</h1>',
-    standalone: false
+    template: '<h1>Background page for Pinboard</h1>'
 })
 export class BackgroundComponent implements OnInit, OnDestroy {
 

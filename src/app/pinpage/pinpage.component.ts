@@ -1,8 +1,10 @@
 // this component is the save bookmark dialog displayed in the popup
 
 import { Component, ElementRef, OnInit, OnDestroy } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { AgoPipe } from '../interval.pipe';
 
 import { Subscription, Subject, timer } from 'rxjs';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
@@ -48,7 +50,7 @@ interface RawContent {
     selector: 'app-popup',
     templateUrl: './pinpage.component.html',
     styleUrls: ['./pinpage.component.scss'],
-    standalone: false
+    imports: [CommonModule, FormsModule, AgoPipe]
 })
 export class PinPageComponent implements OnInit, OnDestroy {
 
