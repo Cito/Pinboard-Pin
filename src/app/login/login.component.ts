@@ -4,6 +4,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs/operators';
 
 import { passwordPage, PinboardService } from '../pinboard.service';
 import { Options, StorageService } from '../storage.service';
@@ -66,22 +67,23 @@ export class LoginComponent implements OnInit {
       return false;
     }
     this.checking = true;
-    this.pinboard.setToken(token).subscribe(
-      ok => {
+    this.pinboard.setToken(token).pipe(
+      finalize(() => this.cdr.detectChanges())
+    ).subscribe({
+      next: ok => {
         this.error = !ok;
         if (ok) {
           this.continue();
         } else {
           this.checking = false;
         }
-        this.cdr.detectChanges();
       },
-      error => {
+      error: error => {
         this.error = true;
         console.error(error.toString());
         this.checking = false;
-        this.cdr.detectChanges();
-      });
+      }
+    });
     return false;
   }
 

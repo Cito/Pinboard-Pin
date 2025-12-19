@@ -179,10 +179,11 @@ export class PinPageComponent implements OnInit, OnDestroy {
       this.retry = true;
       this.suggested = this.popular = null;
       // query both page data and suggested tags
-      this.pinboard.getAndSuggest(this.url).subscribe(
-        data => this.setData(data),
-        error => this.logError(
-          'Cannot check this page on Pinboard.', error.toString()));
+      this.pinboard.getAndSuggest(this.url).subscribe({
+        next: data => this.setData(data),
+        error: error => this.logError(
+          'Cannot check this page on Pinboard.', error.toString())
+      });
     } else {
       this.logError('Can only pin normal web pages.',
         'Cannot get the URL of the page');
@@ -216,18 +217,21 @@ export class PinPageComponent implements OnInit, OnDestroy {
     if (this.options.popular && data.recommended) {
       this.popular = data.recommended;
     }
-    this.pinboard.cachedTags().subscribe(tags => {
-      this.allTags = tags;
-      if (this.tags) {
-        this.tags.trim();
-        this.savedTags = this.tags;
-        this.tags += ' ';
-      } else {
-        this.savedTags = null;
+    this.pinboard.cachedTags().pipe(
+      finalize(() => this.cdr.detectChanges())
+    ).subscribe({
+      next: tags => {
+        this.allTags = tags;
+        if (this.tags) {
+          this.tags.trim();
+          this.savedTags = this.tags;
+          this.tags += ' ';
+        } else {
+          this.savedTags = null;
+        }
+        this.completions = null;
+        this.setReady();
       }
-      this.completions = null;
-      this.setReady();
-      this.cdr.detectChanges();
     });
   }
 
@@ -383,8 +387,8 @@ export class PinPageComponent implements OnInit, OnDestroy {
   // delete the current bookmark
   remove(): boolean {
     if (this.ready && this.update && this.url) {
-      this.pinboard.delete(this.url).subscribe(
-        () => {
+      this.pinboard.delete(this.url).subscribe({
+        next: () => {
           // update the tags in the cache
           const savedTags = this.savedTags ? this.savedTags.split(' ') : [];
           this.pinboard.updateTagCache([], savedTags).pipe(finalize(
@@ -399,10 +403,11 @@ export class PinPageComponent implements OnInit, OnDestroy {
               this.cancel();
             }))).subscribe();
         },
-        error => {
+        error: error => {
           this.logError('Sorry, could not remove this page from Pinboard',
             error.toString());
-        });
+        }
+      });
     }
     return false;
   }
@@ -434,8 +439,8 @@ export class PinPageComponent implements OnInit, OnDestroy {
       tag => !!tag).slice(0, 100).map(tag => tag.slice(0, 255)) : [];
     value.tags = tags.join(' ');
     const savedTags = this.savedTags ? this.savedTags.split(' ') : [];
-    this.pinboard.save(value).subscribe(
-      error => {
+    this.pinboard.save(value).subscribe({
+      next: error => {
         if (error) {
           this.logError('Sorry, could not save this page to Pinboard',
             error);
@@ -454,10 +459,11 @@ export class PinPageComponent implements OnInit, OnDestroy {
             }))).subscribe();
         }
       },
-      error => {
+      error: error => {
         this.logError('Sorry, could not save this page to Pinboard',
           error.toString());
-      });
+      }
+    });
   }
 
   // save current tabs as tab set to Pinboard
@@ -479,12 +485,15 @@ export class PinPageComponent implements OnInit, OnDestroy {
           const data = {
             browser: 'ffox', windows: windows,
           };
-          this.pinboard.saveTabs(data).subscribe(() => {
-            this.cancel();
-          }, error => {
-            this.logError(
-              'Sorry, could not save this tab set to Pinboard.',
-              error.toString());
+          this.pinboard.saveTabs(data).subscribe({
+            next: () => {
+              this.cancel();
+            },
+            error: error => {
+              this.logError(
+                'Sorry, could not save this tab set to Pinboard.',
+                error.toString());
+            }
           });
         }
       });
@@ -499,8 +508,9 @@ export class PinPageComponent implements OnInit, OnDestroy {
 
   // log out from Pinboard
   logOut(): void {
-    this.pinboard.forgetToken().subscribe(
-      () => this.router.navigate(['/login']));
+    this.pinboard.forgetToken().subscribe({
+      next: () => this.router.navigate(['/login'])
+    });
   }
 
   // show error message and log it on the console
@@ -514,8 +524,9 @@ export class PinPageComponent implements OnInit, OnDestroy {
 
   pinboardLink(page): boolean {
     if (page && page.indexOf('~') >= 0) {
-      this.pinboard.userName.subscribe(
-        name => this.pinboardLink(page.replace('~', 'u:' + name)));
+      this.pinboard.userName.subscribe({
+        next: name => this.pinboardLink(page.replace('~', 'u:' + name))
+      });
     } else {
       let url = pinboardPage;
       if (page) {

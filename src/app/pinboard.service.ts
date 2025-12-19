@@ -57,7 +57,7 @@ export class PinboardService {
     if (!params.auth_token) {
       return this.storage.get('token').pipe(switchMap(token => {
         if (!token) {
-          observableThrow(new Error('No API token!'));
+          return observableThrow(() => new Error('No API token!'));
         }
         params.auth_token = token;
         return this.httpGet(method, params);
