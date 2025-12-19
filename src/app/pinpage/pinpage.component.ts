@@ -45,9 +45,10 @@ interface RawContent {
 // At least the tag handling should go into sub component(s).
 
 @Component({
-  selector: 'app-popup',
-  templateUrl: './pinpage.component.html',
-  styleUrls: ['./pinpage.component.scss']
+    selector: 'app-popup',
+    templateUrl: './pinpage.component.html',
+    styleUrls: ['./pinpage.component.scss'],
+    standalone: false
 })
 export class PinPageComponent implements OnInit, OnDestroy {
 

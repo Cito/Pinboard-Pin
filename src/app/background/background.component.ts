@@ -10,8 +10,9 @@ import { Options } from '../storage.service';
 // Background page used for checking whether pages are saved in Pinboard
 
 @Component({
-  selector: 'app-background',
-  template: '<h1>Background page for Pinboard</h1>'
+    selector: 'app-background',
+    template: '<h1>Background page for Pinboard</h1>',
+    standalone: false
 })
 export class BackgroundComponent implements OnInit, OnDestroy {
 
