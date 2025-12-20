@@ -19,6 +19,7 @@ main {
   --color-error: hsl(0, 67%, 50%);
   --color-info: hsl(120, 33%, 37%);
   --color-note: hsl(240, 10%, 33%);
+  --color-link: hsl(250, 67%, 33%);
 
   color: var(--color-fg);
   background-color: var(--color-bg);
@@ -136,6 +137,15 @@ span.note {
   color: var(--color-note);
 }
 
+a {
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 main.dark {
   --color-bg: hsl(var(--hue), 25%, 7%);
   --color-fg: hsl(var(--hue), 12%, 93%);
@@ -145,6 +155,7 @@ main.dark {
   --color-error: hsl(0, 75%, 57%);
   --color-info: hsl(120, 67%, 40%);
   --color-note: hsl(240, 10%, 60%);
+  --color-link: hsl(250, 33%, 67%);
 
   input[type="checkbox"],
   input[type="radio"] {
