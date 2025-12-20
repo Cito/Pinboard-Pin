@@ -107,7 +107,7 @@ export class BackgroundComponent implements OnInit, OnDestroy {
         this.pinboard.get(url).subscribe(
           data => this.icon.setIcon(
             tabId, !!(data && data.posts && data.posts.length)),
-          error => this.icon.setIcon(tabId, false));
+          _err => this.icon.setIcon(tabId, false));
       } else {
         this.icon.setIcon(tabId, false);
       }
@@ -147,7 +147,7 @@ export class BackgroundComponent implements OnInit, OnDestroy {
   }
 
   // handle menu clicks for saving links in the background
-  onMenuClicked(info: browser.menus.OnClickData, tab: browser.tabs.Tab): void {
+  onMenuClicked(info: browser.menus.OnClickData, _tab: browser.tabs.Tab): void {
     if (info.menuItemId === 'save-link-to-pinboard' && info.linkUrl) {
       const url = info.linkUrl;
       // since we cannot get the actual title, we use the link text instead

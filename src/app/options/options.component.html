@@ -1,12 +1,12 @@
 <main [ngClass]="[page, theme]">
 
-  @if (page == 'popup') {
+  @if (page === 'popup') {
     <div>
       <button type="button" (click)="close()">Close</button>
     </div>
   }
 
-  <h1>{{ page == 'popup'? 'Pinboard Pin Options' : 'Options' }}</h1>
+  <h1>{{ page === 'popup'? 'Pinboard Pin Options' : 'Options' }}</h1>
 
   <form (ngSubmit)="submit(form)" #form="ngForm">
     <div>

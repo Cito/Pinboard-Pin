@@ -1,6 +1,6 @@
 // this component is the user setting dialog displayed under options
 
-import { Component, OnInit, OnDestroy, ApplicationRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Options, StorageService } from '../storage.service';
@@ -28,7 +28,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
 
   constructor(
     private storage: StorageService,
-    private appRef: ApplicationRef) {
+    private cdr: ChangeDetectorRef) {
     this.messageListener = this.onMessage.bind(this);
   }
 
@@ -38,7 +38,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
       this.options = options;
       this.setTheme();
       this.setOnMessageListener(true);
-      this.appRef.tick();
+      this.cdr.detectChanges();
     });
     browser.commands.getAll().then(commands => {
       for (const command of commands) {
@@ -46,7 +46,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
           this.shortcut = command.shortcut;
         }
       }
-      this.appRef.tick();
+      this.cdr.detectChanges();
     });
   }
 
@@ -101,7 +101,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
     if (options && !this.sameOptions(options)) {
       this.options = options;
       this.setTheme();
-      this.appRef.tick(); // run change detection
+      this.cdr.detectChanges(); // run change detection
     }
   }
 

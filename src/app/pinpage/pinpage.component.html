@@ -84,7 +84,7 @@
           <ul>
             @for (tag of completions; track tag; let i = $index) {
               <li (mouseover)="tagSelected = i"
-              (mousedown)="selectCompletion(tag)" [class.selected]="i == tagSelected">{{tag}}</li>
+              (mousedown)="selectCompletion(tag)" [class.selected]="i === tagSelected">{{tag}}</li>
             }
           </ul>
         }

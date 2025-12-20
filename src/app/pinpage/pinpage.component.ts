@@ -223,7 +223,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
       next: tags => {
         this.allTags = tags;
         if (this.tags) {
-          this.tags.trim();
+          this.tags = this.tags.trim();
           this.savedTags = this.tags;
           this.tags += ' ';
         } else {

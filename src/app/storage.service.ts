@@ -13,7 +13,7 @@ export interface Options {
   alpha: boolean;  // sort alphabetically
   popular: boolean;  // show popular tags
   menu: boolean;  // add entry to context menu
-  dark: boolean;  // use dark mode
+  dark: boolean | null;  // tri-state: on/off/auto
 }
 
 const defaultOptions: Options = {
@@ -38,7 +38,7 @@ export class StorageService {
 
   private storage = browser.storage.local;  // needs "storage" permission
 
-  private readonly info: Object;
+  private readonly info: Record<string, unknown>;
 
   constructor() {
     this.info = {}; // for various info shared via this service

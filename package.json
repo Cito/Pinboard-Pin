@@ -1,13 +1,15 @@
 {
   "name": "pinboard-pin",
-  "version": "0.5.0",
+  "version": "0.4.4",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "build": "ng build",
     "build:prod": "ng build --configuration production --source-map=false --output-hashing=none",
-    "build:ext": "web-ext build --source-dir=dist/browser --artifacts-dir=.",
+    "build:ext": "web-ext build --source-dir=dist/browser --artifacts-dir=. --overwrite-dest",
     "build:zip": "npm run build:prod && npm run build:ext",
-    "lint": "tslint \"src/**/*.ts\"",
+    "lint": "eslint . --ext .ts,.html",
+    "lint:ext": "npm run build:prod && web-ext lint --source-dir=dist/browser",
     "test": "web-ext run --source-dir=dist/browser --firefox='firefox'"
   },
   "private": true,

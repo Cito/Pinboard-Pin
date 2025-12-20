@@ -4,7 +4,7 @@ import {
   throwError, Observable,
   of, forkJoin, from
 } from 'rxjs';
-import { filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
+import { catchError, filter, map, mergeMap, switchMap } from 'rxjs/operators';
 
 import { StorageService } from './storage.service';
 import { Post } from './pinpage/pinpage.component';
@@ -166,19 +166,21 @@ export class PinboardService {
   cachedTags(): Observable<{ [tag: string]: number }> {
     return this.storage.get('tags').pipe(switchMap(tags => {
       const date = Date.now();
-      if (!tags || !tags.tags || !tags.date ||
-        tags.tags instanceof Array) {  // old version used arrays
-        // no tags cached, retrieve tags first from Pinboard
-        return this.tags().pipe(tap(tags =>
-          this.storage.set({ tags: { tags: tags, date: date } }).subscribe()));
+      const needsRefresh = !tags || !tags.tags || !tags.date ||
+        tags.tags instanceof Array || // old version used arrays
+        tags.date > date || date - tags.date > cacheTimeout;
+
+      if (needsRefresh) {
+        return this.tags().pipe(
+          switchMap(freshTags => this.storage.set({ tags: { tags: freshTags, date } }).pipe(
+            catchError(() => of(null)), // ignore cache write failures
+            map(() => freshTags)
+          )),
+          catchError(() => of({} as { [tag: string]: number }))
+        );
       }
-      // replace outdated tags in the background
-      if (tags.date > date || date - tags.date > cacheTimeout) {
-        this.tags().subscribe(tags =>
-          this.storage.set({ tags: { tags: tags, date: date } }).subscribe());
-      }
-      // but still return the cached tags for faster access
-      return of(tags.tags);
+
+      return of(tags.tags as { [tag: string]: number });
     }));
   }
 
