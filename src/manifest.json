@@ -49,5 +49,17 @@
     }
   },
 
-  "permissions": ["storage", "tabs", "contextMenus", "*://*/*"]
+  "permissions": ["storage", "tabs", "contextMenus", "*://*/*"],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "pinboard-pin@cito.github.io",
+      "data_collection_permissions": {
+        "required": [
+          "browsingActivity",
+          "websiteContent"
+        ]
+      }
+    }
+  }
 }
