@@ -53,7 +53,7 @@
 
   "browser_specific_settings": {
     "gecko": {
-      "id": "pinboard-pin@cito.github.io",
+      "id": "{981c6263-af64-47c6-8c6d-c3289444fdf9}",
       "data_collection_permissions": {
         "required": [
           "browsingActivity",
