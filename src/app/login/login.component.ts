@@ -60,7 +60,7 @@ export class LoginComponent implements OnInit {
     if (!form.valid) {
       return false;
     }
-    let token = form.value.token;
+    let token: string = (form.value as Record<string, unknown>).token as string;
     if (!token) {
       return false;
     }
@@ -81,9 +81,15 @@ export class LoginComponent implements OnInit {
             this.checking = false;
           }
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.error = true;
-          console.error(error.toString());
+          console.error(
+            typeof error === "string"
+              ? error
+              : error instanceof Error
+              ? error.message
+              : JSON.stringify(error)
+          );
           this.checking = false;
         },
       });
@@ -91,6 +97,6 @@ export class LoginComponent implements OnInit {
   }
 
   continue() {
-    this.router.navigate(["/popup"]);
+    void this.router.navigate(["/popup"]);
   }
 }

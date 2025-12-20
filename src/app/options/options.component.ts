@@ -5,6 +5,10 @@ import { CommonModule } from "@angular/common";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Options, StorageService } from "../storage.service";
 
+interface MessagePayload {
+  options?: Options;
+}
+
 // Options form
 
 @Component({
@@ -22,14 +26,16 @@ export class OptionsComponent implements OnInit, OnDestroy {
 
   theme = "light"; // color scheme of the page
 
-  private readonly messageListener: (message: any) => void;
+  private readonly messageListener: (message: MessagePayload) => void;
 
   constructor(private storage: StorageService, private cdr: ChangeDetectorRef) {
-    this.messageListener = this.onMessage.bind(this);
+    this.messageListener = this.onMessage.bind(this) as (
+      message: MessagePayload
+    ) => void;
   }
 
   ngOnInit() {
-    this.page = this.storage.getInfo("options.page") || "options";
+    this.page = (this.storage.getInfo("options.page") as string) || "options";
     this.storage.getOptions().subscribe((options) => {
       this.options = options;
       this.setTheme();
@@ -61,13 +67,14 @@ export class OptionsComponent implements OnInit, OnDestroy {
 
   // check whether given options are the same
   sameOptions(options: Options): boolean {
+    const opts: Partial<Options> = { ...options };
     for (const key in this.options) {
       if (typeof this.options[key] === "boolean" && key !== "dark") {
-        options[key] = !!options[key];
+        opts[key as keyof Options] = !!opts[key as keyof Options];
       }
     }
-    for (const key in options) {
-      if (options[key] !== this.options[key]) {
+    for (const key in opts) {
+      if (opts[key as keyof Options] !== this.options[key as keyof Options]) {
         return false;
       }
     }
@@ -92,7 +99,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
   // fires when another process connects
   // this synchronizes the settings if options popup and options page
   // are open at the same time
-  onMessage(message: any): void {
+  onMessage(message: MessagePayload): void {
     const options = message.options;
     if (options && !this.sameOptions(options)) {
       this.options = options;
@@ -106,7 +113,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
     if (!form.valid) {
       return false;
     }
-    const value: Options = form.value;
+    const value: Options = form.value as Options;
     if (!value || this.sameOptions(value)) {
       return false;
     }

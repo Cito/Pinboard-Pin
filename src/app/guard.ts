@@ -1,30 +1,32 @@
-import { inject } from '@angular/core';
-import { Router, ActivatedRouteSnapshot } from '@angular/router';
+import { inject } from "@angular/core";
+import { Router, ActivatedRouteSnapshot } from "@angular/router";
 
-import { map } from 'rxjs/operators';
+import { map } from "rxjs/operators";
 
-import { PinboardService } from './pinboard.service';
-
+import { PinboardService } from "./pinboard.service";
 
 // Guard for the index route of this extension
-
 
 export const guard = (route: ActivatedRouteSnapshot) => {
   const pinboard = inject(PinboardService);
   const router = inject(Router);
-  
-  const page = route.queryParams['page'];
 
-  if (!page || page === 'popup') {
-    return pinboard.needToken.pipe(map(needed => {
-      if (!needed) {
-        return true;
-      }
-      router.navigate(['/login']);
-      return false;
-    }));
+  const page: string | undefined = route.queryParams["page"] as
+    | string
+    | undefined;
+
+  if (!page || page === "popup") {
+    return pinboard.needToken.pipe(
+      map((needed) => {
+        if (!needed) {
+          return true;
+        }
+        void router.navigate(["/login"]);
+        return false;
+      })
+    );
   }
 
-  router.navigate(['/' + page]);
+  void router.navigate(["/" + page]);
   return false;
 };

@@ -75,7 +75,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   ready: boolean;
   update: boolean;
   date: string;
-  error: boolean;
+  error: string | null;
   retry: boolean;
   options: Options;
 
@@ -94,7 +94,10 @@ export class PinPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.ready = this.update = this.error = this.retry = false;
+    this.ready = false;
+    this.update = false;
+    this.error = null;
+    this.retry = false;
     this.storage.getOptions().subscribe((options) => {
       this.options = options;
       this.setTheme();
@@ -107,13 +110,20 @@ export class PinPageComponent implements OnInit, OnDestroy {
               )
               .catch(() => this.getContent())
           : this.getContent();
-      getContent.then(
-        (content) => {
+      void getContent.then(
+        (content: Content) => {
           this.setContent(content);
           this.cdr.detectChanges();
         },
-        (error) => {
-          this.logError("Can only pin normal web pages.", error.toString());
+        (error: unknown) => {
+          this.logError(
+            "Can only pin normal web pages.",
+            typeof error === "string"
+              ? error
+              : error instanceof Error
+              ? error.message
+              : JSON.stringify(error)
+          );
           this.cdr.detectChanges();
         }
       );
@@ -121,7 +131,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
     this.tagsFocus = false;
     this.tagsSubscription = this.tagsSubject
       .pipe(debounceTime(debounceDueTime), distinctUntilChanged())
-      .subscribe((value) => this.tagsChanged(value));
+      .subscribe((value: string) => this.tagsChanged(value));
   }
 
   ngOnDestroy() {
@@ -206,11 +216,29 @@ export class PinPageComponent implements OnInit, OnDestroy {
       this.suggested = this.popular = null;
       // query both page data and suggested tags
       this.pinboard.getAndSuggest(this.url).subscribe({
-        next: (data) => this.setData(data),
-        error: (error) =>
+        next: (data: unknown) =>
+          this.setData(
+            data as {
+              posts?: Array<{
+                href: string;
+                description: string;
+                extended: string;
+                tags: string;
+                shared: string;
+                toread: string;
+              }>;
+            } & { popular?: string[]; recommended?: string[] } & {
+              date?: string;
+            }
+          ),
+        error: (error: unknown) =>
           this.logError(
             "Cannot check this page on Pinboard.",
-            error.toString()
+            typeof error === "string"
+              ? error
+              : error instanceof Error
+              ? error.message
+              : JSON.stringify(error)
           ),
       });
     } else {
@@ -222,7 +250,18 @@ export class PinPageComponent implements OnInit, OnDestroy {
   }
 
   // receive page data and suggested tags from parallel queries
-  setData(data: any): void {
+  setData(
+    data: {
+      posts?: Array<{
+        href: string;
+        description: string;
+        extended: string;
+        tags: string;
+        shared: string;
+        toread: string;
+      }>;
+    } & { popular?: string[]; recommended?: string[] } & { date?: string }
+  ): void {
     if (data.posts && data.posts.length) {
       this.date = data?.date;
       const post = data.posts[0];
@@ -234,13 +273,20 @@ export class PinPageComponent implements OnInit, OnDestroy {
       this.toread = post.toread === "yes";
       this.update = true;
       // set browser icon to saved state
-      browser.tabs.query({ url: this.url }).then(
-        (tabs) => {
+      void browser.tabs.query({ url: this.url }).then(
+        (tabs: browser.tabs.Tab[]) => {
           for (const tab of tabs) {
             this.icon.setIcon(tab.id, true);
           }
         },
-        (error) => console.error(error.toString())
+        (error: unknown) =>
+          console.error(
+            typeof error === "string"
+              ? error
+              : error instanceof Error
+              ? error.message
+              : JSON.stringify(error)
+          )
       );
     }
     // Note: "popular" and "recommended" are interchanged in Pinboard
@@ -282,7 +328,12 @@ export class PinPageComponent implements OnInit, OnDestroy {
             : "tags"
           : "title"
         : "url";
-      this.eref.nativeElement.querySelector("#" + focus).focus();
+      const element = (this.eref.nativeElement as HTMLElement).querySelector(
+        "#" + focus
+      );
+      if (element instanceof HTMLElement) {
+        element.focus();
+      }
     });
   }
 
@@ -316,7 +367,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   }
 
   // this method is called when keys have been pressed down in the tabs field
-  tagsKeyDown(event: any): boolean {
+  tagsKeyDown(event: KeyboardEvent): boolean {
     if (!this.ready || !this.tagsFocus || !this.completions) {
       return true;
     }
@@ -344,7 +395,8 @@ export class PinPageComponent implements OnInit, OnDestroy {
       case "Tab":
       case "ArrowRight":
         const tag = this.completions[this.tagSelected];
-        let value = event.target.value;
+        const inputElement = event.target as HTMLInputElement;
+        let value = inputElement.value;
         const words = value.split(" ");
         if (words.length) {
           words.pop();
@@ -363,11 +415,11 @@ export class PinPageComponent implements OnInit, OnDestroy {
   }
 
   // this method is called when keys have been released in the tabs field
-  tagsKeyUp(event: any): boolean {
+  tagsKeyUp(event: KeyboardEvent): boolean {
     // the field value is changed after the key has been pressed,
     // so this is the right moment for checking for value changes
     if (this.ready && this.tagsFocus) {
-      this.tagsSubject.next(event.target.value);
+      this.tagsSubject.next((event.target as HTMLInputElement).value);
     }
     return true;
   }
@@ -439,15 +491,21 @@ export class PinPageComponent implements OnInit, OnDestroy {
               finalize(
                 // set the browser icon to unsaved state
                 () =>
-                  browser.tabs.query({ url: this.url }).then(
-                    (tabs) => {
+                  void browser.tabs.query({ url: this.url }).then(
+                    (tabs: browser.tabs.Tab[]) => {
                       for (const tab of tabs) {
                         this.icon.setIcon(tab.id, false);
                       }
                       this.cancel();
                     },
-                    (error) => {
-                      console.error(error.toString());
+                    (error: unknown) => {
+                      console.error(
+                        typeof error === "string"
+                          ? error
+                          : error instanceof Error
+                          ? error.message
+                          : JSON.stringify(error)
+                      );
                       this.cancel();
                     }
                   )
@@ -455,10 +513,14 @@ export class PinPageComponent implements OnInit, OnDestroy {
             )
             .subscribe();
         },
-        error: (error) => {
+        error: (error: unknown) => {
           this.logError(
             "Sorry, could not remove this page from Pinboard",
-            error.toString()
+            typeof error === "string"
+              ? error
+              : error instanceof Error
+              ? error.message
+              : JSON.stringify(error)
           );
         },
       });
@@ -475,7 +537,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
   // submit form
   submit(form: NgForm): boolean {
     if (form.valid) {
-      this.save(form.value);
+      this.save(form.value as Post);
     }
     return false;
   }
@@ -499,9 +561,16 @@ export class PinPageComponent implements OnInit, OnDestroy {
     value.tags = tags.join(" ");
     const savedTags = this.savedTags ? this.savedTags.split(" ") : [];
     this.pinboard.save(value).subscribe({
-      next: (error) => {
+      next: (error: unknown) => {
         if (error) {
-          this.logError("Sorry, could not save this page to Pinboard", error);
+          this.logError(
+            "Sorry, could not save this page to Pinboard",
+            typeof error === "string"
+              ? error
+              : error instanceof Error
+              ? error.message
+              : JSON.stringify(error)
+          );
         } else {
           // update the tags in the cache
           this.pinboard
@@ -510,15 +579,21 @@ export class PinPageComponent implements OnInit, OnDestroy {
               finalize(
                 // set the browser icon to saved state
                 () =>
-                  browser.tabs.query({ url: this.url }).then(
-                    (tabs) => {
+                  void browser.tabs.query({ url: this.url }).then(
+                    (tabs: browser.tabs.Tab[]) => {
                       for (const tab of tabs) {
                         this.icon.setIcon(tab.id, true);
                       }
                       this.cancel();
                     },
-                    (error) => {
-                      console.error(error.toString());
+                    (error: unknown) => {
+                      console.error(
+                        typeof error === "string"
+                          ? error
+                          : error instanceof Error
+                          ? error.message
+                          : JSON.stringify(error)
+                      );
                       this.cancel();
                     }
                   )
@@ -527,10 +602,14 @@ export class PinPageComponent implements OnInit, OnDestroy {
             .subscribe();
         }
       },
-      error: (error) => {
+      error: (error: unknown) => {
         this.logError(
           "Sorry, could not save this page to Pinboard",
-          error.toString()
+          typeof error === "string"
+            ? error
+            : error instanceof Error
+            ? error.message
+            : JSON.stringify(error)
         );
       },
     });
@@ -538,19 +617,27 @@ export class PinPageComponent implements OnInit, OnDestroy {
 
   // save current tabs as tab set to Pinboard
   saveTabs(): void {
-    browser.tabs
+    void browser.tabs
       .query({ windowType: "normal", url: "*://*/*" })
-      .then((tabs) => {
-        const wTabs = {};
+      .then((tabs: browser.tabs.Tab[]) => {
+        const wTabs: Record<
+          number,
+          Record<number, { title?: string; url?: string }>
+        > = {};
         for (const tab of tabs) {
           const wId = tab.windowId;
           if (!wTabs[wId]) {
             wTabs[wId] = {};
           }
-          wTabs[wId][tab.index] = { title: tab.title, url: tab.url };
+          wTabs[wId][tab.index] = {
+            title: tab.title ?? undefined,
+            url: tab.url ?? undefined,
+          };
         }
         const windows = Object.keys(wTabs).map((wId) =>
-          Object.keys(wTabs[wId]).map((index) => wTabs[wId][index])
+          Object.keys(wTabs[Number(wId)]).map(
+            (index) => wTabs[Number(wId)][Number(index)]
+          )
         );
         if (windows.length) {
           const data = {
@@ -561,10 +648,14 @@ export class PinPageComponent implements OnInit, OnDestroy {
             next: () => {
               this.cancel();
             },
-            error: (error) => {
+            error: (error: unknown) => {
               this.logError(
                 "Sorry, could not save this tab set to Pinboard.",
-                error.toString()
+                typeof error === "string"
+                  ? error
+                  : error instanceof Error
+                  ? error.message
+                  : JSON.stringify(error)
               );
             },
           });
@@ -576,36 +667,63 @@ export class PinPageComponent implements OnInit, OnDestroy {
   settings(): void {
     // store a note that we are showing on a popup page
     this.storage.setInfo("options.page", "popup");
-    this.router.navigate(["/options"]);
+    void this.router.navigate(["/options"]);
   }
 
   // log out from Pinboard
   logOut(): void {
-    this.pinboard.forgetToken().subscribe({
-      next: () => this.router.navigate(["/login"]),
+    void this.pinboard.forgetToken().subscribe({
+      next: () => void this.router.navigate(["/login"]),
     });
   }
 
   // show error message and log it on the console
-  logError(errmsg, logmsg): void {
+  logError(errmsg: unknown, logmsg: unknown): void {
     if (errmsg) {
-      console.error(logmsg || errmsg);
+      console.error(
+        logmsg && typeof logmsg === "string"
+          ? logmsg
+          : logmsg instanceof Error
+          ? logmsg.message
+          : JSON.stringify(logmsg)
+      );
     }
-    this.error = errmsg;
+    this.error =
+      typeof errmsg === "string"
+        ? errmsg
+        : errmsg instanceof Error
+        ? errmsg.message
+        : errmsg
+        ? JSON.stringify(errmsg)
+        : null;
     this.cdr.detectChanges();
   }
 
-  pinboardLink(page): boolean {
-    if (page && page.includes("~")) {
-      this.pinboard.userName.subscribe({
-        next: (name) => this.pinboardLink(page.replace("~", "u:" + name)),
+  pinboardLink(page: unknown): boolean {
+    const pageStr =
+      typeof page === "string"
+        ? page
+        : typeof page === "number"
+        ? String(page)
+        : JSON.stringify(page);
+    if (pageStr && pageStr.includes("~")) {
+      void this.pinboard.userName.subscribe({
+        next: (name: unknown) => {
+          const nameStr =
+            typeof name === "string"
+              ? name
+              : typeof name === "number"
+              ? String(name)
+              : JSON.stringify(name);
+          this.pinboardLink(pageStr.replace("~", "u:" + nameStr));
+        },
       });
     } else {
       let url = pinboardPage;
-      if (page) {
-        url += page;
+      if (pageStr) {
+        url += pageStr;
       }
-      browser.tabs.create({ url: url });
+      void browser.tabs.create({ url: url });
       this.cancel();
     }
     return false;

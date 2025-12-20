@@ -1,19 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
-import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, from } from "rxjs";
+import { map } from "rxjs/operators";
 
 export interface Options {
-  ping: boolean;  // check whether pages are bookmarked
-  unshared: boolean;  // add as private by default
-  toread: boolean;  // add as to read by default
-  meta: boolean;  // parse meta elements
-  selection: boolean;  // use selected text
-  blockquote: boolean;  // wrap as block quote
-  alpha: boolean;  // sort alphabetically
-  popular: boolean;  // show popular tags
-  menu: boolean;  // add entry to context menu
-  dark: boolean | null;  // tri-state: on/off/auto
+  ping: boolean; // check whether pages are bookmarked
+  unshared: boolean; // add as private by default
+  toread: boolean; // add as to read by default
+  meta: boolean; // parse meta elements
+  selection: boolean; // use selected text
+  blockquote: boolean; // wrap as block quote
+  alpha: boolean; // sort alphabetically
+  popular: boolean; // show popular tags
+  menu: boolean; // add entry to context menu
+  dark: boolean | null; // tri-state: on/off/auto
 }
 
 const defaultOptions: Options = {
@@ -29,14 +29,12 @@ const defaultOptions: Options = {
   dark: null,
 };
 
-
 // Wrapper around the browser local storage for the web extension,
 // using Observables instead of Promises for flexibility and consistency.
 
-@Injectable({ providedIn: 'root' })
+@Injectable({ providedIn: "root" })
 export class StorageService {
-
-  private storage = browser.storage.local;  // needs "storage" permission
+  private storage = browser.storage.local; // needs "storage" permission
 
   private readonly info: Record<string, unknown>;
 
@@ -48,11 +46,14 @@ export class StorageService {
   // when only one key is requested, only its value is returned
   get(keys: string | string[] | null): Observable<any> {
     return from(this.storage.get(keys)).pipe(
-      map(res => typeof keys === 'string' ? res[keys] : res));
+      map((res: Record<string, unknown>) =>
+        typeof keys === "string" ? res[keys] : res
+      )
+    );
   }
 
   // set keys in local storage as an Observable
-  set(keys: any): Observable<any> {
+  set(keys: Record<string, unknown>): Observable<any> {
     return from(this.storage.set(keys));
   }
 
@@ -63,16 +64,19 @@ export class StorageService {
 
   // retrieve options from local storage
   getOptions(): Observable<Options> {
-    return this.get('options').pipe(
-      map(options => {
-        const opts = {};
-        Object.keys(defaultOptions).forEach(
-          key => {
-            const val = options ? options[key] : undefined;
-            opts[key] = val === undefined ? defaultOptions[key] : val;
-          });
+    return this.get("options").pipe(
+      map((options: Record<string, unknown> | null | undefined) => {
+        const opts: Partial<Options> = {};
+        Object.keys(defaultOptions).forEach((key) => {
+          const val = options ? options[key] : undefined;
+          opts[key as keyof Options] =
+            val === undefined
+              ? defaultOptions[key as keyof Options]
+              : (val as never);
+        });
         return opts as Options;
-      }));
+      })
+    );
   }
 
   // store options in local storage
@@ -89,5 +93,4 @@ export class StorageService {
   getInfo(name: string): any {
     return this.info[name];
   }
-
 }

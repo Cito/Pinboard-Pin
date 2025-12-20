@@ -9,30 +9,44 @@ import { Options } from "../storage.service";
 
 // Background page used for checking whether pages are saved in Pinboard
 
+type UpdatedChangeInfo = {
+  url?: string;
+};
+
+type UpdatedHandler = (
+  tabId: number,
+  changeInfo: UpdatedChangeInfo,
+  tab: browser.tabs.Tab
+) => void;
+
+interface MessagePayload {
+  options?: Options;
+}
+
+type MessageHandler = (message: MessagePayload) => void;
+
+type MenuHandler = (
+  info: browser.menus.OnClickData,
+  tab: browser.tabs.Tab
+) => void;
+
 @Component({
   selector: "app-background",
   template: "<h1>Background page for Pinboard</h1>",
 })
 export class BackgroundComponent implements OnInit, OnDestroy {
-  private readonly updatedListener: (
-    tabId: number,
-    changeInfo: any,
-    tab: browser.tabs.Tab
-  ) => void;
-  private readonly messageListener: (message: any) => void;
-  private readonly menuListener: (
-    info: browser.menus.OnClickData,
-    tab: browser.tabs.Tab
-  ) => void;
+  private readonly updatedListener: UpdatedHandler;
+  private readonly messageListener: MessageHandler;
+  private readonly menuListener: MenuHandler;
 
   constructor(
     private storage: StorageService,
     private pinboard: PinboardService,
     private icon: IconService
   ) {
-    this.updatedListener = this.onUpdated.bind(this);
-    this.messageListener = this.onMessage.bind(this);
-    this.menuListener = this.onMenuClicked.bind(this);
+    this.updatedListener = this.onUpdated.bind(this) as UpdatedHandler;
+    this.messageListener = this.onMessage.bind(this) as MessageHandler;
+    this.menuListener = this.onMenuClicked.bind(this) as MenuHandler;
   }
 
   private ping = false;
@@ -69,8 +83,8 @@ export class BackgroundComponent implements OnInit, OnDestroy {
   }
 
   // fires when another process connects
-  onMessage(message: any): void {
-    const options: Options = message.options;
+  onMessage(message: MessagePayload): void {
+    const options: Options | undefined = message.options;
     if (options) {
       if (options.ping !== this.ping) {
         this.setOnUpdateListener(options.ping);
@@ -100,7 +114,11 @@ export class BackgroundComponent implements OnInit, OnDestroy {
   }
 
   // fires when the active tab in a window changes
-  onUpdated(tabId: number, changeInfo: any, tab: browser.tabs.Tab): void {
+  onUpdated(
+    tabId: number,
+    changeInfo: UpdatedChangeInfo,
+    tab: browser.tabs.Tab
+  ): void {
     // do not ping Pinboard in incognito mode
     if (tab.incognito) {
       return;
@@ -108,14 +126,14 @@ export class BackgroundComponent implements OnInit, OnDestroy {
     const url = changeInfo.url;
     if (url) {
       if (/^https?:\/\//.test(url)) {
-        this.pinboard.get(url).subscribe(
-          (data) =>
+        this.pinboard.get(url).subscribe({
+          next: (data: { posts?: unknown[] }) =>
             this.icon.setIcon(
               tabId,
               !!(data && data.posts && data.posts.length)
             ),
-          (_err) => this.icon.setIcon(tabId, false)
-        );
+          error: () => this.icon.setIcon(tabId, false),
+        });
       } else {
         this.icon.setIcon(tabId, false);
       }
@@ -171,16 +189,22 @@ export class BackgroundComponent implements OnInit, OnDestroy {
         // we do not want to overwrite existing titles and descriptions
         noreplace: true,
       };
-      this.pinboard.save(post).subscribe(
-        (error) => {
+      this.pinboard.save(post).subscribe({
+        next: (error: string | null) => {
           if (error && !/already exists/.test(error)) {
             this.saveLinkError(error);
           }
         },
-        (error) => {
-          this.saveLinkError(error.toString());
-        }
-      );
+        error: (error: unknown) => {
+          this.saveLinkError(
+            typeof error === "string"
+              ? error
+              : error instanceof Error
+              ? error.message
+              : JSON.stringify(error)
+          );
+        },
+      });
     }
   }
 
@@ -188,6 +212,6 @@ export class BackgroundComponent implements OnInit, OnDestroy {
     console.error(error);
     // we cannot display an alert directly, so we use a workaround
     const showAlert = 'alert("Could not save the link to Pinboard.")';
-    browser.tabs.executeScript(null, { code: showAlert });
+    void browser.tabs.executeScript(null, { code: showAlert });
   }
 }

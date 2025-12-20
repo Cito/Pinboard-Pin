@@ -30,7 +30,7 @@ export class AgoPipe implements PipeTransform {
     }
 
     const time: number =
-      typeof value === "string" ? Date.parse(value) : (value as Date).getTime();
+      typeof value === "string" ? Date.parse(value) : value.getTime();
     const elapsed = Date.now() - time;
 
     if (elapsed < 0) {
