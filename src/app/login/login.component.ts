@@ -8,6 +8,7 @@ import { finalize } from "rxjs/operators";
 
 import { passwordPage, PinboardService } from "../pinboard.service";
 import { Options, StorageService } from "../storage.service";
+import { logError } from "../util";
 
 export interface Login {
   token: string;
@@ -83,13 +84,7 @@ export class LoginComponent implements OnInit {
         },
         error: (error: unknown) => {
           this.error = true;
-          console.error(
-            typeof error === "string"
-              ? error
-              : error instanceof Error
-              ? error.message
-              : JSON.stringify(error)
-          );
+          logError(error);
           this.checking = false;
         },
       });

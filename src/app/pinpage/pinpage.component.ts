@@ -18,6 +18,7 @@ import { debounceTime, distinctUntilChanged, finalize } from "rxjs/operators";
 import { IconService } from "../icon.service";
 import { PinboardService, pinboardPage } from "../pinboard.service";
 import { Options, StorageService } from "../storage.service";
+import { errorMessage, logError } from "../util";
 
 const debounceDueTime = 250; // timeout in ms for reacting to changes
 const maxCompletions = 9; // maximum number of suggested completions
@@ -116,14 +117,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         },
         (error: unknown) => {
-          this.logError(
-            "Can only pin normal web pages.",
-            typeof error === "string"
-              ? error
-              : error instanceof Error
-              ? error.message
-              : JSON.stringify(error)
-          );
+          this.logError("Can only pin normal web pages.", errorMessage(error));
           this.cdr.detectChanges();
         }
       );
@@ -234,11 +228,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
         error: (error: unknown) =>
           this.logError(
             "Cannot check this page on Pinboard.",
-            typeof error === "string"
-              ? error
-              : error instanceof Error
-              ? error.message
-              : JSON.stringify(error)
+            errorMessage(error)
           ),
       });
     } else {
@@ -279,14 +269,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
             this.icon.setIcon(tab.id, true);
           }
         },
-        (error: unknown) =>
-          console.error(
-            typeof error === "string"
-              ? error
-              : error instanceof Error
-              ? error.message
-              : JSON.stringify(error)
-          )
+        (error: unknown) => logError(error)
       );
     }
     // Note: "popular" and "recommended" are interchanged in Pinboard
@@ -499,13 +482,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
                       this.cancel();
                     },
                     (error: unknown) => {
-                      console.error(
-                        typeof error === "string"
-                          ? error
-                          : error instanceof Error
-                          ? error.message
-                          : JSON.stringify(error)
-                      );
+                      logError(error);
                       this.cancel();
                     }
                   )
@@ -516,11 +493,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
         error: (error: unknown) => {
           this.logError(
             "Sorry, could not remove this page from Pinboard",
-            typeof error === "string"
-              ? error
-              : error instanceof Error
-              ? error.message
-              : JSON.stringify(error)
+            errorMessage(error)
           );
         },
       });
@@ -565,19 +538,13 @@ export class PinPageComponent implements OnInit, OnDestroy {
         if (error) {
           this.logError(
             "Sorry, could not save this page to Pinboard",
-            typeof error === "string"
-              ? error
-              : error instanceof Error
-              ? error.message
-              : JSON.stringify(error)
+            errorMessage(error)
           );
         } else {
-          // update the tags in the cache
           this.pinboard
             .updateTagCache(tags, savedTags)
             .pipe(
               finalize(
-                // set the browser icon to saved state
                 () =>
                   void browser.tabs.query({ url: this.url }).then(
                     (tabs: browser.tabs.Tab[]) => {
@@ -587,13 +554,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
                       this.cancel();
                     },
                     (error: unknown) => {
-                      console.error(
-                        typeof error === "string"
-                          ? error
-                          : error instanceof Error
-                          ? error.message
-                          : JSON.stringify(error)
-                      );
+                      logError(error);
                       this.cancel();
                     }
                   )
@@ -605,11 +566,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
       error: (error: unknown) => {
         this.logError(
           "Sorry, could not save this page to Pinboard",
-          typeof error === "string"
-            ? error
-            : error instanceof Error
-            ? error.message
-            : JSON.stringify(error)
+          errorMessage(error)
         );
       },
     });
@@ -651,11 +608,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
             error: (error: unknown) => {
               this.logError(
                 "Sorry, could not save this tab set to Pinboard.",
-                typeof error === "string"
-                  ? error
-                  : error instanceof Error
-                  ? error.message
-                  : JSON.stringify(error)
+                errorMessage(error)
               );
             },
           });
@@ -680,22 +633,9 @@ export class PinPageComponent implements OnInit, OnDestroy {
   // show error message and log it on the console
   logError(errmsg: unknown, logmsg: unknown): void {
     if (errmsg) {
-      console.error(
-        logmsg && typeof logmsg === "string"
-          ? logmsg
-          : logmsg instanceof Error
-          ? logmsg.message
-          : JSON.stringify(logmsg)
-      );
+      logError(logmsg ?? errmsg);
     }
-    this.error =
-      typeof errmsg === "string"
-        ? errmsg
-        : errmsg instanceof Error
-        ? errmsg.message
-        : errmsg
-        ? JSON.stringify(errmsg)
-        : null;
+    this.error = errmsg ? errorMessage(errmsg) : null;
     this.cdr.detectChanges();
   }
 

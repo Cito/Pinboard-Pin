@@ -6,6 +6,7 @@ import { PinboardService } from "../pinboard.service";
 import { Post } from "../pinpage/pinpage.component";
 import { IconService } from "../icon.service";
 import { Options } from "../storage.service";
+import { errorMessage, logError } from "../util";
 
 // Background page used for checking whether pages are saved in Pinboard
 
@@ -196,20 +197,14 @@ export class BackgroundComponent implements OnInit, OnDestroy {
           }
         },
         error: (error: unknown) => {
-          this.saveLinkError(
-            typeof error === "string"
-              ? error
-              : error instanceof Error
-              ? error.message
-              : JSON.stringify(error)
-          );
+          this.saveLinkError(errorMessage(error));
         },
       });
     }
   }
 
   saveLinkError(error: string): void {
-    console.error(error);
+    logError(error);
     // we cannot display an alert directly, so we use a workaround
     const showAlert = 'alert("Could not save the link to Pinboard.")';
     void browser.tabs.executeScript(null, { code: showAlert });
