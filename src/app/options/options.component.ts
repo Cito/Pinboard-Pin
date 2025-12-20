@@ -1,48 +1,44 @@
 // this component is the user setting dialog displayed under options
 
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, NgForm } from '@angular/forms';
-import { Options, StorageService } from '../storage.service';
-
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule, NgForm } from "@angular/forms";
+import { Options, StorageService } from "../storage.service";
 
 // Options form
 
 @Component({
-  selector: 'app-options',
-  templateUrl: './options.component.html',
-  styleUrls: ['./options.component.scss'],
-  imports: [CommonModule, FormsModule]
+  selector: "app-options",
+  templateUrl: "./options.component.html",
+  styleUrls: ["./options.component.scss"],
+  imports: [CommonModule, FormsModule],
 })
 export class OptionsComponent implements OnInit, OnDestroy {
-
   options: Options;
 
-  shortcut: string;  // default keyboard shortcut
+  shortcut: string; // default keyboard shortcut
 
   page: string; // type of page (popup or options)
 
-  theme = 'light'; // color scheme of the page
+  theme = "light"; // color scheme of the page
 
   private readonly messageListener: (message: any) => void;
 
-  constructor(
-    private storage: StorageService,
-    private cdr: ChangeDetectorRef) {
+  constructor(private storage: StorageService, private cdr: ChangeDetectorRef) {
     this.messageListener = this.onMessage.bind(this);
   }
 
   ngOnInit() {
-    this.page = this.storage.getInfo('options.page') || 'options';
-    this.storage.getOptions().subscribe(options => {
+    this.page = this.storage.getInfo("options.page") || "options";
+    this.storage.getOptions().subscribe((options) => {
       this.options = options;
       this.setTheme();
       this.setOnMessageListener(true);
       this.cdr.detectChanges();
     });
-    browser.commands.getAll().then(commands => {
+    void browser.commands.getAll().then((commands) => {
       for (const command of commands) {
-        if (command.name === '_execute_browser_action') {
+        if (command.name === "_execute_browser_action") {
           this.shortcut = command.shortcut;
         }
       }
@@ -55,18 +51,18 @@ export class OptionsComponent implements OnInit, OnDestroy {
   }
 
   setTheme() {
-    this.theme = (
+    this.theme =
       this.options.dark === true ||
-      this.options.dark !== false &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches) ?
-      'dark' : 'light';
+      (this.options.dark !== false &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ? "dark"
+        : "light";
   }
 
   // check whether given options are the same
   sameOptions(options: Options): boolean {
     for (const key in this.options) {
-      if (typeof this.options[key] === 'boolean'
-        && key !== 'dark') {
+      if (typeof this.options[key] === "boolean" && key !== "dark") {
         options[key] = !!options[key];
       }
     }
@@ -84,11 +80,11 @@ export class OptionsComponent implements OnInit, OnDestroy {
     const listener = this.messageListener;
     if (event.hasListener(listener)) {
       if (!on) {
-        event.removeListener(listener);
+        void event.removeListener(listener);
       }
     } else {
       if (on) {
-        event.addListener(listener);
+        void event.addListener(listener);
       }
     }
   }
@@ -117,15 +113,14 @@ export class OptionsComponent implements OnInit, OnDestroy {
     this.options = value;
     this.setTheme();
     this.storage.setOptions(value).subscribe();
-    browser.runtime.sendMessage({ 'options': value });
+    void browser.runtime.sendMessage({ options: value });
     return false;
   }
 
   // close the options popup
   close() {
-    if (this.page === 'popup') {
+    if (this.page === "popup") {
       window.close();
     }
   }
-
 }

@@ -1,55 +1,57 @@
 // this component is the login dialog displayed in the popup
 
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
-import { finalize } from 'rxjs/operators';
+import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule, NgForm } from "@angular/forms";
+import { Router } from "@angular/router";
+import { finalize } from "rxjs/operators";
 
-import { passwordPage, PinboardService } from '../pinboard.service';
-import { Options, StorageService } from '../storage.service';
+import { passwordPage, PinboardService } from "../pinboard.service";
+import { Options, StorageService } from "../storage.service";
 
 export interface Login {
   token: string;
 }
 
-
 // Log in form
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
-  imports: [CommonModule, FormsModule]
+  selector: "app-login",
+  templateUrl: "./login.component.html",
+  styleUrls: ["./login.component.scss"],
+  imports: [CommonModule, FormsModule],
 })
 export class LoginComponent implements OnInit {
-
   checking = false;
   error = false;
 
-  theme = 'light'; // color scheme of the page
+  theme = "light"; // color scheme of the page
 
   constructor(
     private pinboard: PinboardService,
     private storage: StorageService,
     private router: Router,
-    private cdr: ChangeDetectorRef) { }
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    this.storage.getOptions().subscribe(options =>
-      { this.setTheme(options); this.cdr.detectChanges(); });
+    this.storage.getOptions().subscribe((options) => {
+      this.setTheme(options);
+      this.cdr.detectChanges();
+    });
   }
 
   setTheme(options: Options) {
-    this.theme = (
+    this.theme =
       options.dark === true ||
-      options.dark !== false &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches) ?
-      'dark' : 'light';
+      (options.dark !== false &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ? "dark"
+        : "light";
   }
 
   openPasswordPage() {
-    browser.windows.create({ url: passwordPage });
+    void browser.windows.create({ url: passwordPage });
     return false;
   }
 
@@ -67,29 +69,28 @@ export class LoginComponent implements OnInit {
       return false;
     }
     this.checking = true;
-    this.pinboard.setToken(token).pipe(
-      finalize(() => this.cdr.detectChanges())
-    ).subscribe({
-      next: ok => {
-        this.error = !ok;
-        if (ok) {
-          this.continue();
-        } else {
+    this.pinboard
+      .setToken(token)
+      .pipe(finalize(() => this.cdr.detectChanges()))
+      .subscribe({
+        next: (ok) => {
+          this.error = !ok;
+          if (ok) {
+            this.continue();
+          } else {
+            this.checking = false;
+          }
+        },
+        error: (error) => {
+          this.error = true;
+          console.error(error.toString());
           this.checking = false;
-        }
-      },
-      error: error => {
-        this.error = true;
-        console.error(error.toString());
-        this.checking = false;
-      }
-    });
+        },
+      });
     return false;
   }
 
   continue() {
-    this.router.navigate(['/popup']);
+    this.router.navigate(["/popup"]);
   }
-
 }
-

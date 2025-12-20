@@ -1,31 +1,35 @@
 // this component pings the saved state of pages in the background
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { StorageService } from '../storage.service';
-import { PinboardService } from '../pinboard.service';
-import { Post } from '../pinpage/pinpage.component';
-import { IconService } from '../icon.service';
-import { Options } from '../storage.service';
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { StorageService } from "../storage.service";
+import { PinboardService } from "../pinboard.service";
+import { Post } from "../pinpage/pinpage.component";
+import { IconService } from "../icon.service";
+import { Options } from "../storage.service";
 
 // Background page used for checking whether pages are saved in Pinboard
 
 @Component({
-    selector: 'app-background',
-    template: '<h1>Background page for Pinboard</h1>'
+  selector: "app-background",
+  template: "<h1>Background page for Pinboard</h1>",
 })
 export class BackgroundComponent implements OnInit, OnDestroy {
-
-  private readonly updatedListener:
-    (tabId: number, changeInfo: any, tab: browser.tabs.Tab) => void;
-  private readonly messageListener:
-    (message: any) => void;
-  private readonly menuListener:
-    (info: browser.menus.OnClickData, tab: browser.tabs.Tab) => void;
+  private readonly updatedListener: (
+    tabId: number,
+    changeInfo: any,
+    tab: browser.tabs.Tab
+  ) => void;
+  private readonly messageListener: (message: any) => void;
+  private readonly menuListener: (
+    info: browser.menus.OnClickData,
+    tab: browser.tabs.Tab
+  ) => void;
 
   constructor(
     private storage: StorageService,
     private pinboard: PinboardService,
-    private icon: IconService) {
+    private icon: IconService
+  ) {
     this.updatedListener = this.onUpdated.bind(this);
     this.messageListener = this.onMessage.bind(this);
     this.menuListener = this.onMenuClicked.bind(this);
@@ -37,7 +41,7 @@ export class BackgroundComponent implements OnInit, OnDestroy {
   private unshared = false;
 
   ngOnInit() {
-    this.storage.getOptions().subscribe(options => {
+    this.storage.getOptions().subscribe((options) => {
       this.setOnMessageListener(true);
       this.onMessage({ options });
     });
@@ -85,11 +89,11 @@ export class BackgroundComponent implements OnInit, OnDestroy {
     const listener = this.updatedListener;
     if (event.hasListener(listener)) {
       if (!on) {
-        event.removeListener(listener);
+        void event.removeListener(listener);
       }
     } else {
       if (on) {
-        event.addListener(listener);
+        void event.addListener(listener);
       }
     }
     this.ping = on;
@@ -105,9 +109,13 @@ export class BackgroundComponent implements OnInit, OnDestroy {
     if (url) {
       if (/^https?:\/\//.test(url)) {
         this.pinboard.get(url).subscribe(
-          data => this.icon.setIcon(
-            tabId, !!(data && data.posts && data.posts.length)),
-          _err => this.icon.setIcon(tabId, false));
+          (data) =>
+            this.icon.setIcon(
+              tabId,
+              !!(data && data.posts && data.posts.length)
+            ),
+          (_err) => this.icon.setIcon(tabId, false)
+        );
       } else {
         this.icon.setIcon(tabId, false);
       }
@@ -121,26 +129,26 @@ export class BackgroundComponent implements OnInit, OnDestroy {
     const listener = this.menuListener;
     if (event.hasListener(listener)) {
       if (!on) {
-        event.removeListener(listener);
-        menus.remove('save-link-to-pinboard');
-        menus.remove('save-page-to-pinboard');
+        void event.removeListener(listener);
+        void menus.remove("save-link-to-pinboard");
+        void menus.remove("save-page-to-pinboard");
       }
     } else {
       if (on) {
         browser.contextMenus.create({
-          id: 'save-page-to-pinboard',
-          title: 'Save page to Pinboard',
-          contexts: ['page'],
-          documentUrlPatterns: ['http://*/*', 'https://*/*'],
-          command: '_execute_browser_action'
+          id: "save-page-to-pinboard",
+          title: "Save page to Pinboard",
+          contexts: ["page"],
+          documentUrlPatterns: ["http://*/*", "https://*/*"],
+          command: "_execute_browser_action",
         });
-        browser.contextMenus.create({
-          id: 'save-link-to-pinboard',
-          title: 'Save link to Pinboard',
-          contexts: ['link'],
-          targetUrlPatterns: ['http://*/*', 'https://*/*']
+        void browser.contextMenus.create({
+          id: "save-link-to-pinboard",
+          title: "Save link to Pinboard",
+          contexts: ["link"],
+          targetUrlPatterns: ["http://*/*", "https://*/*"],
         });
-        event.addListener(listener);
+        void event.addListener(listener);
       }
     }
     this.menu = on;
@@ -148,26 +156,31 @@ export class BackgroundComponent implements OnInit, OnDestroy {
 
   // handle menu clicks for saving links in the background
   onMenuClicked(info: browser.menus.OnClickData, _tab: browser.tabs.Tab): void {
-    if (info.menuItemId === 'save-link-to-pinboard' && info.linkUrl) {
+    if (info.menuItemId === "save-link-to-pinboard" && info.linkUrl) {
       const url = info.linkUrl;
       // since we cannot get the actual title, we use the link text instead
-      const title = info.linkText || 'Link saved with Pinboard Pin';
+      const title = info.linkText || "Link saved with Pinboard Pin";
       const post: Post = {
-        url, title, description: '', tags: '',
-        unshared: this.unshared, toread: this.toread,
+        url,
+        title,
+        description: "",
+        tags: "",
+        unshared: this.unshared,
+        toread: this.toread,
         // links will be only added,
         // we do not want to overwrite existing titles and descriptions
-        noreplace: true
+        noreplace: true,
       };
       this.pinboard.save(post).subscribe(
-        error => {
+        (error) => {
           if (error && !/already exists/.test(error)) {
             this.saveLinkError(error);
           }
         },
-        error => {
+        (error) => {
           this.saveLinkError(error.toString());
-        });
+        }
+      );
     }
   }
 
@@ -177,5 +190,4 @@ export class BackgroundComponent implements OnInit, OnDestroy {
     const showAlert = 'alert("Could not save the link to Pinboard.")';
     browser.tabs.executeScript(null, { code: showAlert });
   }
-
 }
