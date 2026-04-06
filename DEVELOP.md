@@ -34,7 +34,7 @@ Package unsigned extension as zip file:
 Known issues
 ------------
 
-* Due to limitations in the Web-Ext API, the keyboard shortcut (Alt+P) cannot be changed or deactivated (at least I don't see a simple way how to do this - let me know if I'm overlooking something).
+* The keyboard shortcut (Alt+Shift+P) can be changed by the user in Firefox via about:addons (gear icon > Manage Extension Shortcuts), but the WebExtension API does not allow setting the shortcut programmatically, and opening the about:addons page as a workaround is also not permitted.
 
 * Unfortunately, storing tabsets is not supported by the Pinboard API. Therefore you need to be logged in to Pinboard in order use this feature. This works the same as in the official add-on.
 

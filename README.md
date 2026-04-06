@@ -17,7 +17,7 @@ Features
 * Update and delete the bookmark for the current page in Pinboard from the popup.
 * Automatic creation of a description from a selected text on the page or using an existing meta tag on the page.
 * Enter or update tags using automatic suggestions in the popup dialog.
-* Use a keyboard shortcut (Alt + Shift + P) to open the popup dialog.
+* Use a keyboard shortcut (Alt + Shift + P) to open the popup dialog. This can be changed in Firefox by navigating to about:addons, clicking the gear icon at the top of the page, and selecting "Manage Extension Shortcuts" at the bottom of the menu.
 * Use the context menu to open the popup dialog for the current page or to quickly save any link on the page.
 * Configurable dark mode for the popup dialog.
 
