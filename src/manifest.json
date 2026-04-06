@@ -43,7 +43,7 @@
   "commands": {
     "_execute_browser_action": {
       "suggested_key": {
-        "default": "Alt+P"
+        "default": "Alt+Shift+P"
       },
       "description": "Save page to Pinboard"
     }
