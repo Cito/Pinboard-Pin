@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "Pinboard Pin",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "A web extension for pinning pages on Pinboard (pinboard.in) with Firefox.",
   "homepage_url": "https://github.com/Cito/Pinboard-Pin",
 
