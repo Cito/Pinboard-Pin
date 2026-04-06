@@ -34,12 +34,12 @@
     "@angular-eslint/eslint-plugin-template": "^21.3.1",
     "@angular-eslint/schematics": "^21.3.1",
     "@angular-eslint/template-parser": "^21.3.1",
-    "@types/node": "^25.0.3",
-    "@typescript-eslint/eslint-plugin": "^8.50.0",
-    "@typescript-eslint/parser": "^8.50.0",
+    "@types/node": "^25.5.2",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
     "@types/firefox-webext-browser": "^143.0.0",
-    "eslint": "^9.39.2",
-    "typescript": "^5.4.5",
-    "web-ext": "^9.2.0"
+    "eslint": "^9.39.4",
+    "typescript": "^5.9.3",
+    "web-ext": "^10.1.0"
   }
 }
