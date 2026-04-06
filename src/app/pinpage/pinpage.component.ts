@@ -125,7 +125,10 @@ export class PinPageComponent implements OnInit, OnDestroy {
     this.tagsFocus = false;
     this.tagsSubscription = this.tagsSubject
       .pipe(debounceTime(debounceDueTime), distinctUntilChanged())
-      .subscribe((value: string) => this.tagsChanged(value));
+      .subscribe((value: string) => {
+        this.tagsChanged(value);
+        this.cdr.detectChanges();
+      });
   }
 
   ngOnDestroy() {

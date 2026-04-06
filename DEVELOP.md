@@ -40,8 +40,8 @@ Known issues
 
 * If you get errors when requesting data from the Pinboard API via https, these could be caused by the Privacy Badger extension. Make sure that the domain pinboard.in is fully enabled in Privacy Badger or whitelist it.
 
-Future development
-------------------
+Ideas for future development
+----------------------------
 
 * Use v2 of the Pinboard API when this is available with all the necessary functionality.
 
