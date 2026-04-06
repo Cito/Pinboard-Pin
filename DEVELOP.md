@@ -1,9 +1,9 @@
 Development Notes for Pinboard Pin
 ==================================
 
-This is an add-on for pinning pages on [Pinboard](https://pinboard.in) in the web browser, based on the [WebExtensions](https://developer.mozilla.org/de/Add-ons/WebExtensions) system. This web extension has been developed for and tested with Firefox 80 for Windows and Linux. Since WebExtensions was created as a cross-browser standard, it should be portable to other platforms and web browsers like Chrome, Opera or Edge with only few adaptations.
+This is an add-on for pinning pages on [Pinboard](https://pinboard.in) in the web browser, based on the [WebExtensions](https://developer.mozilla.org/Add-ons/WebExtensions) system. This web extension has been developed for and tested with Firefox 149 for Windows and Linux. Since WebExtensions was created as a cross-browser standard, it should be portable to other platforms and web browsers like Chrome, Opera or Edge with only few adaptations.
 
-The web extension has been created using [Angular](https://angular.io/) and the [Angular CLI](https://github.com/angular/angular-cli).
+The web extension has been created using [Angular](https://angular.dev/) and the [Angular CLI](https://github.com/angular/angular-cli).
 
 Installation
 ------------
@@ -43,11 +43,11 @@ Known issues
 Ideas for future development
 ----------------------------
 
-* Use v2 of the Pinboard API when this is available with all the necessary functionality.
+* Use v2 of the Pinboard API when this is available with all the necessary functionality (it was announced, but never materialized).
 
 * Require only those permissions that are needed for the selected options (issue #8).
 
-* The Pinboard API seems to have the "popular" and "recommended" categories interchanged in the "suggest" method for tags. "Popular" are actually those taken from our own tags, contrary to what the Pinboard API docs say. This has already been reported to the Pinboard support. If they will changed this behavior, we need to adapt our code that currently swaps these categories.
+* The Pinboard API seems to have the "popular" and "recommended" categories interchanged in the "suggest" method for tags. "Popular" are actually those taken from our own tags, contrary to what the Pinboard API docs say. This has already been reported to the Pinboard support. If they will change this behavior, we need to adapt our code that currently swaps these categories.
 
 * Ask Pinboard author to provide a method for storing tabsets and support it in the add-on.
 
