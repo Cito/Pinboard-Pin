@@ -55,6 +55,11 @@ Development
 * Read my blog post [Web Extensions made with Angular](https://cito.github.io/blog/web-ext-with-angular/) to learn more about how and why this extension has been created.
 * Contact the author, open GitHub issues or send in pull requests to contribute.
 
+Disclaimer
+----------
+
+This project is an independent client for the Pinboard API and is not affiliated with, endorsed by, or supported by [Pinboard](https://pinboard.in). If the Pinboard API is slow or unavailable, this extension may also be slow or may not work. Please check the service status before reporting a bug.
+
 See Also
 --------
 
