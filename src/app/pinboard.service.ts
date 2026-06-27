@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 
-import { throwError, Observable, of, forkJoin, from } from "rxjs";
+import { throwError, Observable, of, from } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import { StorageService } from "./storage.service";
@@ -166,15 +166,6 @@ export class PinboardService {
         }
         return tags;
       })
-    );
-  }
-
-  // get post for the given url together with the suggested tags
-  getAndSuggest(url: string): Observable<any> {
-    return forkJoin([this.get(url), this.suggest(url)]).pipe(
-      map(([post, tags]) =>
-        Object.assign(post as Record<string, unknown>, tags)
-      )
     );
   }
 

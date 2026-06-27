@@ -13,7 +13,12 @@ import { CommonModule } from "@angular/common";
 import { AgoPipe } from "../interval.pipe";
 
 import { Subscription, Subject, timer } from "rxjs";
-import { debounceTime, distinctUntilChanged, finalize } from "rxjs/operators";
+import {
+  debounceTime,
+  distinctUntilChanged,
+  finalize,
+  timeout,
+} from "rxjs/operators";
 
 import { IconService } from "../icon.service";
 import { PinboardService, pinboardPage } from "../pinboard.service";
@@ -22,6 +27,18 @@ import { errorMessage, logError } from "../util";
 
 const debounceDueTime = 250; // timeout in ms for reacting to changes
 const maxCompletions = 9; // maximum number of suggested completions
+// timeout in ms after which we stop waiting for the content script;
+// this is needed because executeScript() never settles on pages where
+// content scripts cannot be injected (e.g. the built-in PDF viewer)
+const contentScriptTimeout = 1000;
+// timeout in ms for the Pinboard bookmark lookup; this blocks the form, so
+// it is kept short: the lookup is normally fast, and if it stalls we want to
+// fall back to a usable form quickly rather than keep showing "Loading..."
+const pinboardLookupTimeout = 5000;
+// timeout in ms for the suggested tags; this runs in the background and does
+// not block the form, so it is kept generous because Pinboard's "suggest"
+// call analyzes the page server-side and can be slow (e.g. for PDF pages)
+const pinboardSuggestTimeout = 10000;
 
 export interface Post {
   url: string;
@@ -102,14 +119,25 @@ export class PinPageComponent implements OnInit, OnDestroy {
     this.storage.getOptions().subscribe((options) => {
       this.options = options;
       this.setTheme();
+      // apply the theme right away (zoneless: nothing repaints until we ask),
+      // otherwise the popup stays light while the page content is loading
+      this.cdr.detectChanges();
       const getContent =
         options.meta || options.selection
-          ? browser.tabs
-              .executeScript(null, { file: "/js/content.js" })
-              .then((content: Array<RawContent>) =>
-                this.processContent(content[0])
-              )
-              .catch(() => this.getContent())
+          ? Promise.race([
+              browser.tabs
+                .executeScript(null, { file: "/js/content.js" })
+                .then((content: Array<RawContent>) =>
+                  this.processContent(content[0])
+                ),
+              // guard against executeScript() never settling (e.g. PDF viewer)
+              new Promise<Content>((_resolve, reject) =>
+                setTimeout(
+                  () => reject(new Error("content script timed out")),
+                  contentScriptTimeout
+                )
+              ),
+            ]).catch(() => this.getContent())
           : this.getContent();
       void getContent.then(
         (content: Content) => {
@@ -211,29 +239,45 @@ export class PinPageComponent implements OnInit, OnDestroy {
       this.toread = this.options.toread;
       this.retry = true;
       this.suggested = this.popular = null;
-      // query both page data and suggested tags
-      this.pinboard.getAndSuggest(this.url).subscribe({
-        next: (data: unknown) =>
-          this.setData(
-            data as {
-              posts?: Array<{
-                href: string;
-                description: string;
-                extended: string;
-                tags: string;
-                shared: string;
-                toread: string;
-              }>;
-            } & { popular?: string[]; recommended?: string[] } & {
-              date?: string;
-            }
-          ),
-        error: (error: unknown) =>
-          this.logError(
-            "Cannot check this page on Pinboard.",
-            errorMessage(error)
-          ),
-      });
+      // Look up any existing bookmark for this page and enable the form as
+      // soon as that (fast) query returns. The suggested tags are fetched
+      // separately below and must not block the form: Pinboard's "suggest"
+      // call analyzes the page server-side and can be slow, in particular
+      // for PDF pages, which used to make the popup appear to hang.
+      this.pinboard
+        .get(this.url)
+        .pipe(timeout(pinboardLookupTimeout))
+        .subscribe({
+          next: (data: unknown) =>
+            this.setPost(
+              data as {
+                posts?: Array<{
+                  href: string;
+                  description: string;
+                  extended: string;
+                  tags: string;
+                  shared: string;
+                  toread: string;
+                }>;
+                date?: string;
+              }
+            ),
+          // if the lookup fails or stalls, do not hang: log it and still
+          // let the user add the bookmark, just without the existing data
+          error: (error: unknown) => {
+            logError(errorMessage(error));
+            this.loadTagsAndSetReady();
+          },
+        });
+      // fetch the suggested tags in the background; this does not block the
+      // form and just fills in the suggestions once (and if) they arrive
+      this.pinboard
+        .suggest(this.url)
+        .pipe(timeout(pinboardSuggestTimeout))
+        .subscribe({
+          next: (tags) => this.setSuggestions(tags),
+          error: (error: unknown) => logError(errorMessage(error)),
+        });
     } else {
       this.logError(
         "Can only pin normal web pages.",
@@ -242,19 +286,18 @@ export class PinPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  // receive page data and suggested tags from parallel queries
-  setData(
-    data: {
-      posts?: Array<{
-        href: string;
-        description: string;
-        extended: string;
-        tags: string;
-        shared: string;
-        toread: string;
-      }>;
-    } & { popular?: string[]; recommended?: string[] } & { date?: string }
-  ): void {
+  // receive the existing bookmark (if any) for the current page
+  setPost(data: {
+    posts?: Array<{
+      href: string;
+      description: string;
+      extended: string;
+      tags: string;
+      shared: string;
+      toread: string;
+    }>;
+    date?: string;
+  }): void {
     if (data.posts && data.posts.length) {
       this.date = data?.date;
       const post = data.posts[0];
@@ -275,13 +318,23 @@ export class PinPageComponent implements OnInit, OnDestroy {
         (error: unknown) => logError(error)
       );
     }
+    this.loadTagsAndSetReady();
+  }
+
+  // receive the suggested tags (fetched in the background)
+  setSuggestions(tags: { popular: string[]; recommended: string[] }): void {
     // Note: "popular" and "recommended" are interchanged in Pinboard
-    if (data.popular) {
-      this.suggested = data.popular;
+    if (tags.popular) {
+      this.suggested = tags.popular;
     }
-    if (this.options.popular && data.recommended) {
-      this.popular = data.recommended;
+    if (this.options.popular && tags.recommended) {
+      this.popular = tags.recommended;
     }
+    this.cdr.detectChanges();
+  }
+
+  // load the cached tags and then enable the form for input
+  loadTagsAndSetReady(): void {
     this.pinboard
       .cachedTags()
       .pipe(finalize(() => this.cdr.detectChanges()))
