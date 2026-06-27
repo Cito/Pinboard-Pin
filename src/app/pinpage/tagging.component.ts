@@ -149,20 +149,24 @@ export class TaggingComponent {
     const words = tags.replace(",", " ").split(" ");
     let word = words.length ? words.pop() : null;
     const allTags = this.allTags();
-    const matches: [string, number][] = [];
+    // matches are [tag, frequency, rank] where rank 0 matches at the start
+    const matches: [string, number, number][] = [];
     const alpha = this.alpha();
     if (word) {
       word = word.toLowerCase();
       for (const tag of Object.keys(allTags)) {
-        if (tag.toLowerCase().startsWith(word) && !words.includes(tag)) {
-          matches.push([tag, alpha ? 0 : allTags[tag]]);
+        const lowerTag = tag.toLowerCase();
+        if (lowerTag.includes(word) && !words.includes(tag)) {
+          const rank = lowerTag.startsWith(word) ? 0 : 1;
+          matches.push([tag, alpha ? 0 : allTags[tag], rank]);
         }
       }
     }
-    // sort matching tags by decreasing frequency
+    // sort matching tags so that those matching at the start come first,
+    // then by decreasing frequency and finally alphabetically
     matches.sort(
-      (a: [string, number], b: [string, number]) =>
-        b[1] - a[1] || a[0].localeCompare(b[0])
+      (a: [string, number, number], b: [string, number, number]) =>
+        a[2] - b[2] || b[1] - a[1] || a[0].localeCompare(b[0])
     );
     matches.splice(maxCompletions);
     const completions: string[] = matches.map((a) => a[0]).reverse();
