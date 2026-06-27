@@ -1,12 +1,12 @@
-<main class="popup" [class]="theme">
+<main class="popup" [class]="theme()">
 
-  @if (!ready) {
+  @if (!ready()) {
     <h1>Loading page from Pinboard...</h1>
   }
-  @if (ready && !update) {
+  @if (ready() && !update()) {
     <h1>Save page to Pinboard</h1>
   }
-  @if (ready && update) {
+  @if (ready() && update()) {
     <h1>Update page in Pinboard</h1>
   }
 
@@ -46,19 +46,19 @@
     </button>
   </div>
 
-  @if (!error) {
+  @if (!error()) {
     <form (ngSubmit)="submit(form)" #form="ngForm">
       <div class="info">
         <label></label>
-        @if (update && !date) {
+        @if (update() && !date()) {
           <span class="info">
             This page has already been added as a bookmark to Pinboard.
           </span>
-          }@if (update && date) {
+          }@if (update() && date()) {
           <span class="info">
-            This page has already been added as a bookmark to Pinboard {{date | ago}}.
+            This page has already been added as a bookmark to Pinboard {{date() | ago}}.
           </span>
-          }@if (!update) {
+          }@if (!update()) {
           <span class="note">
             This page has not yet been added as a bookmark to Pinboard.
           </span>
@@ -66,96 +66,96 @@
       </div>
       <div>
         <label for="url">URL:</label>
-        <input id="url" name="url" type="url" size="64" required maxlength="2000" [disabled]="!ready" [ngModel]="url">
+        <input id="url" name="url" type="url" size="64" required maxlength="2000" [disabled]="!ready()" [ngModel]="url()">
       </div>
       <div>
         <label for="title">Title:</label>
-        <input id="title" name="title" type="text" size="64" required maxlength="255" [disabled]="!ready"
-          [ngModel]="title">
+        <input id="title" name="title" type="text" size="64" required maxlength="255" [disabled]="!ready()"
+          [ngModel]="title()">
       </div>
       <div>
         <label for="description">Description:</label>
-        <textarea id="description" name="description" rows="4" maxlength="3200" [disabled]="!ready"
-          [ngModel]="description">
+        <textarea id="description" name="description" rows="4" maxlength="3200" [disabled]="!ready()"
+          [ngModel]="description()">
         </textarea>
       </div>
       <div class="completions">
-        @if (ready && tagsFocus && completions) {
+        @if (ready() && tagsFocus() && completions()) {
           <ul>
-            @for (tag of completions; track tag; let i = $index) {
-              <li (mouseover)="tagSelected = i"
-              (mousedown)="selectCompletion(tag)" [class.selected]="i === tagSelected">{{tag}}</li>
+            @for (tag of completions()!; track tag; let i = $index) {
+              <li (mouseover)="tagSelected.set(i)"
+              (mousedown)="selectCompletion(tag)" [class.selected]="i === tagSelected()">{{tag}}</li>
             }
           </ul>
         }
       </div>
       <div>
         <label for="tags">Tags:</label>
-        <input id="tags" name="tags" type="text" autocomplete="off" (focus)="tagsFocus = true" (blur)="tagsFocus = false"
-          (keydown)="tagsKeyDown($event)" (keyup)="tagsKeyUp($event)" maxlength="6400" [disabled]="!ready"
-          [(ngModel)]="tags">
+        <input id="tags" name="tags" type="text" autocomplete="off" (focus)="tagsFocus.set(true)" (blur)="tagsFocus.set(false)"
+          (keydown)="tagsKeyDown($event)" (keyup)="tagsKeyUp($event)" maxlength="6400" [disabled]="!ready()"
+          [ngModel]="tags()" (ngModelChange)="tags.set($event)">
       </div>
-      @if (suggested && suggested.length) {
+      @if (suggested()?.length) {
         <div>
           <label>Suggested:</label>
           <span class="suggested">
-            @for (tag of suggested; track tag) {
+            @for (tag of suggested()!; track tag) {
               <a href="#" (click)="addTags(tag)" [class.added]="hasTags(tag)">{{tag}}</a>
             }
-            <a href="#" (click)="addTags(suggested)" [class.added]="suggested.length > 1 && hasTags(suggested)">Add all</a>
+            <a href="#" (click)="addTags(suggested()!)" [class.added]="suggested()!.length > 1 && hasTags(suggested()!)">Add all</a>
           </span>
         </div>
       }
-      @if (popular && popular.length) {
+      @if (popular()?.length) {
         <div>
           <label>Popular:</label>
           <span class="suggested">
-            @for (tag of popular; track tag) {
+            @for (tag of popular()!; track tag) {
               <a href="#" (click)="addTags(tag)" [class.added]="hasTags(tag)">{{tag}}</a>
             }
-            <a href="#" (click)="addTags(popular)" [class.added]="popular.length > 1 && hasTags(popular)">Add all</a>
+            <a href="#" (click)="addTags(popular()!)" [class.added]="popular()!.length > 1 && hasTags(popular()!)">Add all</a>
           </span>
         </div>
       }
-      @if (keywords && keywords.length) {
+      @if (keywords()?.length) {
         <div>
           <label>Keywords:</label>
           <span class="suggested">
-            @for (tag of keywords; track tag) {
+            @for (tag of keywords()!; track tag) {
               <a href="#" (click)="addTags(tag)" [class.added]="hasTags(tag)">{{tag}}</a>
             }
-            <a href="#" (click)="addTags(keywords)" [class.added]="keywords.length > 1 && hasTags(keywords)">Add all</a>
+            <a href="#" (click)="addTags(keywords()!)" [class.added]="keywords()!.length > 1 && hasTags(keywords()!)">Add all</a>
           </span>
         </div>
       }
       <div class="submit">
         <label></label>
-        <input type="checkbox" id="unshared" name="unshared" [ngModel]="unshared">
+        <input type="checkbox" id="unshared" name="unshared" [ngModel]="unshared()">
         <label for="unshared">private</label>
-        <input type="checkbox" id="toread" name="toread" [ngModel]="toread">
+        <input type="checkbox" id="toread" name="toread" [ngModel]="toread()">
         <label for="toread">to read</label>
         <button type="button" (click)="cancel()">Cancel</button>
-        @if (update) {
-          <button type="button" [disabled]="!ready" (click)="remove()">
+        @if (update()) {
+          <button type="button" [disabled]="!ready()" (click)="remove()">
           Remove bookmark</button>
         }
-        <button type="submit" [disabled]="!ready || !form.valid || !form.controls.url?.value">
-          {{ update ? 'Update bookmark' : 'Add bookmark' }}
+        <button type="submit" [disabled]="!ready() || !form.valid || !form.controls.url?.value">
+          {{ update() ? 'Update bookmark' : 'Add bookmark' }}
         </button>
       </div>
     </form>
   }
 
-  @if (error) {
-    <p class="error">{{error}}</p>
+  @if (error()) {
+    <p class="error">{{error()}}</p>
   }
 
-  @if (error) {
+  @if (error()) {
     <form>
       <div class="submit">
         <label></label>
         <button (click)="cancel()">Cancel</button>
-        @if (retry) {
+        @if (retry()) {
           <button (click)="reset()">Try again</button>
         }
       </div>

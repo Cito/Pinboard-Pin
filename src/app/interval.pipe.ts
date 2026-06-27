@@ -24,7 +24,7 @@ const intervalParts = [
 })
 export class AgoPipe implements PipeTransform {
   // show date as passed time in simple human readable form
-  transform(value: Date | string): string {
+  transform(value: Date | string | null | undefined): string {
     if (!value) {
       return "some time ago";
     }

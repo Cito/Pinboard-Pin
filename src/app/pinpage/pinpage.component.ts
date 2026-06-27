@@ -1,12 +1,21 @@
 // this component is the save bookmark dialog displayed in the popup
 
-import { Component, ElementRef, OnInit, DestroyRef, ChangeDetectorRef, inject } from "@angular/core";
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  DestroyRef,
+  Injector,
+  afterNextRender,
+  signal,
+  inject,
+} from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { AgoPipe } from "../interval.pipe";
 
-import { Subject, timer } from "rxjs";
+import { Subject } from "rxjs";
 import {
   debounceTime,
   distinctUntilChanged,
@@ -75,45 +84,50 @@ export class PinPageComponent implements OnInit {
   private icon = inject(IconService);
   private router = inject(Router);
   private eref = inject(ElementRef);
-  private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
+  private injector = inject(Injector);
 
-  url!: string;
-  title!: string | null;
-  description!: string | null; // description
-  tags!: string | null; // current tags
-  savedTags!: string | null; // tags already saved for this URL
-  allTags!: { [tag: string]: number }; // all of our tags with frequency
-  suggested!: string[] | null; // recommended tags from our own
-  popular!: string[] | null; // other popular tags
-  keywords!: string[] | null; // keywords taken from the page
-  completions!: string[] | null; // tag completions
-  tagsFocus = false; // whether the tags field has focus
-  tagSelected = 0; // index of the selected tag
-  unshared!: boolean;
-  toread!: boolean;
-  ready = false;
-  update = false;
-  date?: string;
-  error: string | null = null;
-  retry = false;
-  options!: Options;
+  // form fields
+  readonly url = signal("");
+  readonly title = signal<string | null>(null);
+  readonly description = signal<string | null>(null);
+  readonly tags = signal<string | null>(null); // current tags
+  readonly unshared = signal(false);
+  readonly toread = signal(false);
 
-  theme = "light"; // color scheme of the page
+  // tags already saved for this URL (not displayed, used to diff on save)
+  savedTags: string | null = null;
+  // all of our tags with frequency (not displayed, used for completions)
+  allTags: { [tag: string]: number } = {};
+
+  readonly suggested = signal<string[] | null>(null); // recommended tags from our own
+  readonly popular = signal<string[] | null>(null); // other popular tags
+  readonly keywords = signal<string[] | null>(null); // keywords taken from the page
+  readonly completions = signal<string[] | null>(null); // tag completions
+  readonly tagsFocus = signal(false); // whether the tags field has focus
+  readonly tagSelected = signal(0); // index of the selected tag
+  readonly ready = signal(false);
+  readonly update = signal(false);
+  readonly date = signal<string | undefined>(undefined);
+  readonly error = signal<string | null>(null);
+  readonly retry = signal(false);
+
+  readonly theme = signal("light"); // color scheme of the page
+
+  private options!: Options;
 
   private tagsSubject = new Subject<string>();
 
   ngOnInit() {
-    this.ready = false;
-    this.update = false;
-    this.error = null;
-    this.retry = false;
+    this.ready.set(false);
+    this.update.set(false);
+    this.error.set(null);
+    this.retry.set(false);
     this.storage.getOptions().subscribe((options) => {
       this.options = options;
+      // apply the theme right away; the signal schedules a repaint so the
+      // popup does not stay light while the page content is loading
       this.setTheme();
-      // apply the theme right away (zoneless: nothing repaints until we ask),
-      // otherwise the popup stays light while the page content is loading
-      this.cdr.detectChanges();
       const getContent =
         options.meta || options.selection
           ? Promise.race([
@@ -132,36 +146,29 @@ export class PinPageComponent implements OnInit {
             ]).catch(() => this.getContent())
           : this.getContent();
       void getContent.then(
-        (content: Content) => {
-          this.setContent(content);
-          this.cdr.detectChanges();
-        },
-        (error: unknown) => {
-          this.logError("Can only pin normal web pages.", errorMessage(error));
-          this.cdr.detectChanges();
-        }
+        (content: Content) => this.setContent(content),
+        (error: unknown) =>
+          this.logError("Can only pin normal web pages.", errorMessage(error))
       );
     });
-    this.tagsFocus = false;
+    this.tagsFocus.set(false);
     this.tagsSubject
       .pipe(
         debounceTime(debounceDueTime),
         distinctUntilChanged(),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe((value: string) => {
-        this.tagsChanged(value);
-        this.cdr.detectChanges();
-      });
+      .subscribe((value: string) => this.tagsChanged(value));
   }
 
   setTheme() {
-    this.theme =
+    this.theme.set(
       this.options.dark === true ||
-      (this.options.dark !== false &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
+        (this.options.dark !== false &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
         ? "dark"
-        : "light";
+        : "light"
+    );
   }
 
   // process the data gathered by the content script
@@ -171,7 +178,7 @@ export class PinPageComponent implements OnInit {
     url = url || null;
     title = title
       ? title.length > 255 // trim title
-        ? title.slice(0, 254) + "\u2026"
+        ? title.slice(0, 254) + "…"
         : title
       : null;
     const options = this.options;
@@ -182,7 +189,7 @@ export class PinPageComponent implements OnInit {
     description = description
       ? description.length > 3200
         ? // trim description (actual max. size seems to be 3798 chars)
-          description.slice(0, 3199) + "\u2026"
+          description.slice(0, 3199) + "…"
         : description
       : null;
     const keywords: string[] = [];
@@ -221,28 +228,28 @@ export class PinPageComponent implements OnInit {
   // store info on current content in the form inputs
   setContent(content: Content): void {
     if (content && content.url && this.pinboard.isValidUrl(content.url)) {
-      this.url = content.url;
-      this.title = content.title;
-      this.description = content.description;
-      if (this.description && this.options.blockquote) {
-        this.description =
-          "<blockquote>" +
-          this.description.slice(0, 3200 - 25) +
-          "</blockquote>";
+      this.url.set(content.url);
+      this.title.set(content.title);
+      let description = content.description;
+      if (description && this.options.blockquote) {
+        description =
+          "<blockquote>" + description.slice(0, 3200 - 25) + "</blockquote>";
       }
-      this.keywords = content.keywords;
-      this.tags = null;
-      this.unshared = this.options.unshared;
-      this.toread = this.options.toread;
-      this.retry = true;
-      this.suggested = this.popular = null;
+      this.description.set(description);
+      this.keywords.set(content.keywords);
+      this.tags.set(null);
+      this.unshared.set(this.options.unshared);
+      this.toread.set(this.options.toread);
+      this.retry.set(true);
+      this.suggested.set(null);
+      this.popular.set(null);
       // Look up any existing bookmark for this page and enable the form as
       // soon as that (fast) query returns. The suggested tags are fetched
       // separately below and must not block the form: Pinboard's "suggest"
       // call analyzes the page server-side and can be slow, in particular
       // for PDF pages, which used to make the popup appear to hang.
       this.pinboard
-        .get(this.url)
+        .get(this.url())
         .pipe(timeout(pinboardLookupTimeout))
         .subscribe({
           next: (data: unknown) =>
@@ -269,7 +276,7 @@ export class PinPageComponent implements OnInit {
       // fetch the suggested tags in the background; this does not block the
       // form and just fills in the suggestions once (and if) they arrive
       this.pinboard
-        .suggest(this.url)
+        .suggest(this.url())
         .pipe(timeout(pinboardSuggestTimeout))
         .subscribe({
           next: (tags) => this.setSuggestions(tags),
@@ -296,17 +303,17 @@ export class PinPageComponent implements OnInit {
     date?: string;
   }): void {
     if (data.posts && data.posts.length) {
-      this.date = data?.date;
+      this.date.set(data?.date);
       const post = data.posts[0];
-      this.url = post.href;
-      this.title = post.description;
-      this.description = post.extended;
-      this.tags = post.tags;
-      this.unshared = post.shared !== "yes";
-      this.toread = post.toread === "yes";
-      this.update = true;
+      this.url.set(post.href);
+      this.title.set(post.description);
+      this.description.set(post.extended);
+      this.tags.set(post.tags);
+      this.unshared.set(post.shared !== "yes");
+      this.toread.set(post.toread === "yes");
+      this.update.set(true);
       // set browser icon to saved state
-      void browser.tabs.query({ url: this.url }).then(
+      void browser.tabs.query({ url: this.url() }).then(
         (tabs: browser.tabs.Tab[]) => {
           for (const tab of tabs) {
             this.icon.setIcon(tab.id, true);
@@ -322,66 +329,67 @@ export class PinPageComponent implements OnInit {
   setSuggestions(tags: { popular: string[]; recommended: string[] }): void {
     // Note: "popular" and "recommended" are interchanged in Pinboard
     if (tags.popular) {
-      this.suggested = tags.popular;
+      this.suggested.set(tags.popular);
     }
     if (this.options.popular && tags.recommended) {
-      this.popular = tags.recommended;
+      this.popular.set(tags.recommended);
     }
-    this.cdr.detectChanges();
   }
 
   // load the cached tags and then enable the form for input
   loadTagsAndSetReady(): void {
-    this.pinboard
-      .cachedTags()
-      .pipe(finalize(() => this.cdr.detectChanges()))
-      .subscribe({
-        next: (tags) => {
-          this.allTags = tags;
-          if (this.tags) {
-            this.tags = this.tags.trim();
-            this.savedTags = this.tags;
-            this.tags += " ";
-          } else {
-            this.savedTags = null;
-          }
-          this.completions = null;
-          this.setReady();
-        },
-      });
+    this.pinboard.cachedTags().subscribe({
+      next: (tags) => {
+        this.allTags = tags;
+        const current = this.tags();
+        if (current) {
+          const trimmed = current.trim();
+          this.savedTags = trimmed;
+          this.tags.set(trimmed + " ");
+        } else {
+          this.savedTags = null;
+        }
+        this.completions.set(null);
+        this.setReady();
+      },
+    });
   }
 
   // set form as ready for input
   setReady(): void {
-    this.ready = true;
-    this.cdr.detectChanges();
-    // wait until inputs have been enabled, then focus
-    timer(0).subscribe(() => {
-      const focus = this.url
-        ? this.title
-          ? this.tags && !this.description
-            ? "description"
-            : "tags"
-          : "title"
-        : "url";
-      const element = (this.eref.nativeElement as HTMLElement).querySelector(
-        "#" + focus
-      );
-      if (element instanceof HTMLElement) {
-        element.focus();
-      }
-    });
+    this.ready.set(true);
+    // focus the most relevant field once the enabled inputs have rendered
+    // (setting `ready` schedules the render; afterNextRender runs after it)
+    afterNextRender(
+      () => {
+        const focus = this.url()
+          ? this.title()
+            ? this.tags() && !this.description()
+              ? "description"
+              : "tags"
+            : "title"
+          : "url";
+        const element = (
+          this.eref.nativeElement as HTMLElement
+        ).querySelector("#" + focus);
+        if (element instanceof HTMLElement) {
+          element.focus();
+        }
+      },
+      { injector: this.injector }
+    );
   }
 
   // check whether the given tags have already been added
   hasTags(tags: string | string[]): boolean {
-    if (!this.tags) {
+    const current = this.tags();
+    if (!current) {
       return false;
     }
     if (!Array.isArray(tags)) {
       tags = [tags];
     }
-    const allTags = this.tags.split(" ").filter((tag) => !!tag);
+    const allTags = current.split(" ").filter((tag) => !!tag);
     return tags.every((tag) => allTags.includes(tag));
   }
 
@@ -390,7 +398,7 @@ export class PinPageComponent implements OnInit {
     if (!Array.isArray(tags)) {
       tags = [tags];
     }
-    let allTags = (this.tags || "").split(" ").filter((tag) => !!tag);
+    let allTags = (this.tags() || "").split(" ").filter((tag) => !!tag);
     const newTags = tags.filter((tag) => !allTags.includes(tag));
     if (newTags.length) {
       // some tags are new
@@ -399,12 +407,13 @@ export class PinPageComponent implements OnInit {
       // all tags have already been added, remove these tags again
       allTags = allTags.filter((tag) => !tags.includes(tag));
     }
-    this.tags = allTags.join(" ");
+    this.tags.set(allTags.join(" "));
   }
 
   // this method is called when keys have been pressed down in the tabs field
   tagsKeyDown(event: KeyboardEvent): boolean {
-    if (!this.ready || !this.tagsFocus || !this.completions) {
+    const completions = this.completions();
+    if (!this.ready() || !this.tagsFocus() || !completions) {
       return true;
     }
     // Firefox reacts to some of our control keys as well, so to prevent this
@@ -412,25 +421,25 @@ export class PinPageComponent implements OnInit {
     let control = true;
     switch (event.code) {
       case "Home":
-        this.tagSelected = 0;
+        this.tagSelected.set(0);
         break;
       case "End":
-        this.tagSelected = this.completions.length - 1;
+        this.tagSelected.set(completions.length - 1);
         break;
       case "ArrowDown":
-        if (this.tagSelected < this.completions.length - 1) {
-          ++this.tagSelected;
+        if (this.tagSelected() < completions.length - 1) {
+          this.tagSelected.update((i) => i + 1);
         }
         break;
       case "ArrowUp":
-        if (this.tagSelected > 0) {
-          --this.tagSelected;
+        if (this.tagSelected() > 0) {
+          this.tagSelected.update((i) => i - 1);
         }
         break;
       case "Enter":
       case "Tab":
       case "ArrowRight":
-        const tag = this.completions[this.tagSelected];
+        const tag = completions[this.tagSelected()];
         const inputElement = event.target as HTMLInputElement;
         let value = inputElement.value;
         const words = value.split(" ");
@@ -441,7 +450,7 @@ export class PinPageComponent implements OnInit {
           words.push(tag);
           value = words.join(" ") + " ";
           this.tagsChanged(value);
-          this.tags = value;
+          this.tags.set(value);
         }
         break;
       default:
@@ -454,7 +463,7 @@ export class PinPageComponent implements OnInit {
   tagsKeyUp(event: KeyboardEvent): boolean {
     // the field value is changed after the key has been pressed,
     // so this is the right moment for checking for value changes
-    if (this.ready && this.tagsFocus) {
+    if (this.ready() && this.tagsFocus()) {
       this.tagsSubject.next((event.target as HTMLInputElement).value);
     }
     return true;
@@ -484,23 +493,23 @@ export class PinPageComponent implements OnInit {
     matches.splice(maxCompletions);
     const completions: string[] = matches.map((a) => a[0]).reverse();
     if (completions.length) {
-      const oldCompletions = this.completions;
+      const oldCompletions = this.completions();
       if (
         !oldCompletions ||
         completions.length !== oldCompletions.length ||
         completions.some((tag, i) => completions[i] !== oldCompletions[i])
       ) {
-        this.completions = completions;
-        this.tagSelected = completions.length - 1;
+        this.completions.set(completions);
+        this.tagSelected.set(completions.length - 1);
       }
     } else {
-      this.completions = null;
+      this.completions.set(null);
     }
   }
 
   // this method is called when a tag completion was clicked
   selectCompletion(tag: string): boolean {
-    let value = this.tags || "";
+    let value = this.tags() || "";
     const words = value.split(" ");
     if (words.length) {
       words.pop();
@@ -509,15 +518,15 @@ export class PinPageComponent implements OnInit {
       words.push(tag);
       value = words.join(" ") + " ";
       this.tagsChanged(value);
-      this.tags = value;
+      this.tags.set(value);
     }
     return false;
   }
 
   // delete the current bookmark
   remove(): boolean {
-    if (this.ready && this.update && this.url) {
-      this.pinboard.delete(this.url).subscribe({
+    if (this.ready() && this.update() && this.url()) {
+      this.pinboard.delete(this.url()).subscribe({
         next: () => {
           // update the tags in the cache
           const savedTags = this.savedTags ? this.savedTags.split(" ") : [];
@@ -527,7 +536,7 @@ export class PinPageComponent implements OnInit {
               finalize(
                 // set the browser icon to unsaved state
                 () =>
-                  void browser.tabs.query({ url: this.url }).then(
+                  void browser.tabs.query({ url: this.url() }).then(
                     (tabs: browser.tabs.Tab[]) => {
                       for (const tab of tabs) {
                         this.icon.setIcon(tab.id, false);
@@ -556,7 +565,7 @@ export class PinPageComponent implements OnInit {
 
   // reset error message
   reset(): boolean {
-    this.error = null;
+    this.error.set(null);
     return false;
   }
 
@@ -599,7 +608,7 @@ export class PinPageComponent implements OnInit {
             .pipe(
               finalize(
                 () =>
-                  void browser.tabs.query({ url: this.url }).then(
+                  void browser.tabs.query({ url: this.url() }).then(
                     (tabs: browser.tabs.Tab[]) => {
                       for (const tab of tabs) {
                         this.icon.setIcon(tab.id, true);
@@ -691,8 +700,7 @@ export class PinPageComponent implements OnInit {
     if (errmsg) {
       logError(logmsg ?? errmsg);
     }
-    this.error = errmsg ? errorMessage(errmsg) : null;
-    this.cdr.detectChanges();
+    this.error.set(errmsg ? errorMessage(errmsg) : null);
   }
 
   pinboardLink(page: unknown): boolean {
