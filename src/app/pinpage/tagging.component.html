@@ -10,9 +10,9 @@
 </div>
 <div>
   <label for="tags">Tags:</label>
-  <input id="tags" type="text" autocomplete="off" (focus)="tagsFocus.set(true)" (blur)="tagsFocus.set(false)"
+  <input #tagsInput id="tags" type="text" autocomplete="off" (focus)="tagsFocus.set(true)" (blur)="tagsFocus.set(false)"
     (keydown)="tagsKeyDown($event)" (keyup)="tagsKeyUp($event)" maxlength="6400" [disabled]="disabled()"
-    [ngModel]="tags()" (ngModelChange)="tags.set($event)" [ngModelOptions]="{ standalone: true }">
+    [value]="tags() ?? ''" (input)="tags.set(tagsInput.value)">
 </div>
 @if (suggested()?.length) {
   <div>

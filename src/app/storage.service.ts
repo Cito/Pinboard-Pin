@@ -21,7 +21,7 @@ export interface MessagePayload {
   options?: Options;
 }
 
-const defaultOptions: Options = {
+export const defaultOptions: Options = {
   ping: false,
   unshared: false,
   toread: false,

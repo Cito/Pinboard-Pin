@@ -47,7 +47,7 @@
   </div>
 
   @if (!error()) {
-    <form (ngSubmit)="submit(form)" #form="ngForm">
+    <form (submit)="submit($event)">
       <div class="info">
         <label></label>
         @if (update() && !date()) {
@@ -66,33 +66,30 @@
       </div>
       <div>
         <label for="url">URL:</label>
-        <input id="url" name="url" type="url" size="64" required maxlength="2000" [disabled]="!ready()" [ngModel]="url()">
+        <input id="url" type="url" size="64" [formField]="form.url">
       </div>
       <div>
         <label for="title">Title:</label>
-        <input id="title" name="title" type="text" size="64" required maxlength="255" [disabled]="!ready()"
-          [ngModel]="title()">
+        <input id="title" type="text" size="64" [formField]="form.title">
       </div>
       <div>
         <label for="description">Description:</label>
-        <textarea id="description" name="description" rows="4" maxlength="3200" [disabled]="!ready()"
-          [ngModel]="description()">
-        </textarea>
+        <textarea id="description" rows="4" [formField]="form.description"></textarea>
       </div>
       <app-tagging [(tags)]="tags" [allTags]="allTags()" [suggested]="suggested()" [popular]="popular()"
         [keywords]="keywords()" [alpha]="sortAlpha" [disabled]="!ready()"></app-tagging>
       <div class="submit">
         <label></label>
-        <input type="checkbox" id="unshared" name="unshared" [ngModel]="unshared()">
+        <input type="checkbox" id="unshared" [formField]="form.unshared">
         <label for="unshared">private</label>
-        <input type="checkbox" id="toread" name="toread" [ngModel]="toread()">
+        <input type="checkbox" id="toread" [formField]="form.toread">
         <label for="toread">to read</label>
         <button type="button" (click)="cancel()">Cancel</button>
         @if (update()) {
           <button type="button" [disabled]="!ready()" (click)="remove()">
           Remove bookmark</button>
         }
-        <button type="submit" [disabled]="!ready() || !form.valid || !form.controls.url.value">
+        <button type="submit" [disabled]="!ready() || !form().valid()">
           {{ update() ? 'Update bookmark' : 'Add bookmark' }}
         </button>
       </div>

@@ -10,6 +10,9 @@ form div {
   display: flex;
   flex-direction: row;
   align-items: stretch;
+  // space the label row above and the input row below
+  margin-bottom: 6px;
+
   input[type="text"] {
     flex: 1 0 70px;
     margin-right: 8px;

@@ -63,10 +63,19 @@ npm run test         # run the built extension in Firefox via web-ext (manual QA
   explicitly (the `@angular-eslint/prefer-on-push-component-change-detection`
   rule flags components that opt out). Singleton services use the `@Service()`
   decorator (v22), not `@Injectable({ providedIn: 'root' })`.
-- Forms are **template-driven** (`FormsModule` / `ngModel`) bound to signals via
-  `[ngModel]="x()"` + `(ngModelChange)="x.set($event)"`. Signal Forms
-  (`@angular/forms/signals`) are intentionally not adopted yet — don't migrate
-  the forms without being asked.
+- Forms use **Signal Forms** (`@angular/forms/signals`) throughout —
+  [pinpage](src/app/pinpage/pinpage.component.ts),
+  [options](src/app/options/options.component.ts), and
+  [login](src/app/login/login.component.ts) each build a `form()` over a single
+  model signal, with fields bound by `[formField]`. `FormsModule` / `ngModel` is
+  **no longer used anywhere**; the tag input in
+  [tagging](src/app/pinpage/tagging.component.ts) is a plain `[value]`/`(input)`
+  binding on a single signal. Notes on Signal Forms here: native **radio**
+  controls are string-valued, so map tri-state/typed values to a string in the
+  form model and back at the storage boundary (see options' `dark`); validators
+  (`required` / `maxLength` / `pattern`) replace the native attributes; and the
+  root-level `disabled({ when })` cascade settles a tick late, so post-render
+  focus may need a `requestAnimationFrame` retry (see pinpage's `setReady`).
 - The `browser.*` WebExtensions global is typed via `src/typings.d.ts`
   (`/// <reference types="firefox-webext-browser" />`).
 - ESLint config in [eslint.config.js](eslint.config.js) (flat config,

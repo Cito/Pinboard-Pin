@@ -125,6 +125,12 @@ input[type="radio"]:focus {
   -moz-outline-radius: 9px;
 }
 
+// give the selected radio a halo so the active choice is obvious on load;
+// without it only the focus outline (shown after a click) marks the selection
+input[type="radio"]:checked {
+  box-shadow: 0 0 0 2px var(--color-focus);
+}
+
 span.error {
   color: var(--color-error);
 }

@@ -6,7 +6,7 @@
     that you can find on your
     <a href="#" (click)="openPasswordPage()">Pinboard password page</a>.</p>
 
-    <form (ngSubmit)="submit(form)" #form="ngForm">
+    <form (submit)="submit($event)">
       <div>
         @if (!checking()) {
           <label for="token">
@@ -24,9 +24,8 @@
         }
       </div>
       <div>
-        <input id="token" name="token" type="text" pattern=".+:.+" placeholder="API Token" autofocus [disabled]="checking()"
-          ngModel>
-        <button type="submit" [disabled]="checking() || !form.valid || !form.controls.token.value">
+        <input id="token" type="text" placeholder="API Token" autofocus [formField]="form.token">
+        <button type="submit" [disabled]="checking() || !form().valid()">
           Log in
         </button>
       </div>

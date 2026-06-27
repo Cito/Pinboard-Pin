@@ -9,7 +9,13 @@ import {
   signal,
   inject,
 } from "@angular/core";
-import { FormsModule, NgForm } from "@angular/forms";
+import {
+  form,
+  FormField,
+  required,
+  maxLength,
+  disabled,
+} from "@angular/forms/signals";
 import { Router } from "@angular/router";
 import { AgoPipe } from "../interval.pipe";
 
@@ -44,6 +50,11 @@ export interface Post {
   noreplace: boolean;
 }
 
+// the editable bookmark fields backing the signal form; the tags live in the
+// child TaggingComponent and noreplace is not user-editable, so both are
+// excluded here and merged back into a Post on save
+type PinForm = Omit<Post, "tags" | "noreplace">;
+
 interface Content {
   url: string | null;
   title: string | null;
@@ -65,7 +76,7 @@ interface RawContent {
   selector: "app-popup",
   templateUrl: "./pinpage.component.html",
   styleUrls: ["./pinpage.component.scss"],
-  imports: [FormsModule, AgoPipe, TaggingComponent],
+  imports: [FormField, AgoPipe, TaggingComponent],
 })
 export class PinPageComponent implements OnInit {
   private pinboard = inject(PinboardService);
@@ -75,13 +86,17 @@ export class PinPageComponent implements OnInit {
   private eref = inject(ElementRef);
   private injector = inject(Injector);
 
-  // form fields
-  readonly url = signal("");
-  readonly title = signal<string | null>(null);
-  readonly description = signal<string | null>(null);
-  readonly tags = signal<string | null>(null); // current tags
-  readonly unshared = signal(false);
-  readonly toread = signal(false);
+  // the editable bookmark fields, bound to the signal form below
+  readonly model = signal<PinForm>({
+    url: "",
+    title: "",
+    description: "",
+    unshared: false,
+    toread: false,
+  });
+
+  // current tags as a space separated string (two-way bound to the tag editor)
+  readonly tags = signal<string | null>(null);
 
   // tags already saved for this URL (used to diff the tag cache on save)
   savedTags: string | null = null;
@@ -98,6 +113,18 @@ export class PinPageComponent implements OnInit {
   readonly retry = signal(false);
 
   readonly theme = signal("light"); // color scheme of the page
+
+  // signal form over the editable fields; the [formField] directive binds the
+  // validators (required/maxlength) to the native controls and keeps every
+  // field disabled until the bookmark data has finished loading
+  readonly form = form(this.model, (field) => {
+    required(field.url);
+    maxLength(field.url, 2000);
+    required(field.title);
+    maxLength(field.title, 255);
+    maxLength(field.description, 3200);
+    disabled(field, { when: () => !this.ready() });
+  });
 
   private options!: Options;
 
@@ -202,18 +229,20 @@ export class PinPageComponent implements OnInit {
   // store info on current content in the form inputs
   setContent(content: Content): void {
     if (content && content.url && this.pinboard.isValidUrl(content.url)) {
-      this.url.set(content.url);
-      this.title.set(content.title);
       let description = content.description;
       if (description && this.options.blockquote) {
         description =
           "<blockquote>" + description.slice(0, 3200 - 25) + "</blockquote>";
       }
-      this.description.set(description);
+      this.model.set({
+        url: content.url,
+        title: content.title ?? "",
+        description: description ?? "",
+        unshared: this.options.unshared,
+        toread: this.options.toread,
+      });
       this.keywords.set(content.keywords);
       this.tags.set(null);
-      this.unshared.set(this.options.unshared);
-      this.toread.set(this.options.toread);
       this.retry.set(true);
       this.suggested.set(null);
       this.popular.set(null);
@@ -223,7 +252,7 @@ export class PinPageComponent implements OnInit {
       // call analyzes the page server-side and can be slow, in particular
       // for PDF pages, which used to make the popup appear to hang.
       this.pinboard
-        .get(this.url())
+        .get(this.model().url)
         .pipe(timeout(pinboardLookupTimeout))
         .subscribe({
           next: (data: unknown) =>
@@ -250,7 +279,7 @@ export class PinPageComponent implements OnInit {
       // fetch the suggested tags in the background; this does not block the
       // form and just fills in the suggestions once (and if) they arrive
       this.pinboard
-        .suggest(this.url())
+        .suggest(this.model().url)
         .pipe(timeout(pinboardSuggestTimeout))
         .subscribe({
           next: (tags) => this.setSuggestions(tags),
@@ -279,15 +308,18 @@ export class PinPageComponent implements OnInit {
     if (data.posts && data.posts.length) {
       this.date.set(data?.date);
       const post = data.posts[0];
-      this.url.set(post.href);
-      this.title.set(post.description);
-      this.description.set(post.extended);
+      this.model.update((m) => ({
+        ...m,
+        url: post.href,
+        title: post.description,
+        description: post.extended,
+        unshared: post.shared !== "yes",
+        toread: post.toread === "yes",
+      }));
       this.tags.set(post.tags);
-      this.unshared.set(post.shared !== "yes");
-      this.toread.set(post.toread === "yes");
       this.update.set(true);
       // set browser icon to saved state
-      void browser.tabs.query({ url: this.url() }).then(
+      void browser.tabs.query({ url: this.model().url }).then(
         (tabs: browser.tabs.Tab[]) => {
           for (const tab of tabs) {
             this.icon.setIcon(tab.id, true);
@@ -335,9 +367,10 @@ export class PinPageComponent implements OnInit {
     // (setting `ready` schedules the render; afterNextRender runs after it)
     afterNextRender(
       () => {
-        const focus = this.url()
-          ? this.title()
-            ? this.tags() && !this.description()
+        const fields = this.model();
+        const focus = fields.url
+          ? fields.title
+            ? this.tags() && !fields.description
               ? "description"
               : "tags"
             : "title"
@@ -347,6 +380,12 @@ export class PinPageComponent implements OnInit {
         ).querySelector("#" + focus);
         if (element instanceof HTMLElement) {
           element.focus();
+          // the [formField] directive lifts the disabled state one tick after
+          // `ready` flips, and focusing a disabled control is a no-op; if the
+          // focus did not take yet, retry once the control has been enabled
+          if (document.activeElement !== element) {
+            requestAnimationFrame(() => element.focus());
+          }
         }
       },
       { injector: this.injector }
@@ -355,8 +394,8 @@ export class PinPageComponent implements OnInit {
 
   // delete the current bookmark
   remove(): boolean {
-    if (this.ready() && this.update() && this.url()) {
-      this.pinboard.delete(this.url()).subscribe({
+    if (this.ready() && this.update() && this.model().url) {
+      this.pinboard.delete(this.model().url).subscribe({
         next: () => {
           // update the tags in the cache
           const savedTags = this.savedTags ? this.savedTags.split(" ") : [];
@@ -366,7 +405,7 @@ export class PinPageComponent implements OnInit {
               finalize(
                 // set the browser icon to unsaved state
                 () =>
-                  void browser.tabs.query({ url: this.url() }).then(
+                  void browser.tabs.query({ url: this.model().url }).then(
                     (tabs: browser.tabs.Tab[]) => {
                       for (const tab of tabs) {
                         this.icon.setIcon(tab.id, false);
@@ -400,12 +439,12 @@ export class PinPageComponent implements OnInit {
   }
 
   // submit form
-  submit(form: NgForm): boolean {
-    if (form.valid) {
-      // the tags field lives in the child tag editor, not the form
-      this.save({ ...(form.value as Post), tags: this.tags() ?? "" });
+  submit(event: Event): void {
+    event.preventDefault();
+    if (this.form().valid()) {
+      // the tags field lives in the child tag editor, noreplace is unused
+      this.save({ ...this.model(), tags: this.tags() ?? "", noreplace: false });
     }
-    return false;
   }
 
   // save page to Pinboard
@@ -439,7 +478,7 @@ export class PinPageComponent implements OnInit {
             .pipe(
               finalize(
                 () =>
-                  void browser.tabs.query({ url: this.url() }).then(
+                  void browser.tabs.query({ url: this.model().url }).then(
                     (tabs: browser.tabs.Tab[]) => {
                       for (const tab of tabs) {
                         this.icon.setIcon(tab.id, true);

@@ -1,7 +1,13 @@
 // this component is the login dialog displayed in the popup
 
 import { Component, OnInit, signal, inject } from "@angular/core";
-import { FormsModule, NgForm } from "@angular/forms";
+import {
+  form,
+  FormField,
+  required,
+  pattern,
+  disabled,
+} from "@angular/forms/signals";
 import { Router } from "@angular/router";
 
 import { passwordPage, PinboardService } from "../pinboard.service";
@@ -12,13 +18,16 @@ export interface Login {
   token: string;
 }
 
+// an API token is two non-empty parts separated by a colon (user:hex)
+const tokenPattern = /.+:.+/;
+
 // Log in form
 
 @Component({
   selector: "app-login",
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.scss"],
-  imports: [FormsModule],
+  imports: [FormField],
 })
 export class LoginComponent implements OnInit {
   private pinboard = inject(PinboardService);
@@ -29,6 +38,14 @@ export class LoginComponent implements OnInit {
   readonly error = signal(false);
 
   readonly theme = signal("light");
+
+  // the API token bound to the form; the input is disabled while logging in
+  readonly model = signal<Login>({ token: "" });
+  readonly form = form(this.model, (field) => {
+    required(field.token);
+    pattern(field.token, tokenPattern);
+    disabled(field, { when: () => this.checking() });
+  });
 
   ngOnInit() {
     this.storage.getOptions().subscribe((options) => {
@@ -46,17 +63,14 @@ export class LoginComponent implements OnInit {
   }
 
   // submit form (store token)
-  submit(form: NgForm) {
-    if (!form.valid) {
-      return false;
+  submit(event: Event) {
+    event.preventDefault();
+    if (!this.form().valid()) {
+      return;
     }
-    let token: string = (form.value as Record<string, unknown>).token as string;
+    const token = this.model().token.trim();
     if (!token) {
-      return false;
-    }
-    token = token.trim();
-    if (!token) {
-      return false;
+      return;
     }
     this.checking.set(true);
     this.pinboard.setToken(token).subscribe({
@@ -74,7 +88,6 @@ export class LoginComponent implements OnInit {
         this.checking.set(false);
       },
     });
-    return false;
   }
 
   continue() {

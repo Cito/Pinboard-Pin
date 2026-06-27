@@ -10,7 +10,6 @@ import {
   inject,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { FormsModule } from "@angular/forms";
 
 import { Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged } from "rxjs/operators";
@@ -22,7 +21,6 @@ const maxCompletions = 9; // maximum number of suggested completions
   selector: "app-tagging",
   templateUrl: "./tagging.component.html",
   styleUrls: ["./tagging.component.scss"],
-  imports: [FormsModule],
 })
 export class TaggingComponent {
   private destroyRef = inject(DestroyRef);
