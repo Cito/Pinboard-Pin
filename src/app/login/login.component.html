@@ -1,4 +1,4 @@
-<main class="popup" [class]="theme">
+<main class="popup" [class]="theme()">
 
   <h1>Log in to Pinboard</h1>
 
@@ -8,25 +8,25 @@
 
     <form (ngSubmit)="submit(form)" #form="ngForm">
       <div>
-        @if (!checking) {
+        @if (!checking()) {
           <label for="token">
-            @if (!error) {
+            @if (!error()) {
               <span>Please enter your API token:</span>
             }
-            @if (error) {
+            @if (error()) {
               <span class="error">Invalid API token, please re-enter:</span>
             }
           </label>
         }
-        @if (checking) {
+        @if (checking()) {
           <label><span class="info">Trying to log in
           with this API token...</span></label>
         }
       </div>
       <div>
-        <input id="token" name="token" type="text" pattern=".+:.+" placeholder="API Token" autofocus [disabled]="checking"
+        <input id="token" name="token" type="text" pattern=".+:.+" placeholder="API Token" autofocus [disabled]="checking()"
           ngModel>
-        <button type="submit" [disabled]="checking || !form.valid || !form.controls.token?.value">
+        <button type="submit" [disabled]="checking() || !form.valid || !form.controls.token?.value">
           Log in
         </button>
       </div>

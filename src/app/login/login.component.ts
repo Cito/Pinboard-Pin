@@ -1,9 +1,8 @@
 // this component is the login dialog displayed in the popup
 
-import { Component, OnInit, ChangeDetectorRef, inject } from "@angular/core";
+import { Component, OnInit, signal, inject } from "@angular/core";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
-import { finalize } from "rxjs/operators";
 
 import { passwordPage, PinboardService } from "../pinboard.service";
 import { Options, StorageService } from "../storage.service";
@@ -25,27 +24,26 @@ export class LoginComponent implements OnInit {
   private pinboard = inject(PinboardService);
   private storage = inject(StorageService);
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef);
 
-  checking = false;
-  error = false;
+  readonly checking = signal(false);
+  readonly error = signal(false);
 
-  theme = "light";
+  readonly theme = signal("light");
 
   ngOnInit() {
     this.storage.getOptions().subscribe((options) => {
       this.setTheme(options);
-      this.cdr.detectChanges();
     });
   }
 
   setTheme(options: Options) {
-    this.theme =
+    this.theme.set(
       options.dark === true ||
-      (options.dark !== false &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
+        (options.dark !== false &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
         ? "dark"
-        : "light";
+        : "light"
+    );
   }
 
   openPasswordPage() {
@@ -66,25 +64,22 @@ export class LoginComponent implements OnInit {
     if (!token) {
       return false;
     }
-    this.checking = true;
-    this.pinboard
-      .setToken(token)
-      .pipe(finalize(() => this.cdr.detectChanges()))
-      .subscribe({
-        next: (ok) => {
-          this.error = !ok;
-          if (ok) {
-            this.continue();
-          } else {
-            this.checking = false;
-          }
-        },
-        error: (error: unknown) => {
-          this.error = true;
-          logError(error);
-          this.checking = false;
-        },
-      });
+    this.checking.set(true);
+    this.pinboard.setToken(token).subscribe({
+      next: (ok) => {
+        this.error.set(!ok);
+        if (ok) {
+          this.continue();
+        } else {
+          this.checking.set(false);
+        }
+      },
+      error: (error: unknown) => {
+        this.error.set(true);
+        logError(error);
+        this.checking.set(false);
+      },
+    });
     return false;
   }
 
