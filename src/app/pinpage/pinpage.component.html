@@ -79,55 +79,8 @@
           [ngModel]="description()">
         </textarea>
       </div>
-      <div class="completions">
-        @if (ready() && tagsFocus() && completions()) {
-          <ul>
-            @for (tag of completions()!; track tag; let i = $index) {
-              <li (mouseover)="tagSelected.set(i)"
-              (mousedown)="selectCompletion(tag)" [class.selected]="i === tagSelected()">{{tag}}</li>
-            }
-          </ul>
-        }
-      </div>
-      <div>
-        <label for="tags">Tags:</label>
-        <input id="tags" name="tags" type="text" autocomplete="off" (focus)="tagsFocus.set(true)" (blur)="tagsFocus.set(false)"
-          (keydown)="tagsKeyDown($event)" (keyup)="tagsKeyUp($event)" maxlength="6400" [disabled]="!ready()"
-          [ngModel]="tags()" (ngModelChange)="tags.set($event)">
-      </div>
-      @if (suggested()?.length) {
-        <div>
-          <label>Suggested:</label>
-          <span class="suggested">
-            @for (tag of suggested()!; track tag) {
-              <a href="#" (click)="addTags(tag)" [class.added]="hasTags(tag)">{{tag}}</a>
-            }
-            <a href="#" (click)="addTags(suggested()!)" [class.added]="suggested()!.length > 1 && hasTags(suggested()!)">Add all</a>
-          </span>
-        </div>
-      }
-      @if (popular()?.length) {
-        <div>
-          <label>Popular:</label>
-          <span class="suggested">
-            @for (tag of popular()!; track tag) {
-              <a href="#" (click)="addTags(tag)" [class.added]="hasTags(tag)">{{tag}}</a>
-            }
-            <a href="#" (click)="addTags(popular()!)" [class.added]="popular()!.length > 1 && hasTags(popular()!)">Add all</a>
-          </span>
-        </div>
-      }
-      @if (keywords()?.length) {
-        <div>
-          <label>Keywords:</label>
-          <span class="suggested">
-            @for (tag of keywords()!; track tag) {
-              <a href="#" (click)="addTags(tag)" [class.added]="hasTags(tag)">{{tag}}</a>
-            }
-            <a href="#" (click)="addTags(keywords()!)" [class.added]="keywords()!.length > 1 && hasTags(keywords()!)">Add all</a>
-          </span>
-        </div>
-      }
+      <app-tag-editor [(tags)]="tags" [allTags]="allTags()" [suggested]="suggested()" [popular]="popular()"
+        [keywords]="keywords()" [alpha]="sortAlpha" [disabled]="!ready()"></app-tag-editor>
       <div class="submit">
         <label></label>
         <input type="checkbox" id="unshared" name="unshared" [ngModel]="unshared()">

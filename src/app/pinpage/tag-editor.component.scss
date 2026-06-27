@@ -1,0 +1,104 @@
+// the host has no box of its own: its rows flow as direct children of the
+// surrounding form so the layout matches the other form fields
+:host {
+  display: contents;
+}
+
+div {
+  display: flex;
+  align-items: baseline;
+  margin-top: 8px;
+
+  label {
+    flex: 0 0 100px;
+    margin-right: 8px;
+    text-align: right;
+    font-weight: bold;
+  }
+
+  input[type="text"] {
+    flex: 1 0 70px;
+  }
+}
+
+div.completions {
+  display: block;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  height: 0;
+}
+
+span.suggested {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  a {
+    color: hsl(var(--hue), 40%, 33%);
+    margin-right: 8px;
+    text-decoration: none;
+
+    &.added {
+      color: hsl(var(--hue), 5%, 60%);
+    }
+
+    &:last-child {
+      font-weight: bold;
+    }
+
+    &:nth-last-child(2) {
+      margin-right: 12px;
+    }
+  }
+}
+
+.completions {
+  ul {
+    position: absolute;
+    list-style-type: none;
+    bottom: -2px;
+    left: 110px;
+    width: 300px;
+    max-height: 250px;
+    overflow-y: scroll;
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-bg-input);
+    border: 1px solid hsl(var(--hue-2), 15%, 67%);
+    box-shadow: 4px 4px 10px hsl(var(--hue), 15%, 67%);
+    color: hsl(var(--hue), 40%, 33%);
+    z-index: 9;
+  }
+
+  li {
+    padding: 4px;
+  }
+
+  li.selected {
+    background-color: hsl(var(--hue), 33%, 40%);
+    color: var(--color-bg-input);
+  }
+}
+
+// dark mode is driven by the `.dark` class on the popup's <main> ancestor
+:host-context(.dark) {
+  span.suggested a {
+    color: hsl(var(--hue), 60%, 67%);
+
+    &.added {
+      color: hsl(var(--hue), 5%, 40%);
+    }
+  }
+
+  .completions {
+    ul {
+      border: 1px solid hsl(var(--hue-2), 15%, 25%);
+      box-shadow: 4px 4px 10px hsl(var(--hue), 15%, 3%);
+      color: hsl(var(--hue), 33%, 86%);
+    }
+
+    li.selected {
+      background-color: hsl(var(--hue), 40%, 80%);
+    }
+  }
+}

@@ -66,37 +66,6 @@ form {
       align-self: stretch;
     }
   }
-
-  div.completions {
-    display: block;
-    position: relative;
-    margin: 0;
-    padding: 0;
-    height: 0;
-  }
-}
-
-span.suggested {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  a {
-    color: hsl(var(--hue), 40%, 33%);
-    margin-right: 8px;
-    text-decoration: none;
-
-    &.added {
-      color: hsl(var(--hue), 5%, 60%);
-    }
-
-    &:last-child {
-      font-weight: bold;
-    }
-
-    &:nth-last-child(2) {
-      margin-right: 12px;
-    }
-  }
 }
 
 input[type="checkbox"] {
@@ -109,57 +78,5 @@ input[type="checkbox"] {
   &::before {
     font-size: 28px;
     margin-left: 3px;
-  }
-}
-
-.completions {
-  ul {
-    position: absolute;
-    list-style-type: none;
-    bottom: -2px;
-    left: 110px;
-    width: 300px;
-    max-height: 250px;
-    overflow-y: scroll;
-    margin: 0;
-    padding: 0;
-    background-color: var(--color-bg-input);
-    border: 1px solid hsl(var(--hue-2), 15%, 67%);
-    box-shadow: 4px 4px 10px hsl(var(--hue), 15%, 67%);
-    color: hsl(var(--hue), 40%, 33%);
-    z-index: 9;
-  }
-
-  li {
-    padding: 4px;
-  }
-
-  li.selected {
-    background-color: hsl(var(--hue), 33%, 40%);
-    color: var(--color-bg-input);
-  }
-}
-
-main.dark {
-  span.suggested {
-    a {
-      color: hsl(var(--hue), 60%, 67%);
-  
-      &.added {
-        color: hsl(var(--hue), 5%, 40%);
-      }
-    }
-  }
-
-  .completions {
-    ul {
-      border: 1px solid hsl(var(--hue-2), 15%, 25%);
-      box-shadow: 4px 4px 10px hsl(var(--hue), 15%, 3%);
-      color: hsl(var(--hue), 33%, 86%);
-    }
-
-    li.selected {
-      background-color: hsl(var(--hue), 40%, 80%);
-    }
   }
 }
