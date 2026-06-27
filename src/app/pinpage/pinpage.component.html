@@ -77,7 +77,7 @@
         <textarea id="description" rows="4" [formField]="form.description"></textarea>
       </div>
       <app-tagging [(tags)]="tags" [allTags]="allTags()" [suggested]="suggested()" [popular]="popular()"
-        [keywords]="keywords()" [alpha]="sortAlpha" [disabled]="!ready()"></app-tagging>
+        [keywords]="keywords()" [alpha]="sortAlpha()" [disabled]="!ready()"></app-tagging>
       <div class="submit">
         <label></label>
         <input type="checkbox" id="unshared" [formField]="form.unshared">

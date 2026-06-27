@@ -46,28 +46,29 @@ export class StorageService {
 
   // get keys from local storage as an Observable
   // when only one key is requested, only its value is returned
-  get(keys: string | string[] | null): Observable<any> {
+  get<T = unknown>(keys: string | string[] | null): Observable<T> {
     return from(this.storage.get(keys)).pipe(
-      map((res: Record<string, unknown>) =>
-        typeof keys === "string" ? res[keys] : res
+      map(
+        (res: Record<string, unknown>) =>
+          (typeof keys === "string" ? res[keys] : res) as T
       )
     );
   }
 
   // set keys in local storage as an Observable
-  set(keys: Record<string, unknown>): Observable<any> {
+  set(keys: Record<string, unknown>): Observable<void> {
     return from(this.storage.set(keys));
   }
 
   // remove keys in local storage as an Observable
-  remove(keys: string | string[]): Observable<any> {
+  remove(keys: string | string[]): Observable<void> {
     return from(this.storage.remove(keys));
   }
 
   // retrieve options from local storage
   getOptions(): Observable<Options> {
-    return this.get("options").pipe(
-      map((options: Record<string, unknown> | null | undefined) => {
+    return this.get<Record<string, unknown> | null | undefined>("options").pipe(
+      map((options) => {
         const opts: Partial<Options> = {};
         Object.keys(defaultOptions).forEach((key) => {
           const val = options ? options[key] : undefined;
@@ -81,7 +82,7 @@ export class StorageService {
   }
 
   // store options in local storage
-  setOptions(options: Options): Observable<any> {
+  setOptions(options: Options): Observable<void> {
     return this.set({ options: options });
   }
 

@@ -6,6 +6,7 @@ import {
   OnInit,
   Injector,
   afterNextRender,
+  computed,
   signal,
   inject,
 } from "@angular/core";
@@ -30,7 +31,7 @@ import {
   pinboardPage,
   Post,
 } from "../pinboard.service";
-import { Options, StorageService } from "../storage.service";
+import { defaultOptions, Options, StorageService } from "../storage.service";
 import { errorMessage, logError, resolveTheme } from "../util";
 import { TaggingComponent } from "./tagging.component";
 
@@ -106,12 +107,11 @@ export class PinPageComponent implements OnInit {
     disabled(field, { when: () => !this.ready() });
   });
 
-  private options!: Options;
+  // the user options (seeded with the defaults until they have loaded)
+  private readonly options = signal<Options>(defaultOptions);
 
-  // expose the alpha-sort option to the tag editor (false until options load)
-  protected get sortAlpha(): boolean {
-    return this.options ? this.options.alpha : false;
-  }
+  // expose the alpha-sort option to the tag editor
+  protected readonly sortAlpha = computed(() => this.options().alpha);
 
   ngOnInit() {
     this.ready.set(false);
@@ -119,7 +119,7 @@ export class PinPageComponent implements OnInit {
     this.error.set(null);
     this.retry.set(false);
     this.storage.getOptions().subscribe((options) => {
-      this.options = options;
+      this.options.set(options);
       // apply the theme right away; the signal schedules a repaint so the
       // popup does not stay light while the page content is loading
       this.setTheme();
@@ -132,14 +132,14 @@ export class PinPageComponent implements OnInit {
   }
 
   setTheme() {
-    this.theme.set(resolveTheme(this.options.dark));
+    this.theme.set(resolveTheme(this.options().dark));
   }
 
   // store info on current content in the form inputs
   setContent(content: Content): void {
     if (content && content.url && this.pinboard.isValidUrl(content.url)) {
       let description = content.description;
-      if (description && this.options.blockquote) {
+      if (description && this.options().blockquote) {
         description =
           "<blockquote>" + description.slice(0, 3200 - 25) + "</blockquote>";
       }
@@ -147,8 +147,8 @@ export class PinPageComponent implements OnInit {
         url: content.url,
         title: content.title ?? "",
         description: description ?? "",
-        unshared: this.options.unshared,
-        toread: this.options.toread,
+        unshared: this.options().unshared,
+        toread: this.options().toread,
       });
       this.keywords.set(content.keywords);
       this.tags.set(null);
@@ -235,7 +235,7 @@ export class PinPageComponent implements OnInit {
     if (tags.popular) {
       this.suggested.set(tags.popular);
     }
-    if (this.options.popular && tags.recommended) {
+    if (this.options().popular && tags.recommended) {
       this.popular.set(tags.recommended);
     }
   }

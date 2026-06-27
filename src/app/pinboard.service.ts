@@ -172,7 +172,7 @@ export class PinboardService {
   }
 
   // forget the API token
-  forgetToken(): Observable<any> {
+  forgetToken(): Observable<void> {
     // also clear the tags cache when leaving
     return this.storage.remove(["token", "tags"]);
   }

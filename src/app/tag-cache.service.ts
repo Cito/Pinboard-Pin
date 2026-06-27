@@ -25,8 +25,8 @@ export class TagCacheService {
 
   // get the cached list of all used tags, refreshing it when it has expired
   get(): Observable<{ [tag: string]: number }> {
-    return this.storage.get("tags").pipe(
-      switchMap((cached: TagCache | null) => {
+    return this.storage.get<TagCache | null>("tags").pipe(
+      switchMap((cached) => {
         const date = Date.now();
         const needsRefresh =
           !cached ||
@@ -54,9 +54,9 @@ export class TagCacheService {
   }
 
   // update the cached tags and their frequency after a save or removal
-  update(addTags: string[], savedTags: string[]): Observable<any> {
-    return this.storage.get("tags").pipe(
-      mergeMap((cache: TagCache | null) => {
+  update(addTags: string[], savedTags: string[]): Observable<void> {
+    return this.storage.get<TagCache | null>("tags").pipe(
+      mergeMap((cache) => {
         let tags: { [tag: string]: number }, date: number;
         if (cache && cache.tags && cache.date) {
           tags = cache.tags;
