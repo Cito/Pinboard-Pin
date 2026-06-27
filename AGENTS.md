@@ -2,9 +2,9 @@
 
 Pinboard Pin is a **Firefox web extension** (WebExtensions / Manifest **V2**) for
 pinning pages on [Pinboard](https://pinboard.in). It is unusual in that the whole
-extension is built as a single **Angular** application (Angular CLI, `application`
-builder). See [README.md](README.md) for the user-facing description and
-[DEVELOP.md](DEVELOP.md) for build details.
+extension is built as a single **Angular** application (Angular CLI with the
+`@angular/build` esbuild `application` builder). See [README.md](README.md) for
+the user-facing description and [DEVELOP.md](DEVELOP.md) for build details.
 
 ## Architecture
 
@@ -24,6 +24,9 @@ One Angular app renders several extension surfaces, selected at runtime via a
 - Services: [pinboard.service.ts](src/app/pinboard.service.ts) (Pinboard API),
   [storage.service.ts](src/app/storage.service.ts) (extension storage),
   [icon.service.ts](src/app/icon.service.ts) (toolbar icon state).
+- The popup's tag input — completion dropdown plus suggested/popular/keyword
+  chips — is a child component of pinpage:
+  [tag-editor.component.ts](src/app/pinpage/tag-editor.component.ts).
 - WebExtensions API is accessed through the `browser.*` namespace (Firefox),
   typed via `@types/firefox-webext-browser`. **Not** the `chrome.*` namespace.
 - Build config: [angular.json](angular.json) copies `src/img`, `src/js`, and
@@ -50,9 +53,20 @@ npm run test         # run the built extension in Firefox via web-ext (manual QA
 
 - **Angular 22**, standalone components, SCSS for styles. Drive Angular
   ecosystem upgrades with `ng update`, not by hand-editing `package.json`.
-- **TypeScript strict mode** is on; components use `inject()` (not constructor
-  DI) and `ChangeDetectionStrategy.OnPush`. The app is zoneless, so call
-  `cdr.detectChanges()` after async state changes.
+- **TypeScript strict mode** is on. Components use `inject()` (not constructor
+  DI) and hold state in **signals** (`signal`/`computed`/`model`/`input`). The
+  app is **zoneless**, so let signals schedule change detection automatically —
+  do **not** call `cdr.detectChanges()` (there is none left in the codebase).
+  For DOM work that must run after a signal-driven render (e.g. focusing an
+  input), use `afterNextRender`.
+- `OnPush` is the **default** in Angular 22 — do **not** set `changeDetection`
+  explicitly (the `@angular-eslint/prefer-on-push-component-change-detection`
+  rule flags components that opt out). Singleton services use the `@Service()`
+  decorator (v22), not `@Injectable({ providedIn: 'root' })`.
+- Forms are **template-driven** (`FormsModule` / `ngModel`) bound to signals via
+  `[ngModel]="x()"` + `(ngModelChange)="x.set($event)"`. Signal Forms
+  (`@angular/forms/signals`) are intentionally not adopted yet — don't migrate
+  the forms without being asked.
 - The `browser.*` WebExtensions global is typed via `src/typings.d.ts`
   (`/// <reference types="firefox-webext-browser" />`).
 - ESLint config in [eslint.config.js](eslint.config.js) (flat config,
