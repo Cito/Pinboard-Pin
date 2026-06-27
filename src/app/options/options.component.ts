@@ -1,6 +1,6 @@
 // this component is the user setting dialog displayed under options
 
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from "@angular/core";
+import { Component, OnInit, OnDestroy, signal, inject } from "@angular/core";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Options, StorageService } from "../storage.service";
 
@@ -18,35 +18,32 @@ interface MessagePayload {
 })
 export class OptionsComponent implements OnInit, OnDestroy {
   private storage = inject(StorageService);
-  private cdr = inject(ChangeDetectorRef);
 
-  options!: Options;
+  readonly options = signal<Options | null>(null);
 
-  shortcut = ""; // default keyboard shortcut
+  readonly shortcut = signal(""); // default keyboard shortcut
 
-  page!: string; // type of page (popup or options)
+  readonly page = signal("options"); // type of page (popup or options)
 
-  theme = "light"; // color scheme of the page
+  readonly theme = signal("light"); // color scheme of the page
 
   // stable listener reference (bound once) for add/removeListener
   private readonly messageListener: (message: MessagePayload) => void =
     this.onMessage.bind(this);
 
   ngOnInit() {
-    this.page = (this.storage.getInfo("options.page") as string) || "options";
+    this.page.set((this.storage.getInfo("options.page") as string) || "options");
     this.storage.getOptions().subscribe((options) => {
-      this.options = options;
-      this.setTheme();
+      this.options.set(options);
+      this.setTheme(options);
       this.setOnMessageListener(true);
-      this.cdr.detectChanges();
     });
     void browser.commands.getAll().then((commands) => {
       for (const command of commands) {
         if (command.name === "_execute_browser_action") {
-          this.shortcut = command.shortcut ?? "";
+          this.shortcut.set(command.shortcut ?? "");
         }
       }
-      this.cdr.detectChanges();
     });
   }
 
@@ -54,25 +51,30 @@ export class OptionsComponent implements OnInit, OnDestroy {
     this.setOnMessageListener(false);
   }
 
-  setTheme() {
-    this.theme =
-      this.options.dark === true ||
-      (this.options.dark !== false &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
+  setTheme(options: Options) {
+    this.theme.set(
+      options.dark === true ||
+        (options.dark !== false &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
         ? "dark"
-        : "light";
+        : "light"
+    );
   }
 
-  // check whether given options are the same
+  // check whether given options are the same as the current ones
   sameOptions(options: Options): boolean {
+    const current = this.options();
+    if (!current) {
+      return false;
+    }
     const opts: Partial<Options> = { ...options };
-    for (const key in this.options) {
-      if (typeof this.options[key as keyof Options] === "boolean" && key !== "dark") {
+    for (const key in current) {
+      if (typeof current[key as keyof Options] === "boolean" && key !== "dark") {
         opts[key as keyof Options] = !!opts[key as keyof Options];
       }
     }
     for (const key in opts) {
-      if (opts[key as keyof Options] !== this.options[key as keyof Options]) {
+      if (opts[key as keyof Options] !== current[key as keyof Options]) {
         return false;
       }
     }
@@ -100,9 +102,8 @@ export class OptionsComponent implements OnInit, OnDestroy {
   onMessage(message: MessagePayload): void {
     const options = message.options;
     if (options && !this.sameOptions(options)) {
-      this.options = options;
-      this.setTheme();
-      this.cdr.detectChanges(); // run change detection
+      this.options.set(options);
+      this.setTheme(options);
     }
   }
 
@@ -115,8 +116,8 @@ export class OptionsComponent implements OnInit, OnDestroy {
     if (!value || this.sameOptions(value)) {
       return false;
     }
-    this.options = value;
-    this.setTheme();
+    this.options.set(value);
+    this.setTheme(value);
     this.storage.setOptions(value).subscribe();
     void browser.runtime.sendMessage({ options: value });
     return false;
@@ -124,7 +125,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
 
   // close the options popup
   close() {
-    if (this.page === "popup") {
+    if (this.page() === "popup") {
       window.close();
     }
   }
