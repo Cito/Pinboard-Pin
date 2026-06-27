@@ -21,6 +21,7 @@ import { AgoPipe } from "../interval.pipe";
 
 import { finalize, timeout } from "rxjs/operators";
 
+import { ContentService, Content } from "../content.service";
 import { IconService } from "../icon.service";
 import {
   BookmarkResponse,
@@ -32,10 +33,6 @@ import { Options, StorageService } from "../storage.service";
 import { errorMessage, logError, resolveTheme } from "../util";
 import { TaggingComponent } from "./tagging.component";
 
-// timeout in ms after which we stop waiting for the content script;
-// this is needed because executeScript() never settles on pages where
-// content scripts cannot be injected (e.g. the built-in PDF viewer)
-const contentScriptTimeout = 1000;
 // timeout in ms for the Pinboard bookmark lookup; this blocks the form, so
 // it is kept short: the lookup is normally fast, and if it stalls we want to
 // fall back to a usable form quickly rather than keep showing "Loading..."
@@ -50,21 +47,6 @@ const pinboardSuggestTimeout = 10000;
 // excluded here and merged back into a Post on save
 type PinForm = Omit<Post, "tags" | "noreplace">;
 
-interface Content {
-  url: string | null;
-  title: string | null;
-  description: string | null;
-  keywords: string[] | null;
-}
-
-interface RawContent {
-  url: string;
-  title: string;
-  selection: string;
-  description: string;
-  keywords: string;
-}
-
 // Pin page form (the tag handling lives in the TaggingComponent)
 
 @Component({
@@ -75,6 +57,7 @@ interface RawContent {
 })
 export class PinPageComponent implements OnInit {
   private pinboard = inject(PinboardService);
+  private content = inject(ContentService);
   private storage = inject(StorageService);
   private icon = inject(IconService);
   private router = inject(Router);
@@ -138,25 +121,8 @@ export class PinPageComponent implements OnInit {
       // apply the theme right away; the signal schedules a repaint so the
       // popup does not stay light while the page content is loading
       this.setTheme();
-      const getContent =
-        options.meta || options.selection
-          ? Promise.race([
-              browser.tabs
-                .executeScript({ file: "/js/content.js" })
-                .then((content: Array<RawContent>) =>
-                  this.processContent(content[0])
-                ),
-              // guard against executeScript() never settling (e.g. PDF viewer)
-              new Promise<Content>((_resolve, reject) =>
-                setTimeout(
-                  () => reject(new Error("content script timed out")),
-                  contentScriptTimeout
-                )
-              ),
-            ]).catch(() => this.getContent())
-          : this.getContent();
-      void getContent.then(
-        (content: Content) => this.setContent(content),
+      void this.content.getContent(options).then(
+        (content) => this.setContent(content),
         (error: unknown) =>
           this.logError("Can only pin normal web pages.", errorMessage(error))
       );
@@ -165,60 +131,6 @@ export class PinPageComponent implements OnInit {
 
   setTheme() {
     this.theme.set(resolveTheme(this.options.dark));
-  }
-
-  // process the data gathered by the content script
-  processContent(content: RawContent): Content {
-    let url: string | null = content.url;
-    let title: string | null = content.title;
-    url = url || null;
-    title = title
-      ? title.length > 255 // trim title
-        ? title.slice(0, 254) + "…"
-        : title
-      : null;
-    const options = this.options;
-    let description = options.selection ? content.selection : null;
-    if (!description && options.meta) {
-      description = content.description;
-    }
-    description = description
-      ? description.length > 3200
-        ? // trim description (actual max. size seems to be 3798 chars)
-          description.slice(0, 3199) + "…"
-        : description
-      : null;
-    const keywords: string[] = [];
-    if (options.meta && content.keywords) {
-      for (let word of content.keywords.split(",")) {
-        word = word.replace(/\s+/, "").slice(0, 255).toLowerCase();
-        if (word && !keywords.includes(word)) {
-          keywords.push(word);
-          if (keywords.length >= 100) {
-            break;
-          }
-        }
-      }
-    }
-    return {
-      url,
-      title,
-      description,
-      keywords: keywords.length ? keywords.slice(0, 6400) : null,
-    };
-  }
-
-  // get url and title of content (used if content script cannot run)
-  getContent(): Promise<Content> {
-    return browser.tabs
-      .query({ active: true, currentWindow: true })
-      .then((tabs) => tabs[0])
-      .then((tab) => ({
-        url: tab.url ?? null,
-        title: tab.title ?? null,
-        description: null,
-        keywords: null,
-      }));
   }
 
   // store info on current content in the form inputs
@@ -291,16 +203,28 @@ export class PinPageComponent implements OnInit {
       this.tags.set(post.tags);
       this.update.set(true);
       // set browser icon to saved state
-      void browser.tabs.query({ url: this.model().url }).then(
-        (tabs: browser.tabs.Tab[]) => {
-          for (const tab of tabs) {
-            this.icon.setIcon(tab.id, true);
-          }
-        },
-        (error: unknown) => logError(error)
-      );
+      void this.setTabIcons(true);
     }
     this.loadTagsAndSetReady();
+  }
+
+  // set the toolbar icon for every tab showing the current url
+  private setTabIcons(saved: boolean): Promise<void> {
+    return browser.tabs.query({ url: this.model().url }).then(
+      (tabs) => {
+        for (const tab of tabs) {
+          this.icon.setIcon(tab.id, saved);
+        }
+      },
+      (error: unknown) => {
+        logError(error);
+      }
+    );
+  }
+
+  // update the toolbar icon to the saved/unsaved state, then close the popup
+  private updateIconAndClose(saved: boolean): void {
+    void this.setTabIcons(saved).then(() => this.cancel());
   }
 
   // receive the suggested tags (fetched in the background)
@@ -373,24 +297,8 @@ export class PinPageComponent implements OnInit {
           const savedTags = this.savedTags ? this.savedTags.split(" ") : [];
           this.pinboard
             .updateTagCache([], savedTags)
-            .pipe(
-              finalize(
-                // set the browser icon to unsaved state
-                () =>
-                  void browser.tabs.query({ url: this.model().url }).then(
-                    (tabs: browser.tabs.Tab[]) => {
-                      for (const tab of tabs) {
-                        this.icon.setIcon(tab.id, false);
-                      }
-                      this.cancel();
-                    },
-                    (error: unknown) => {
-                      logError(error);
-                      this.cancel();
-                    }
-                  )
-              )
-            )
+            // set the browser icon to unsaved state
+            .pipe(finalize(() => this.updateIconAndClose(false)))
             .subscribe();
         },
         error: (error: unknown) => {
@@ -447,23 +355,8 @@ export class PinPageComponent implements OnInit {
         } else {
           this.pinboard
             .updateTagCache(tags, savedTags)
-            .pipe(
-              finalize(
-                () =>
-                  void browser.tabs.query({ url: this.model().url }).then(
-                    (tabs: browser.tabs.Tab[]) => {
-                      for (const tab of tabs) {
-                        this.icon.setIcon(tab.id, true);
-                      }
-                      this.cancel();
-                    },
-                    (error: unknown) => {
-                      logError(error);
-                      this.cancel();
-                    }
-                  )
-              )
-            )
+            // set the browser icon to saved state
+            .pipe(finalize(() => this.updateIconAndClose(true)))
             .subscribe();
         }
       },
@@ -478,49 +371,14 @@ export class PinPageComponent implements OnInit {
 
   // save current tabs as tab set to Pinboard
   saveTabs(): void {
-    void browser.tabs
-      .query({ windowType: "normal", url: "*://*/*" })
-      .then((tabs: browser.tabs.Tab[]) => {
-        const wTabs: Record<
-          number,
-          Record<number, { title?: string; url?: string }>
-        > = {};
-        for (const tab of tabs) {
-          const wId = tab.windowId;
-          if (wId === undefined) {
-            continue;
-          }
-          if (!wTabs[wId]) {
-            wTabs[wId] = {};
-          }
-          wTabs[wId][tab.index] = {
-            title: tab.title ?? undefined,
-            url: tab.url ?? undefined,
-          };
-        }
-        const windows = Object.keys(wTabs).map((wId) =>
-          Object.keys(wTabs[Number(wId)]).map(
-            (index) => wTabs[Number(wId)][Number(index)]
-          )
-        );
-        if (windows.length) {
-          const data = {
-            browser: "ffox",
-            windows: windows,
-          };
-          this.pinboard.saveTabs(data).subscribe({
-            next: () => {
-              this.cancel();
-            },
-            error: (error: unknown) => {
-              this.logError(
-                "Sorry, could not save this tab set to Pinboard.",
-                errorMessage(error)
-              );
-            },
-          });
-        }
-      });
+    this.pinboard.saveCurrentTabs().subscribe({
+      next: () => this.cancel(),
+      error: (error: unknown) =>
+        this.logError(
+          "Sorry, could not save this tab set to Pinboard.",
+          errorMessage(error)
+        ),
+    });
   }
 
   // navigate to options

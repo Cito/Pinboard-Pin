@@ -1,6 +1,6 @@
 import { Service, inject } from "@angular/core";
 
-import { throwError, Observable, of, from } from "rxjs";
+import { throwError, Observable, of, from, EMPTY } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import { StorageService } from "./storage.service";
@@ -35,6 +35,43 @@ export interface BookmarkPost {
 export interface BookmarkResponse {
   posts?: BookmarkPost[];
   date?: string;
+}
+
+// a single tab within a saved tabset
+interface TabsetTab {
+  title?: string;
+  url?: string;
+}
+
+// the payload of the Pinboard tabset web form (a list of windows, each a
+// list of tabs)
+interface Tabset {
+  browser: string;
+  windows: TabsetTab[][];
+}
+
+// group the given browser tabs by window into the structure that the
+// Pinboard tabset form expects
+function groupTabsByWindow(tabs: browser.tabs.Tab[]): TabsetTab[][] {
+  const wTabs: Record<number, Record<number, TabsetTab>> = {};
+  for (const tab of tabs) {
+    const wId = tab.windowId;
+    if (wId === undefined) {
+      continue;
+    }
+    if (!wTabs[wId]) {
+      wTabs[wId] = {};
+    }
+    wTabs[wId][tab.index] = {
+      title: tab.title ?? undefined,
+      url: tab.url ?? undefined,
+    };
+  }
+  return Object.keys(wTabs).map((wId) =>
+    Object.keys(wTabs[Number(wId)]).map(
+      (index) => wTabs[Number(wId)][Number(index)]
+    )
+  );
 }
 
 export const pinboardPage = "https://pinboard.in/";
@@ -284,9 +321,24 @@ export class PinboardService {
     );
   }
 
-  // save the current tabs as tabset using the web form
+  // save all currently open normal browser tabs as a tabset; completes
+  // without emitting when there are no matching tabs to save
+  saveCurrentTabs(): Observable<browser.tabs.Tab> {
+    return from(
+      browser.tabs.query({ windowType: "normal", url: "*://*/*" })
+    ).pipe(
+      mergeMap((tabs) => {
+        const windows = groupTabsByWindow(tabs);
+        return windows.length
+          ? this.saveTabs({ browser: "ffox", windows })
+          : EMPTY;
+      })
+    );
+  }
+
+  // save the given tabset using the web form
   // (this operation is not provided by the Pinboard API)
-  saveTabs(data: any): Observable<browser.tabs.Tab> {
+  private saveTabs(data: Tabset): Observable<browser.tabs.Tab> {
     const params = new FormData();
     params.append("data", JSON.stringify(data));
     const post = this.http.post(tabsPage + "save/", params);
