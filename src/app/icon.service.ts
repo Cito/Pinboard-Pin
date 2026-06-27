@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Service } from "@angular/core";
 
 const defaultIcon = {
   "16": "/img/pinboard_idle_16.png",
@@ -24,10 +24,8 @@ const savedIcon = {
 
 // Service for setting the browser action icon
 
-@Injectable({ providedIn: "root" })
+@Service()
 export class IconService {
-  constructor() {}
-
   // set the icon for saved or unsaved for the given tab
   setIcon(tabId: number | undefined, saved: boolean) {
     void browser.browserAction.setIcon({

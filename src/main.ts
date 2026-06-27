@@ -1,7 +1,7 @@
-import { enableProdMode, provideZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 
 import { AppComponent } from './app/app.component';
 import { LoginComponent } from './app/login/login.component';
@@ -9,11 +9,6 @@ import { PinPageComponent } from './app/pinpage/pinpage.component';
 import { OptionsComponent } from './app/options/options.component';
 import { BackgroundComponent } from './app/background/background.component';
 import { guard } from './app/guard';
-import { environment } from './environments/environment';
-
-if (environment.production) {
-  enableProdMode();
-}
 
 const appRoutes = [
   { path: 'login', component: LoginComponent },
@@ -26,6 +21,6 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideZonelessChangeDetection(),
     provideRouter(appRoutes),
-    provideHttpClient(withXhr(), withInterceptorsFromDi())
+    provideHttpClient(withXhr())
   ]
 }).catch(error => console.error(error));

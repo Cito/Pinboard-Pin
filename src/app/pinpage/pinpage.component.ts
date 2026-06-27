@@ -3,7 +3,6 @@
 import { Component, ElementRef, OnInit, OnDestroy, ChangeDetectorRef, inject } from "@angular/core";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
-import { CommonModule } from "@angular/common";
 import { AgoPipe } from "../interval.pipe";
 
 import { Subscription, Subject, timer } from "rxjs";
@@ -67,7 +66,7 @@ interface RawContent {
   selector: "app-popup",
   templateUrl: "./pinpage.component.html",
   styleUrls: ["./pinpage.component.scss"],
-  imports: [CommonModule, FormsModule, AgoPipe],
+  imports: [FormsModule, AgoPipe],
 })
 export class PinPageComponent implements OnInit, OnDestroy {
   private pinboard = inject(PinboardService);

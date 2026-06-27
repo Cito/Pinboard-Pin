@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Service } from "@angular/core";
 
 import { Observable, from } from "rxjs";
 import { map } from "rxjs/operators";
@@ -32,15 +32,12 @@ const defaultOptions: Options = {
 // Wrapper around the browser local storage for the web extension,
 // using Observables instead of Promises for flexibility and consistency.
 
-@Injectable({ providedIn: "root" })
+@Service()
 export class StorageService {
   private storage = browser.storage.local; // needs "storage" permission
 
-  private readonly info: Record<string, unknown>;
-
-  constructor() {
-    this.info = {}; // for various info shared via this service
-  }
+  // for various info shared via this service
+  private readonly info: Record<string, unknown> = {};
 
   // get keys from local storage as an Observable
   // when only one key is requested, only its value is returned

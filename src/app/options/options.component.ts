@@ -1,7 +1,6 @@
 // this component is the user setting dialog displayed under options
 
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from "@angular/core";
-import { CommonModule } from "@angular/common";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Options, StorageService } from "../storage.service";
 
@@ -15,7 +14,7 @@ interface MessagePayload {
   selector: "app-options",
   templateUrl: "./options.component.html",
   styleUrls: ["./options.component.scss"],
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
 })
 export class OptionsComponent implements OnInit, OnDestroy {
   private storage = inject(StorageService);

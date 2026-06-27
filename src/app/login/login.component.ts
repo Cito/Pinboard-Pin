@@ -1,7 +1,6 @@
 // this component is the login dialog displayed in the popup
 
 import { Component, OnInit, ChangeDetectorRef, inject } from "@angular/core";
-import { CommonModule } from "@angular/common";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { finalize } from "rxjs/operators";
@@ -20,7 +19,7 @@ export interface Login {
   selector: "app-login",
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.scss"],
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
 })
 export class LoginComponent implements OnInit {
   private pinboard = inject(PinboardService);

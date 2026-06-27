@@ -1,4 +1,4 @@
-import { Injectable, inject } from "@angular/core";
+import { Service, inject } from "@angular/core";
 
 import { throwError, Observable, of, from } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
@@ -46,7 +46,7 @@ const paramsEncoder = new ParamsEncoder();
 
 // Service for dealing with the Pinboard API
 
-@Injectable({ providedIn: "root" })
+@Service()
 export class PinboardService {
   private http = inject(HttpClient);
   private storage = inject(StorageService);
