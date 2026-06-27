@@ -19,7 +19,7 @@ interface TagCache {
 // extension storage, refreshing it from the Pinboard API when it expires
 
 @Service()
-export class TagCacheService {
+export class TagsService {
   private pinboard = inject(PinboardService);
   private storage = inject(StorageService);
 
