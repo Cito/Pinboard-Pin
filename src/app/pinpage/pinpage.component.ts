@@ -1,6 +1,6 @@
 // this component is the save bookmark dialog displayed in the popup
 
-import { Component, ElementRef, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy, inject } from "@angular/core";
+import { Component, ElementRef, OnInit, OnDestroy, ChangeDetectorRef, inject } from "@angular/core";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { CommonModule } from "@angular/common";
@@ -67,7 +67,6 @@ interface RawContent {
   selector: "app-popup",
   templateUrl: "./pinpage.component.html",
   styleUrls: ["./pinpage.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, AgoPipe],
 })
 export class PinPageComponent implements OnInit, OnDestroy {

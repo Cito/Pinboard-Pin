@@ -1,6 +1,6 @@
 // this component is the login dialog displayed in the popup
 
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from "@angular/core";
+import { Component, OnInit, ChangeDetectorRef, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
@@ -20,7 +20,6 @@ export interface Login {
   selector: "app-login",
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.scss"],
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
 })
 export class LoginComponent implements OnInit {
