@@ -7,9 +7,9 @@
     "declaration": false,
     "moduleResolution": "bundler",
     "experimentalDecorators": true,
+    "strict": true,
     "typeRoots": [
-      "node_modules/@types",
-      "node_modules/web-ext-types"
+      "node_modules/@types"
     ],
     "target": "ES2022",
     "module": "es2020",

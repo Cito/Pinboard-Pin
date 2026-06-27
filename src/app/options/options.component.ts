@@ -19,11 +19,11 @@ interface MessagePayload {
   imports: [CommonModule, FormsModule],
 })
 export class OptionsComponent implements OnInit, OnDestroy {
-  options: Options;
+  options!: Options;
 
-  shortcut: string; // default keyboard shortcut
+  shortcut = ""; // default keyboard shortcut
 
-  page: string; // type of page (popup or options)
+  page!: string; // type of page (popup or options)
 
   theme = "light"; // color scheme of the page
 
@@ -46,7 +46,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
     void browser.commands.getAll().then((commands) => {
       for (const command of commands) {
         if (command.name === "_execute_browser_action") {
-          this.shortcut = command.shortcut;
+          this.shortcut = command.shortcut ?? "";
         }
       }
       this.cdr.detectChanges();
@@ -70,7 +70,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
   sameOptions(options: Options): boolean {
     const opts: Partial<Options> = { ...options };
     for (const key in this.options) {
-      if (typeof this.options[key] === "boolean" && key !== "dark") {
+      if (typeof this.options[key as keyof Options] === "boolean" && key !== "dark") {
         opts[key as keyof Options] = !!opts[key as keyof Options];
       }
     }

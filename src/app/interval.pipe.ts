@@ -50,5 +50,6 @@ export class AgoPipe implements PipeTransform {
         return n + " " + unit + " ago";
       }
     }
+    return "some time ago";
   }
 }

@@ -29,7 +29,7 @@ export class IconService {
   constructor() {}
 
   // set the icon for saved or unsaved for the given tab
-  setIcon(tabId: number, saved: boolean) {
+  setIcon(tabId: number | undefined, saved: boolean) {
     void browser.browserAction.setIcon({
       tabId: tabId,
       path: saved ? savedIcon : defaultIcon,

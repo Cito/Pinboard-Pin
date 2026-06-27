@@ -28,7 +28,7 @@ type MessageHandler = (message: MessagePayload) => void;
 
 type MenuHandler = (
   info: browser.menus.OnClickData,
-  tab: browser.tabs.Tab
+  tab?: browser.tabs.Tab
 ) => void;
 
 @Component({
@@ -175,7 +175,7 @@ export class BackgroundComponent implements OnInit, OnDestroy {
   }
 
   // handle menu clicks for saving links in the background
-  onMenuClicked(info: browser.menus.OnClickData, _tab: browser.tabs.Tab): void {
+  onMenuClicked(info: browser.menus.OnClickData, _tab?: browser.tabs.Tab): void {
     if (info.menuItemId === "save-link-to-pinboard" && info.linkUrl) {
       const url = info.linkUrl;
       // since we cannot get the actual title, we use the link text instead
@@ -208,6 +208,6 @@ export class BackgroundComponent implements OnInit, OnDestroy {
     logError(error);
     // we cannot display an alert directly, so we use a workaround
     const showAlert = 'alert("Could not save the link to Pinboard.")';
-    void browser.tabs.executeScript(null, { code: showAlert });
+    void browser.tabs.executeScript({ code: showAlert });
   }
 }

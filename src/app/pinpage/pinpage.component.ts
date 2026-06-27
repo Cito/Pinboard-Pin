@@ -52,10 +52,10 @@ export interface Post {
 }
 
 interface Content {
-  url: string;
-  title: string;
-  description: string;
-  keywords: string[];
+  url: string | null;
+  title: string | null;
+  description: string | null;
+  keywords: string[] | null;
 }
 
 interface RawContent {
@@ -78,31 +78,31 @@ interface RawContent {
   imports: [CommonModule, FormsModule, AgoPipe],
 })
 export class PinPageComponent implements OnInit, OnDestroy {
-  url: string;
-  title: string;
-  description: string; // description
-  tags: string; // current tags
-  savedTags: string; // tags already saved for this URL
-  allTags: { [tag: string]: number }; // all of our tags with frequency
-  suggested: string[]; // recommended tags from our own
-  popular: string[]; // other popular tags
-  keywords: string[]; // keywords taken from the page
-  completions: string[]; // tag completions
-  tagsFocus: boolean; // whether the tags field has focus
-  tagSelected: number; // index of the selected tag
-  unshared: boolean;
-  toread: boolean;
-  ready: boolean;
-  update: boolean;
-  date: string;
-  error: string | null;
-  retry: boolean;
-  options: Options;
+  url!: string;
+  title!: string | null;
+  description!: string | null; // description
+  tags!: string | null; // current tags
+  savedTags!: string | null; // tags already saved for this URL
+  allTags!: { [tag: string]: number }; // all of our tags with frequency
+  suggested!: string[] | null; // recommended tags from our own
+  popular!: string[] | null; // other popular tags
+  keywords!: string[] | null; // keywords taken from the page
+  completions!: string[] | null; // tag completions
+  tagsFocus = false; // whether the tags field has focus
+  tagSelected = 0; // index of the selected tag
+  unshared!: boolean;
+  toread!: boolean;
+  ready = false;
+  update = false;
+  date?: string;
+  error: string | null = null;
+  retry = false;
+  options!: Options;
 
   theme = "light"; // color scheme of the page
 
   private tagsSubject = new Subject<string>();
-  private tagsSubscription: Subscription;
+  private tagsSubscription!: Subscription;
 
   constructor(
     private pinboard: PinboardService,
@@ -128,7 +128,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
         options.meta || options.selection
           ? Promise.race([
               browser.tabs
-                .executeScript(null, { file: "/js/content.js" })
+                .executeScript({ file: "/js/content.js" })
                 .then((content: Array<RawContent>) =>
                   this.processContent(content[0])
                 ),
@@ -176,7 +176,8 @@ export class PinPageComponent implements OnInit, OnDestroy {
 
   // process the data gathered by the content script
   processContent(content: RawContent): Content {
-    let { url, title } = content;
+    let url: string | null = content.url;
+    let title: string | null = content.title;
     url = url || null;
     title = title
       ? title.length > 255 // trim title
@@ -206,8 +207,12 @@ export class PinPageComponent implements OnInit, OnDestroy {
         }
       }
     }
-    keywords = keywords.length ? keywords.slice(0, 6400) : null;
-    return { url, title, description, keywords };
+    return {
+      url,
+      title,
+      description,
+      keywords: keywords.length ? keywords.slice(0, 6400) : null,
+    };
   }
 
   // get url and title of content (used if content script cannot run)
@@ -216,8 +221,8 @@ export class PinPageComponent implements OnInit, OnDestroy {
       .query({ active: true, currentWindow: true })
       .then((tabs) => tabs[0])
       .then((tab) => ({
-        url: tab.url,
-        title: tab.title,
+        url: tab.url ?? null,
+        title: tab.title ?? null,
         description: null,
         keywords: null,
       }));
@@ -580,7 +585,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
     if (!value.url || !value.title) {
       return;
     }
-    value.description = (value.description || "").trim() || null;
+    value.description = (value.description || "").trim();
     // clean up tags, maximum of 100 tags with 255 chars each
     const tags = value.tags
       ? value.tags
@@ -641,6 +646,9 @@ export class PinPageComponent implements OnInit, OnDestroy {
         > = {};
         for (const tab of tabs) {
           const wId = tab.windowId;
+          if (wId === undefined) {
+            continue;
+          }
           if (!wTabs[wId]) {
             wTabs[wId] = {};
           }

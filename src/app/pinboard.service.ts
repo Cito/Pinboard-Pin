@@ -121,7 +121,8 @@ export class PinboardService {
   }
 
   // add or replace bookmark with given attributes
-  save(post: Post): Observable<string> {
+  // (resolves to null on success, or the Pinboard error code otherwise)
+  save(post: Post): Observable<string | null> {
     const params: Record<string, string> = {
       url: post.url,
       description: post.title,
@@ -265,6 +266,6 @@ export class PinboardService {
 
   // check if the given URL is valid (can be saved in Pinboard)
   isValidUrl(url: string): boolean {
-    return url && /:\/\//.test(url);
+    return !!url && /:\/\//.test(url);
   }
 }

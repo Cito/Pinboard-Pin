@@ -124,7 +124,7 @@
             @for (tag of keywords; track tag) {
               <a href="#" (click)="addTags(tag)" [class.added]="hasTags(tag)">{{tag}}</a>
             }
-            <a href="#" (click)="addTags(keywords)" [class.added]="hasTags(keywords.length > 1 && keywords)">Add all</a>
+            <a href="#" (click)="addTags(keywords)" [class.added]="keywords.length > 1 && hasTags(keywords)">Add all</a>
           </span>
         </div>
       }
