@@ -22,7 +22,12 @@ import { AgoPipe } from "../interval.pipe";
 import { finalize, timeout } from "rxjs/operators";
 
 import { IconService } from "../icon.service";
-import { PinboardService, pinboardPage } from "../pinboard.service";
+import {
+  BookmarkResponse,
+  PinboardService,
+  pinboardPage,
+  Post,
+} from "../pinboard.service";
 import { Options, StorageService } from "../storage.service";
 import { errorMessage, logError, resolveTheme } from "../util";
 import { TaggingComponent } from "./tagging.component";
@@ -39,16 +44,6 @@ const pinboardLookupTimeout = 5000;
 // not block the form, so it is kept generous because Pinboard's "suggest"
 // call analyzes the page server-side and can be slow (e.g. for PDF pages)
 const pinboardSuggestTimeout = 10000;
-
-export interface Post {
-  url: string;
-  title: string;
-  description: string;
-  tags: string;
-  unshared: boolean;
-  toread: boolean;
-  noreplace: boolean;
-}
 
 // the editable bookmark fields backing the signal form; the tags live in the
 // child TaggingComponent and noreplace is not user-editable, so both are
@@ -255,20 +250,7 @@ export class PinPageComponent implements OnInit {
         .get(this.model().url)
         .pipe(timeout(pinboardLookupTimeout))
         .subscribe({
-          next: (data: unknown) =>
-            this.setPost(
-              data as {
-                posts?: Array<{
-                  href: string;
-                  description: string;
-                  extended: string;
-                  tags: string;
-                  shared: string;
-                  toread: string;
-                }>;
-                date?: string;
-              }
-            ),
+          next: (data) => this.setPost(data),
           // if the lookup fails or stalls, do not hang: log it and still
           // let the user add the bookmark, just without the existing data
           error: (error: unknown) => {
@@ -294,17 +276,7 @@ export class PinPageComponent implements OnInit {
   }
 
   // receive the existing bookmark (if any) for the current page
-  setPost(data: {
-    posts?: Array<{
-      href: string;
-      description: string;
-      extended: string;
-      tags: string;
-      shared: string;
-      toread: string;
-    }>;
-    date?: string;
-  }): void {
+  setPost(data: BookmarkResponse): void {
     if (data.posts && data.posts.length) {
       this.date.set(data?.date);
       const post = data.posts[0];

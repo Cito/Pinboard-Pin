@@ -2,8 +2,7 @@
 
 import { Component, OnInit, OnDestroy, inject } from "@angular/core";
 import { MessagePayload, Options, StorageService } from "../storage.service";
-import { PinboardService } from "../pinboard.service";
-import { Post } from "../pinpage/pinpage.component";
+import { PinboardService, Post } from "../pinboard.service";
 import { IconService } from "../icon.service";
 import { errorMessage, logError } from "../util";
 
@@ -118,11 +117,7 @@ export class BackgroundComponent implements OnInit, OnDestroy {
     if (url) {
       if (/^https?:\/\//.test(url)) {
         this.pinboard.get(url).subscribe({
-          next: (data: { posts?: unknown[] }) =>
-            this.icon.setIcon(
-              tabId,
-              !!(data && data.posts && data.posts.length)
-            ),
+          next: (data) => this.icon.setIcon(tabId, !!data.posts?.length),
           error: () => this.icon.setIcon(tabId, false),
         });
       } else {

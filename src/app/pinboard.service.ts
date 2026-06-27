@@ -4,12 +4,38 @@ import { throwError, Observable, of, from } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import { StorageService } from "./storage.service";
-import { Post } from "./pinpage/pinpage.component";
 import {
   HttpClient,
   HttpParameterCodec,
   HttpParams,
 } from "@angular/common/http";
+
+// a bookmark to be saved to Pinboard (the payload of the save method)
+export interface Post {
+  url: string;
+  title: string;
+  description: string;
+  tags: string;
+  unshared: boolean;
+  toread: boolean;
+  noreplace: boolean;
+}
+
+// a single bookmark as returned by the Pinboard "posts/get" method
+export interface BookmarkPost {
+  href: string;
+  description: string;
+  extended: string;
+  tags: string;
+  shared: string;
+  toread: string;
+}
+
+// the response of the Pinboard "posts/get" method
+export interface BookmarkResponse {
+  posts?: BookmarkPost[];
+  date?: string;
+}
 
 export const pinboardPage = "https://pinboard.in/";
 
@@ -117,8 +143,11 @@ export class PinboardService {
   }
 
   // get bookmark with the given url
-  get(url: string): Observable<any> {
-    return this.httpGet("posts/get", { url: url, meta: "no" });
+  get(url: string): Observable<BookmarkResponse> {
+    return this.httpGet<BookmarkResponse>("posts/get", {
+      url: url,
+      meta: "no",
+    });
   }
 
   // add or replace bookmark with given attributes
@@ -144,8 +173,8 @@ export class PinboardService {
   }
 
   // delete bookmark with the given url
-  delete(url: string): Observable<any> {
-    return this.httpGet("posts/delete", { url: url });
+  delete(url: string): Observable<unknown> {
+    return this.httpGet<unknown>("posts/delete", { url: url });
   }
 
   // get suggested tags for the given url
