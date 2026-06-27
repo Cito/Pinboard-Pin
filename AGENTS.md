@@ -11,12 +11,12 @@ builder). See [README.md](README.md) for the user-facing description and
 One Angular app renders several extension surfaces, selected at runtime via a
 `?page=` query parameter on `index.html`:
 
-| Surface     | Entry                         | Component                                  |
-| ----------- | ----------------------------- | ------------------------------------------ |
-| Popup       | `/index.html` (default)       | `pinpage` ([src/app/pinpage/](src/app/pinpage/)) |
-| Options     | `/index.html?page=options`    | `options` ([src/app/options/](src/app/options/)) |
-| Background  | `/index.html?page=background` | `background` ([src/app/background/](src/app/background/)) |
-| Login       | (within popup)                | `login` ([src/app/login/](src/app/login/)) |
+| Surface    | Entry                         | Component                         |
+| ---------- | ----------------------------- | --------------------------------- |
+| Popup      | `/index.html` (default)       | [pinpage](src/app/pinpage/)       |
+| Options    | `/index.html?page=options`    | [options](src/app/options/)       |
+| Background | `/index.html?page=background` | [background](src/app/background/) |
+| Login      | (within popup)                | [login](src/app/login/)           |
 
 - Manifest: [src/manifest.json](src/manifest.json) — MV2, `browser_action`,
   background **page** (not a service worker), content script
@@ -48,9 +48,13 @@ npm run test         # run the built extension in Firefox via web-ext (manual QA
 
 ## Conventions
 
-- **Angular 21**, standalone components, SCSS for styles. A migration to
-  **Angular 22** is planned — drive Angular ecosystem upgrades with `ng update`,
-  not by hand-editing `package.json`.
+- **Angular 22**, standalone components, SCSS for styles. Drive Angular
+  ecosystem upgrades with `ng update`, not by hand-editing `package.json`.
+- **TypeScript strict mode** is on; components use `inject()` (not constructor
+  DI) and `ChangeDetectionStrategy.OnPush`. The app is zoneless, so call
+  `cdr.detectChanges()` after async state changes.
+- The `browser.*` WebExtensions global is typed via `src/typings.d.ts`
+  (`/// <reference types="firefox-webext-browser" />`).
 - ESLint config in [eslint.config.js](eslint.config.js) (flat config,
   `@angular-eslint`). Run `npm run lint` before finishing changes.
 - Keep `version` in [src/manifest.json](src/manifest.json) and
