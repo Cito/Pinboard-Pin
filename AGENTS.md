@@ -26,7 +26,7 @@ One Angular app renders several extension surfaces, selected at runtime via a
   [icon.service.ts](src/app/icon.service.ts) (toolbar icon state).
 - The popup's tag input — completion dropdown plus suggested/popular/keyword
   chips — is a child component of pinpage:
-  [tag-editor.component.ts](src/app/pinpage/tag-editor.component.ts).
+  [tagging.component.ts](src/app/pinpage/tagging.component.ts).
 - WebExtensions API is accessed through the `browser.*` namespace (Firefox),
   typed via `@types/firefox-webext-browser`. **Not** the `chrome.*` namespace.
 - Build config: [angular.json](angular.json) copies `src/img`, `src/js`, and

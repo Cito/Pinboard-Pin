@@ -19,12 +19,12 @@ const debounceDueTime = 250; // timeout in ms for reacting to changes
 const maxCompletions = 9; // maximum number of suggested completions
 
 @Component({
-  selector: "app-tag-editor",
-  templateUrl: "./tag-editor.component.html",
-  styleUrls: ["./tag-editor.component.scss"],
+  selector: "app-tagging",
+  templateUrl: "./tagging.component.html",
+  styleUrls: ["./tagging.component.scss"],
   imports: [FormsModule],
 })
-export class TagEditorComponent {
+export class TaggingComponent {
   private destroyRef = inject(DestroyRef);
 
   // the current tags as a space separated string (two-way bound)

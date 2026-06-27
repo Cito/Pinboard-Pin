@@ -19,7 +19,7 @@ import { IconService } from "../icon.service";
 import { PinboardService, pinboardPage } from "../pinboard.service";
 import { Options, StorageService } from "../storage.service";
 import { errorMessage, logError, resolveTheme } from "../util";
-import { TagEditorComponent } from "./tag-editor.component";
+import { TaggingComponent } from "./tagging.component";
 
 // timeout in ms after which we stop waiting for the content script;
 // this is needed because executeScript() never settles on pages where
@@ -59,13 +59,13 @@ interface RawContent {
   keywords: string;
 }
 
-// Pin page form (the tag handling lives in the TagEditorComponent)
+// Pin page form (the tag handling lives in the TaggingComponent)
 
 @Component({
   selector: "app-popup",
   templateUrl: "./pinpage.component.html",
   styleUrls: ["./pinpage.component.scss"],
-  imports: [FormsModule, AgoPipe, TagEditorComponent],
+  imports: [FormsModule, AgoPipe, TaggingComponent],
 })
 export class PinPageComponent implements OnInit {
   private pinboard = inject(PinboardService);
