@@ -26,7 +26,7 @@ import {
 import { IconService } from "../icon.service";
 import { PinboardService, pinboardPage } from "../pinboard.service";
 import { Options, StorageService } from "../storage.service";
-import { errorMessage, logError } from "../util";
+import { errorMessage, logError, resolveTheme } from "../util";
 
 const debounceDueTime = 250; // timeout in ms for reacting to changes
 const maxCompletions = 9; // maximum number of suggested completions
@@ -162,13 +162,7 @@ export class PinPageComponent implements OnInit {
   }
 
   setTheme() {
-    this.theme.set(
-      this.options.dark === true ||
-        (this.options.dark !== false &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches)
-        ? "dark"
-        : "light"
-    );
+    this.theme.set(resolveTheme(this.options.dark));
   }
 
   // process the data gathered by the content script

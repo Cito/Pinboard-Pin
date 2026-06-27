@@ -16,6 +16,11 @@ export interface Options {
   dark: boolean | null; // tri-state: on/off/auto
 }
 
+// payload of internal runtime messages exchanged between extension surfaces
+export interface MessagePayload {
+  options?: Options;
+}
+
 const defaultOptions: Options = {
   ping: false,
   unshared: false,

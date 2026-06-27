@@ -26,7 +26,7 @@
       <div>
         <input id="token" name="token" type="text" pattern=".+:.+" placeholder="API Token" autofocus [disabled]="checking()"
           ngModel>
-        <button type="submit" [disabled]="checking() || !form.valid || !form.controls.token?.value">
+        <button type="submit" [disabled]="checking() || !form.valid || !form.controls.token.value">
           Log in
         </button>
       </div>

@@ -6,7 +6,7 @@ import { Router } from "@angular/router";
 
 import { passwordPage, PinboardService } from "../pinboard.service";
 import { Options, StorageService } from "../storage.service";
-import { logError } from "../util";
+import { logError, resolveTheme } from "../util";
 
 export interface Login {
   token: string;
@@ -37,13 +37,7 @@ export class LoginComponent implements OnInit {
   }
 
   setTheme(options: Options) {
-    this.theme.set(
-      options.dark === true ||
-        (options.dark !== false &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches)
-        ? "dark"
-        : "light"
-    );
+    this.theme.set(resolveTheme(options.dark));
   }
 
   openPasswordPage() {

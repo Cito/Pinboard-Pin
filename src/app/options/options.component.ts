@@ -2,11 +2,8 @@
 
 import { Component, OnInit, OnDestroy, signal, inject } from "@angular/core";
 import { FormsModule, NgForm } from "@angular/forms";
-import { Options, StorageService } from "../storage.service";
-
-interface MessagePayload {
-  options?: Options;
-}
+import { MessagePayload, Options, StorageService } from "../storage.service";
+import { resolveTheme } from "../util";
 
 // Options form
 
@@ -52,13 +49,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
   }
 
   setTheme(options: Options) {
-    this.theme.set(
-      options.dark === true ||
-        (options.dark !== false &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches)
-        ? "dark"
-        : "light"
-    );
+    this.theme.set(resolveTheme(options.dark));
   }
 
   // check whether given options are the same as the current ones

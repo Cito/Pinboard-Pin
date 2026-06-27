@@ -139,7 +139,7 @@
           <button type="button" [disabled]="!ready()" (click)="remove()">
           Remove bookmark</button>
         }
-        <button type="submit" [disabled]="!ready() || !form.valid || !form.controls.url?.value">
+        <button type="submit" [disabled]="!ready() || !form.valid || !form.controls.url.value">
           {{ update() ? 'Update bookmark' : 'Add bookmark' }}
         </button>
       </div>

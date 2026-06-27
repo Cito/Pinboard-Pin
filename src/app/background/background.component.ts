@@ -1,11 +1,10 @@
 // this component pings the saved state of pages in the background
 
 import { Component, OnInit, OnDestroy, inject } from "@angular/core";
-import { StorageService } from "../storage.service";
+import { MessagePayload, Options, StorageService } from "../storage.service";
 import { PinboardService } from "../pinboard.service";
 import { Post } from "../pinpage/pinpage.component";
 import { IconService } from "../icon.service";
-import { Options } from "../storage.service";
 import { errorMessage, logError } from "../util";
 
 // Background page used for checking whether pages are saved in Pinboard
@@ -19,10 +18,6 @@ type UpdatedHandler = (
   changeInfo: UpdatedChangeInfo,
   tab: browser.tabs.Tab
 ) => void;
-
-interface MessagePayload {
-  options?: Options;
-}
 
 type MessageHandler = (message: MessagePayload) => void;
 

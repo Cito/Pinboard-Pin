@@ -1,5 +1,15 @@
 // Utility functions for Pinboard Pin
 
+// resolve the effective color scheme from the tri-state dark mode option
+// (true = dark, false = light, null = follow the OS preference)
+export function resolveTheme(dark: boolean | null): "dark" | "light" {
+  return dark === true ||
+    (dark !== false &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ? "dark"
+    : "light";
+}
+
 // convert an unknown error to a string message
 export function errorMessage(error: unknown): string {
   if (typeof error === "string") {
