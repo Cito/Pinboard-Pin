@@ -22,6 +22,7 @@ import { AgoPipe } from "../interval.pipe";
 import { finalize, timeout } from "rxjs/operators";
 
 import { ContentService, Content } from "../content.service";
+import { TagCacheService } from "../tag-cache.service";
 import { IconService } from "../icon.service";
 import {
   BookmarkResponse,
@@ -58,6 +59,7 @@ type PinForm = Omit<Post, "tags" | "noreplace">;
 export class PinPageComponent implements OnInit {
   private pinboard = inject(PinboardService);
   private content = inject(ContentService);
+  private tagCache = inject(TagCacheService);
   private storage = inject(StorageService);
   private icon = inject(IconService);
   private router = inject(Router);
@@ -240,7 +242,7 @@ export class PinPageComponent implements OnInit {
 
   // load the cached tags and then enable the form for input
   loadTagsAndSetReady(): void {
-    this.pinboard.cachedTags().subscribe({
+    this.tagCache.get().subscribe({
       next: (tags) => {
         this.allTags.set(tags);
         const current = this.tags();
@@ -295,8 +297,8 @@ export class PinPageComponent implements OnInit {
         next: () => {
           // update the tags in the cache
           const savedTags = this.savedTags ? this.savedTags.split(" ") : [];
-          this.pinboard
-            .updateTagCache([], savedTags)
+          this.tagCache
+            .update([], savedTags)
             // set the browser icon to unsaved state
             .pipe(finalize(() => this.updateIconAndClose(false)))
             .subscribe();
@@ -353,8 +355,8 @@ export class PinPageComponent implements OnInit {
             errorMessage(error)
           );
         } else {
-          this.pinboard
-            .updateTagCache(tags, savedTags)
+          this.tagCache
+            .update(tags, savedTags)
             // set the browser icon to saved state
             .pipe(finalize(() => this.updateIconAndClose(true)))
             .subscribe();

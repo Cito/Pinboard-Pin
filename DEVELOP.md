@@ -51,6 +51,4 @@ Ideas for future development
 
 * Ask Pinboard author to provide a method for storing tabsets and support it in the add-on.
 
-* The PinPageComponent was much too big; its tag handling has since been extracted into a separate TaggingComponent, and its remaining form fields have been consolidated into a single model signal driven by Angular Signal Forms (`@angular/forms/signals`).
-
 * Make this extension also work with Chrome (use the `chrome.*` API instead of the `browser.*` API provided by Firefox).

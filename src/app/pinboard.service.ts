@@ -1,7 +1,7 @@
 import { Service, inject } from "@angular/core";
 
 import { throwError, Observable, of, from, EMPTY } from "rxjs";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { filter, map, mergeMap, switchMap } from "rxjs/operators";
 
 import { StorageService } from "./storage.service";
 import {
@@ -80,8 +80,6 @@ export const passwordPage = pinboardPage + "settings/password";
 const tabsPage = pinboardPage + "tabs/";
 
 const apiUrl = "https://api.pinboard.in/v1/";
-
-const cacheTimeout = 1000 * 60 * 60; // one hour cache time
 
 // Create a custom encoder for query parameters that can be used
 // as a workaround for https://github.com/angular/angular/issues/18261
@@ -247,77 +245,6 @@ export class PinboardService {
         }
         return result;
       })
-    );
-  }
-
-  // get a cached list of all used tags
-  cachedTags(): Observable<{ [tag: string]: number }> {
-    return this.storage.get("tags").pipe(
-      switchMap(
-        (
-          cached: { tags?: { [tag: string]: number }; date?: number } | null
-        ) => {
-          const date = Date.now();
-          const needsRefresh =
-            !cached ||
-            !cached.tags ||
-            !cached.date ||
-            cached.tags instanceof Array || // old version used arrays
-            cached.date > date ||
-            date - cached.date > cacheTimeout;
-
-          if (needsRefresh) {
-            return this.tags().pipe(
-              switchMap((freshTags) =>
-                this.storage.set({ tags: { tags: freshTags, date } }).pipe(
-                  catchError(() => of(null)), // ignore cache write failures
-                  map(() => freshTags)
-                )
-              ),
-              catchError(() => of({} as { [tag: string]: number }))
-            );
-          }
-
-          return of(cached.tags as { [tag: string]: number });
-        }
-      )
-    );
-  }
-
-  // update the cached object with all used tags and their frequency
-  updateTagCache(addTags: string[], savedTags: string[]): Observable<any> {
-    return this.storage.get("tags").pipe(
-      mergeMap(
-        (cache: { tags?: { [tag: string]: number }; date?: number } | null) => {
-          let tags: { [tag: string]: number }, date: number;
-          if (cache && cache.tags && cache.date) {
-            tags = cache.tags;
-            date = cache.date;
-          } else {
-            tags = {};
-            date = Date.now();
-          }
-          for (const tag of savedTags) {
-            if (!addTags.includes(tag)) {
-              if (Object.hasOwn(tags, tag)) {
-                if (--tags[tag] <= 0) {
-                  delete tags[tag];
-                }
-              }
-            }
-          }
-          for (const tag of addTags) {
-            if (!savedTags.includes(tag)) {
-              if (Object.hasOwn(tags, tag)) {
-                ++tags[tag];
-              } else {
-                tags[tag] = 1;
-              }
-            }
-          }
-          return this.storage.set({ tags: { tags: tags, date: date } });
-        }
-      )
     );
   }
 
