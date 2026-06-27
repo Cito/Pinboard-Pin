@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 
 import { throwError, Observable, of, from } from "rxjs";
 import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
@@ -48,7 +48,8 @@ const paramsEncoder = new ParamsEncoder();
 
 @Injectable({ providedIn: "root" })
 export class PinboardService {
-  constructor(private http: HttpClient, private storage: StorageService) {}
+  private http = inject(HttpClient);
+  private storage = inject(StorageService);
 
   // get an object via the Pinboard API
   httpGet<T = any>(

@@ -1,6 +1,6 @@
 // this component pings the saved state of pages in the background
 
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, inject } from "@angular/core";
 import { StorageService } from "../storage.service";
 import { PinboardService } from "../pinboard.service";
 import { Post } from "../pinpage/pinpage.component";
@@ -33,22 +33,22 @@ type MenuHandler = (
 
 @Component({
   selector: "app-background",
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: "<h1>Background page for Pinboard</h1>",
 })
 export class BackgroundComponent implements OnInit, OnDestroy {
+  private storage = inject(StorageService);
+  private pinboard = inject(PinboardService);
+  private icon = inject(IconService);
+
   private readonly updatedListener: UpdatedHandler;
   private readonly messageListener: MessageHandler;
   private readonly menuListener: MenuHandler;
 
-  constructor(
-    private storage: StorageService,
-    private pinboard: PinboardService,
-    private icon: IconService
-  ) {
-    this.updatedListener = this.onUpdated.bind(this) as UpdatedHandler;
-    this.messageListener = this.onMessage.bind(this) as MessageHandler;
-    this.menuListener = this.onMenuClicked.bind(this) as MenuHandler;
+  constructor() {
+    this.updatedListener = this.onUpdated.bind(this);
+    this.messageListener = this.onMessage.bind(this);
+    this.menuListener = this.onMenuClicked.bind(this);
   }
 
   private ping = false;

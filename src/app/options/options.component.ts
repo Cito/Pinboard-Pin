@@ -1,6 +1,6 @@
 // this component is the user setting dialog displayed under options
 
-import { Component, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Options, StorageService } from "../storage.service";
@@ -15,10 +15,13 @@ interface MessagePayload {
   selector: "app-options",
   templateUrl: "./options.component.html",
   styleUrls: ["./options.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
 })
 export class OptionsComponent implements OnInit, OnDestroy {
+  private storage = inject(StorageService);
+  private cdr = inject(ChangeDetectorRef);
+
   options!: Options;
 
   shortcut = ""; // default keyboard shortcut
@@ -29,10 +32,8 @@ export class OptionsComponent implements OnInit, OnDestroy {
 
   private readonly messageListener: (message: MessagePayload) => void;
 
-  constructor(private storage: StorageService, private cdr: ChangeDetectorRef) {
-    this.messageListener = this.onMessage.bind(this) as (
-      message: MessagePayload
-    ) => void;
+  constructor() {
+    this.messageListener = this.onMessage.bind(this);
   }
 
   ngOnInit() {

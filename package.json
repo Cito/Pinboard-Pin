@@ -29,17 +29,12 @@
     "@angular/cli": "^22.0.4",
     "@angular/compiler-cli": "^22.0.4",
     "@angular/language-service": "^22.0.4",
-    "@angular-eslint/builder": "^22.0.0",
-    "@angular-eslint/eslint-plugin": "^22.0.0",
-    "@angular-eslint/eslint-plugin-template": "^22.0.0",
-    "@angular-eslint/schematics": "^22.0.0",
-    "@angular-eslint/template-parser": "^22.0.0",
-    "@types/node": "^25.5.2",
-    "@typescript-eslint/eslint-plugin": "^8.58.0",
-    "@typescript-eslint/parser": "^8.58.0",
     "@types/firefox-webext-browser": "^143.0.0",
+    "@types/node": "^25.5.2",
+    "angular-eslint": "^22.0.0",
     "eslint": "^9.39.4",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.62.0",
     "web-ext": "^10.1.0"
   }
 }

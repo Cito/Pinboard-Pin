@@ -1,13 +1,6 @@
 // this component is the save bookmark dialog displayed in the popup
 
-import {
-  Component,
-  ElementRef,
-  OnInit,
-  OnDestroy,
-  ChangeDetectorRef,
-  ChangeDetectionStrategy
-} from "@angular/core";
+import { Component, ElementRef, OnInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy, inject } from "@angular/core";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { CommonModule } from "@angular/common";
@@ -74,10 +67,17 @@ interface RawContent {
   selector: "app-popup",
   templateUrl: "./pinpage.component.html",
   styleUrls: ["./pinpage.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule, AgoPipe],
 })
 export class PinPageComponent implements OnInit, OnDestroy {
+  private pinboard = inject(PinboardService);
+  private storage = inject(StorageService);
+  private icon = inject(IconService);
+  private router = inject(Router);
+  private eref = inject(ElementRef);
+  private cdr = inject(ChangeDetectorRef);
+
   url!: string;
   title!: string | null;
   description!: string | null; // description
@@ -103,15 +103,6 @@ export class PinPageComponent implements OnInit, OnDestroy {
 
   private tagsSubject = new Subject<string>();
   private tagsSubscription!: Subscription;
-
-  constructor(
-    private pinboard: PinboardService,
-    private storage: StorageService,
-    private icon: IconService,
-    private router: Router,
-    private eref: ElementRef,
-    private cdr: ChangeDetectorRef
-  ) {}
 
   ngOnInit() {
     this.ready = false;
@@ -195,7 +186,7 @@ export class PinPageComponent implements OnInit, OnDestroy {
           description.slice(0, 3199) + "\u2026"
         : description
       : null;
-    let keywords: string[] = [];
+    const keywords: string[] = [];
     if (options.meta && content.keywords) {
       for (let word of content.keywords.split(",")) {
         word = word.replace(/\s+/, "").slice(0, 255).toLowerCase();

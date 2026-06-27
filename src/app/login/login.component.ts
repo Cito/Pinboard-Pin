@@ -1,6 +1,6 @@
 // this component is the login dialog displayed in the popup
 
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
@@ -20,21 +20,19 @@ export interface Login {
   selector: "app-login",
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.scss"],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, FormsModule],
 })
 export class LoginComponent implements OnInit {
+  private pinboard = inject(PinboardService);
+  private storage = inject(StorageService);
+  private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
+
   checking = false;
   error = false;
 
-  theme = "light"; // color scheme of the page
-
-  constructor(
-    private pinboard: PinboardService,
-    private storage: StorageService,
-    private router: Router,
-    private cdr: ChangeDetectorRef
-  ) {}
+  theme = "light";
 
   ngOnInit() {
     this.storage.getOptions().subscribe((options) => {
