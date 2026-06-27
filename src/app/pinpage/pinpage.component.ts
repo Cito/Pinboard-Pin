@@ -1,11 +1,12 @@
 // this component is the save bookmark dialog displayed in the popup
 
-import { Component, ElementRef, OnInit, OnDestroy, ChangeDetectorRef, inject } from "@angular/core";
+import { Component, ElementRef, OnInit, DestroyRef, ChangeDetectorRef, inject } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
 import { AgoPipe } from "../interval.pipe";
 
-import { Subscription, Subject, timer } from "rxjs";
+import { Subject, timer } from "rxjs";
 import {
   debounceTime,
   distinctUntilChanged,
@@ -68,13 +69,14 @@ interface RawContent {
   styleUrls: ["./pinpage.component.scss"],
   imports: [FormsModule, AgoPipe],
 })
-export class PinPageComponent implements OnInit, OnDestroy {
+export class PinPageComponent implements OnInit {
   private pinboard = inject(PinboardService);
   private storage = inject(StorageService);
   private icon = inject(IconService);
   private router = inject(Router);
   private eref = inject(ElementRef);
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   url!: string;
   title!: string | null;
@@ -100,7 +102,6 @@ export class PinPageComponent implements OnInit, OnDestroy {
   theme = "light"; // color scheme of the page
 
   private tagsSubject = new Subject<string>();
-  private tagsSubscription!: Subscription;
 
   ngOnInit() {
     this.ready = false;
@@ -142,16 +143,16 @@ export class PinPageComponent implements OnInit, OnDestroy {
       );
     });
     this.tagsFocus = false;
-    this.tagsSubscription = this.tagsSubject
-      .pipe(debounceTime(debounceDueTime), distinctUntilChanged())
+    this.tagsSubject
+      .pipe(
+        debounceTime(debounceDueTime),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe((value: string) => {
         this.tagsChanged(value);
         this.cdr.detectChanges();
       });
-  }
-
-  ngOnDestroy() {
-    this.tagsSubscription.unsubscribe();
   }
 
   setTheme() {

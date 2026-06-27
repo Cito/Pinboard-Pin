@@ -40,15 +40,10 @@ export class BackgroundComponent implements OnInit, OnDestroy {
   private pinboard = inject(PinboardService);
   private icon = inject(IconService);
 
-  private readonly updatedListener: UpdatedHandler;
-  private readonly messageListener: MessageHandler;
-  private readonly menuListener: MenuHandler;
-
-  constructor() {
-    this.updatedListener = this.onUpdated.bind(this);
-    this.messageListener = this.onMessage.bind(this);
-    this.menuListener = this.onMenuClicked.bind(this);
-  }
+  // stable listener references (bound once) for add/removeListener
+  private readonly updatedListener: UpdatedHandler = this.onUpdated.bind(this);
+  private readonly messageListener: MessageHandler = this.onMessage.bind(this);
+  private readonly menuListener: MenuHandler = this.onMenuClicked.bind(this);
 
   private ping = false;
   private menu = false;

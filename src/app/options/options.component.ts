@@ -28,11 +28,9 @@ export class OptionsComponent implements OnInit, OnDestroy {
 
   theme = "light"; // color scheme of the page
 
-  private readonly messageListener: (message: MessagePayload) => void;
-
-  constructor() {
-    this.messageListener = this.onMessage.bind(this);
-  }
+  // stable listener reference (bound once) for add/removeListener
+  private readonly messageListener: (message: MessagePayload) => void =
+    this.onMessage.bind(this);
 
   ngOnInit() {
     this.page = (this.storage.getInfo("options.page") as string) || "options";
