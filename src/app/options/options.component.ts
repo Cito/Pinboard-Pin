@@ -8,7 +8,7 @@ import {
   StorageService,
   defaultOptions,
 } from "../storage.service";
-import { resolveTheme } from "../util";
+import { resolveTheme, toggleListener } from "../util";
 
 // the options as bound to the signal form; the tri-state dark mode is a string
 // here because native radio controls are string-valued, and is mapped back to
@@ -97,17 +97,7 @@ export class OptionsComponent implements OnInit, OnDestroy {
 
   // set the listener for internal messages
   setOnMessageListener(on: boolean) {
-    const event = browser.runtime.onMessage;
-    const listener = this.messageListener;
-    if (event.hasListener(listener)) {
-      if (!on) {
-        void event.removeListener(listener);
-      }
-    } else {
-      if (on) {
-        void event.addListener(listener);
-      }
-    }
+    toggleListener(browser.runtime.onMessage, this.messageListener, on);
   }
 
   // fires when another process connects

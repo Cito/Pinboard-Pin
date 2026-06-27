@@ -39,6 +39,27 @@ export function errorMessage(error: unknown): string {
   return "Unknown error";
 }
 
+// add or remove a WebExtensions event listener, idempotently: register it
+// when `on` is true and not yet registered, unregister it when `on` is false
+// and currently registered
+export function toggleListener<T extends (...args: any[]) => any>(
+  event: {
+    hasListener(callback: T): boolean;
+    addListener(callback: T): void;
+    removeListener(callback: T): void;
+  },
+  listener: NoInfer<T>,
+  on: boolean
+): void {
+  if (on) {
+    if (!event.hasListener(listener)) {
+      event.addListener(listener);
+    }
+  } else if (event.hasListener(listener)) {
+    event.removeListener(listener);
+  }
+}
+
 // log an unknown error to the console and return its string message
 export function logError(error: unknown, context?: unknown): string {
   const base = errorMessage(error);

@@ -4,7 +4,7 @@ import { Component, OnInit, OnDestroy, inject } from "@angular/core";
 import { MessagePayload, Options, StorageService } from "../storage.service";
 import { PinboardService, Post } from "../pinboard.service";
 import { IconService } from "../icon.service";
-import { errorMessage, logError } from "../util";
+import { errorMessage, logError, toggleListener } from "../util";
 
 // Background page used for checking whether pages are saved in Pinboard
 
@@ -59,17 +59,7 @@ export class BackgroundComponent implements OnInit, OnDestroy {
 
   // set the listener for internal messages
   setOnMessageListener(on: boolean) {
-    const event = browser.runtime.onMessage;
-    const listener = this.messageListener;
-    if (event.hasListener(listener)) {
-      if (!on) {
-        event.removeListener(listener);
-      }
-    } else {
-      if (on) {
-        event.addListener(listener);
-      }
-    }
+    toggleListener(browser.runtime.onMessage, this.messageListener, on);
   }
 
   // fires when another process connects
@@ -89,17 +79,7 @@ export class BackgroundComponent implements OnInit, OnDestroy {
 
   // set the listener for url update in browser tabs
   setOnUpdateListener(on: boolean) {
-    const event = browser.tabs.onUpdated;
-    const listener = this.updatedListener;
-    if (event.hasListener(listener)) {
-      if (!on) {
-        void event.removeListener(listener);
-      }
-    } else {
-      if (on) {
-        void event.addListener(listener);
-      }
-    }
+    toggleListener(browser.tabs.onUpdated, this.updatedListener, on);
     this.ping = on;
   }
 
@@ -129,31 +109,27 @@ export class BackgroundComponent implements OnInit, OnDestroy {
   // set the listener for context menu clicks
   setOnMenuClickedListener(on: boolean) {
     const menus = browser.contextMenus;
-    const event = menus.onClicked;
     const listener = this.menuListener;
-    if (event.hasListener(listener)) {
-      if (!on) {
-        void event.removeListener(listener);
-        void menus.remove("save-link-to-pinboard");
-        void menus.remove("save-page-to-pinboard");
-      }
-    } else {
-      if (on) {
-        browser.contextMenus.create({
-          id: "save-page-to-pinboard",
-          title: "Save page to Pinboard",
-          contexts: ["page"],
-          documentUrlPatterns: ["http://*/*", "https://*/*"],
-          command: "_execute_browser_action",
-        });
-        void browser.contextMenus.create({
-          id: "save-link-to-pinboard",
-          title: "Save link to Pinboard",
-          contexts: ["link"],
-          targetUrlPatterns: ["http://*/*", "https://*/*"],
-        });
-        void event.addListener(listener);
-      }
+    // create/remove the menu entries only on an actual on/off transition
+    const wasOn = menus.onClicked.hasListener(listener);
+    toggleListener(menus.onClicked, listener, on);
+    if (on && !wasOn) {
+      menus.create({
+        id: "save-page-to-pinboard",
+        title: "Save page to Pinboard",
+        contexts: ["page"],
+        documentUrlPatterns: ["http://*/*", "https://*/*"],
+        command: "_execute_browser_action",
+      });
+      void menus.create({
+        id: "save-link-to-pinboard",
+        title: "Save link to Pinboard",
+        contexts: ["link"],
+        targetUrlPatterns: ["http://*/*", "https://*/*"],
+      });
+    } else if (!on && wasOn) {
+      void menus.remove("save-link-to-pinboard");
+      void menus.remove("save-page-to-pinboard");
     }
     this.menu = on;
   }
