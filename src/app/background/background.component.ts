@@ -1,6 +1,6 @@
 // this component pings the saved state of pages in the background
 
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from "@angular/core";
 import { StorageService } from "../storage.service";
 import { PinboardService } from "../pinboard.service";
 import { Post } from "../pinpage/pinpage.component";
@@ -33,6 +33,7 @@ type MenuHandler = (
 
 @Component({
   selector: "app-background",
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: "<h1>Background page for Pinboard</h1>",
 })
 export class BackgroundComponent implements OnInit, OnDestroy {

@@ -6,6 +6,7 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectorRef,
+  ChangeDetectionStrategy
 } from "@angular/core";
 import { FormsModule, NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
@@ -73,6 +74,7 @@ interface RawContent {
   selector: "app-popup",
   templateUrl: "./pinpage.component.html",
   styleUrls: ["./pinpage.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [CommonModule, FormsModule, AgoPipe],
 })
 export class PinPageComponent implements OnInit, OnDestroy {
